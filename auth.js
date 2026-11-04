@@ -2,7 +2,7 @@
 
 // 1. Importar o cliente Supabase (a biblioteca já está no index.html via CDN)
 // 2. Configurar as credenciais (SUBSTITUI PELOS TEUS VALORES)
-const SUPABASE_URL = 'https://finditschool.vercel.app';
+const SUPABASE_URL = 'https://kswqakffuudugnfudizg.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_XM9rWUkcESRXVrKFFlgNDA_VZ8XgXJl';
 
 // Inicializar o cliente Supabase
