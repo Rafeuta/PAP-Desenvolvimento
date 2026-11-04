@@ -7,8 +7,10 @@ Este projeto simula o desenvolvimento de uma aplicação web para gestão de obj
 
 ## Tecnologias Utilizadas
 - Frontend: HTML, CSS, JavaScript
-- Backend: Vercel
 - Base de Dados: SUPABASE(PostgreSQL)
+- Alojamento (Hosting): Vercel.
+- Controlo de Versões: Git e GitHub.
+
 
 ## Funcionalidades Principais
 - **Área Pública / Aluno:** Consulta de catálogo visual, pesquisa com filtros, submissão de pedidos de posse e registo de avisos ("Procura-se").
