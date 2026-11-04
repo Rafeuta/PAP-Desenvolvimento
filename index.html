@@ -1,1 +1,83 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FindIT School - Objetos Perdidos e Achados</title>
+    <!-- Ligação ao teu ficheiro CSS -->
+    <link rel="stylesheet" href="css/style.css">
+    <!-- Biblioteca do Supabase (para usarmos mais tarde) -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
 
+    <!-- Cabeçalho com o Logótipo -->
+    <header class="navbar">
+        <div class="logo-container">
+            <!-- Certifica-te que a imagem está na pasta img -->
+            <img src="img/logo.png" alt="FindIT School Logo" class="logo">
+        </div>
+        <nav class="nav-links">
+            <a href="#">Início</a>
+            <a href="#">Objetos Achados</a>
+            <a href="#" class="btn-login">Entrar / Registar</a>
+        </nav>
+    </header>
+
+    <!-- Secção Principal -->
+    <main class="container">
+        <!-- Título e Pesquisa -->
+        <section class="hero-section">
+            <h1>Encontra o que perdeste.</h1>
+            <p>Pesquisa no nosso catálogo de objetos achados na escola.</p>
+            
+            <div class="search-bar">
+                <input type="text" id="searchInput" placeholder="Pesquisar por casaco, chaves, telemóvel...">
+                <button type="button">Pesquisar</button>
+            </div>
+        </section>
+
+        <!-- Grelha de Objetos (Onde vão aparecer os cartões) -->
+        <section class="objetos-grid" id="lista-objetos">
+            
+            <!-- Cartão de Exemplo (Vais apagar isto quando ligares ao Supabase) -->
+            <div class="card-objeto">
+                <div class="foto-objeto">
+                    <!-- Placeholder temporário -->
+                    <img src="https://via.placeholder.com/300x200?text=Foto+do+Objeto" alt="Objeto">
+                </div>
+                <div class="info-objeto">
+                    <span class="categoria">Material Escolar</span>
+                    <h3>Estojo Azul</h3>
+                    <p><strong>Local:</strong> Pavilhão A</p>
+                    <p><strong>Data:</strong> 10/10/2026</p>
+                    <a href="#" class="btn-detalhes">Ver Detalhes</a>
+                </div>
+            </div>
+
+            <!-- Podes copiar este cartão para testar como fica com vários objetos -->
+            <div class="card-objeto">
+                <div class="foto-objeto">
+                    <img src="https://via.placeholder.com/300x200?text=Foto+do+Objeto" alt="Objeto">
+                </div>
+                <div class="info-objeto">
+                    <span class="categoria">Roupa</span>
+                    <h3>Casaco Preto</h3>
+                    <p><strong>Local:</strong> Refeitório</p>
+                    <p><strong>Data:</strong> 09/10/2026</p>
+                    <a href="#" class="btn-detalhes">Ver Detalhes</a>
+                </div>
+            </div>
+
+        </section>
+    </main>
+
+    <!-- Rodapé -->
+    <footer>
+        <p>&copy; 2026 FindIT School - Rafael Rodrigues. Todos os direitos reservados.</p>
+    </footer>
+
+    <!-- Ligação ao JavaScript (para depois) -->
+    <script src="js/script.js"></script>
+</body>
+</html>
