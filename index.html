@@ -1,83 +1,160 @@
 <!DOCTYPE html>
-<html lang="pt-PT">
+<html lang="pt-PT" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FindIT School - Objetos Perdidos e Achados</title>
-    <!-- Ligação ao teu ficheiro CSS -->
-    <link rel="stylesheet" href="css/style.css">
-    <!-- Biblioteca do Supabase (para usarmos mais tarde) -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-</head>
-<body>
+    
+    <!-- Tailwind CSS (Design moderno) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Configuração das cores do teu logótipo no Tailwind -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'marca-azul': '#0f3b7a',
+                        'marca-laranja': '#e67e22',
+                        'marca-azul-claro': '#1e5fbf',
+                    }
+                }
+            }
+        }
+    </script>
 
-    <!-- Cabeçalho com o Logótipo -->
-    <header class="navbar">
-        <div class="logo-container">
-            <!-- Certifica-te que a imagem está na pasta img -->
-            <img src="img/logo.png" alt="FindIT School Logo" class="logo">
+    <!-- O teu ficheiro CSS (se quiseres adicionar estilos extra) -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans antialiased flex flex-col min-h-screen">
+
+    <!-- Cabeçalho (Navbar) -->
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            <!-- Logótipo (Atenção: o caminho agora é apenas "logo.png") -->
+            <a href="index.html" class="flex items-center gap-2">
+                <img src="logo.png" alt="FindIT School" class="h-14 w-auto object-contain">
+            </a>
+            
+            <nav class="hidden md:flex gap-8">
+                <a href="#" class="text-marca-azul font-semibold hover:text-marca-laranja transition-colors">Início</a>
+                <a href="#" class="text-marca-azul font-semibold hover:text-marca-laranja transition-colors">Objetos Achados</a>
+            </nav>
+
+            <div class="flex items-center gap-4">
+                <a href="#" class="hidden md:block text-marca-azul font-semibold hover:text-marca-laranja transition-colors">Entrar</a>
+                <a href="#" class="bg-marca-laranja text-white px-5 py-2.5 rounded-lg font-bold shadow-md hover:bg-orange-600 transition-all transform hover:-translate-y-0.5">Registar</a>
+            </div>
         </div>
-        <nav class="nav-links">
-            <a href="#">Início</a>
-            <a href="#">Objetos Achados</a>
-            <a href="#" class="btn-login">Entrar / Registar</a>
-        </nav>
     </header>
 
-    <!-- Secção Principal -->
-    <main class="container">
-        <!-- Título e Pesquisa -->
-        <section class="hero-section">
-            <h1>Encontra o que perdeste.</h1>
-            <p>Pesquisa no nosso catálogo de objetos achados na escola.</p>
-            
-            <div class="search-bar">
-                <input type="text" id="searchInput" placeholder="Pesquisar por casaco, chaves, telemóvel...">
-                <button type="button">Pesquisar</button>
+    <!-- Conteúdo Principal -->
+    <main class="flex-grow">
+        
+        <!-- Secção Hero (Pesquisa) -->
+        <section class="bg-gradient-to-br from-marca-azul to-marca-azul-claro text-white py-20 px-4">
+            <div class="max-w-4xl mx-auto text-center">
+                <h1 class="text-4xl md:text-5xl font-extrabold mb-6 tracking-tight">Perdeste algo na escola?</h1>
+                <p class="text-lg md:text-xl text-blue-100 mb-10 max-w-2xl mx-auto">
+                    O FindIT School ajuda-te a encontrar os teus pertences. Pesquisa no nosso catálogo de objetos encontrados pela nossa equipa.
+                </p>
+                
+                <!-- Barra de Pesquisa -->
+                <div class="bg-white p-2 rounded-xl shadow-2xl flex flex-col md:flex-row gap-2 max-w-3xl mx-auto">
+                    <input type="text" placeholder="Pesquisar por casaco, chaves, telemóvel..." 
+                           class="flex-grow px-4 py-3 text-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-marca-laranja text-lg border-none">
+                    <button class="bg-marca-laranja text-white px-8 py-3 rounded-lg font-bold text-lg hover:bg-orange-600 transition-colors shadow-md">
+                        Pesquisar
+                    </button>
+                </div>
             </div>
         </section>
 
-        <!-- Grelha de Objetos (Onde vão aparecer os cartões) -->
-        <section class="objetos-grid" id="lista-objetos">
-            
-            <!-- Cartão de Exemplo (Vais apagar isto quando ligares ao Supabase) -->
-            <div class="card-objeto">
-                <div class="foto-objeto">
-                    <!-- Placeholder temporário -->
-                    <img src="https://via.placeholder.com/300x200?text=Foto+do+Objeto" alt="Objeto">
+        <!-- Secção de Objetos Recentes -->
+        <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+            <div class="flex justify-between items-end mb-10">
+                <div>
+                    <h2 class="text-3xl font-bold text-marca-azul">Objetos Recentes</h2>
+                    <p class="text-gray-500 mt-2">Últimos itens registados na secretaria.</p>
                 </div>
-                <div class="info-objeto">
-                    <span class="categoria">Material Escolar</span>
-                    <h3>Estojo Azul</h3>
-                    <p><strong>Local:</strong> Pavilhão A</p>
-                    <p><strong>Data:</strong> 10/10/2026</p>
-                    <a href="#" class="btn-detalhes">Ver Detalhes</a>
-                </div>
+                <a href="#" class="text-marca-laranja font-semibold hover:underline hidden sm:block">Ver todos &rarr;</a>
             </div>
 
-            <!-- Podes copiar este cartão para testar como fica com vários objetos -->
-            <div class="card-objeto">
-                <div class="foto-objeto">
-                    <img src="https://via.placeholder.com/300x200?text=Foto+do+Objeto" alt="Objeto">
-                </div>
-                <div class="info-objeto">
-                    <span class="categoria">Roupa</span>
-                    <h3>Casaco Preto</h3>
-                    <p><strong>Local:</strong> Refeitório</p>
-                    <p><strong>Data:</strong> 09/10/2026</p>
-                    <a href="#" class="btn-detalhes">Ver Detalhes</a>
-                </div>
-            </div>
+            <!-- Grelha de Objetos -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                
+                <!-- Cartão 1 -->
+                <article class="bg-white rounded-2xl shadow-sm hover:shadow-xl transition-shadow duration-300 overflow-hidden border border-gray-100 group">
+                    <div class="h-56 bg-gray-200 overflow-hidden relative">
+                        <!-- Imagem de exemplo temporária -->
+                        <img src="https://images.unsplash.com/photo-1544816155-12df9643f363?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Casaco" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                        <span class="absolute top-4 right-4 bg-marca-laranja text-white text-xs font-bold px-3 py-1 rounded-full shadow-sm">Achado</span>
+                    </div>
+                    <div class="p-6">
+                        <span class="text-xs font-bold text-marca-azul-claro uppercase tracking-wider">Vestuário</span>
+                        <h3 class="text-xl font-bold text-gray-900 mt-2 mb-3">Casaco Preto Nike</h3>
+                        <div class="flex items-center text-sm text-gray-500 gap-2 mb-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                            Refeitório
+                        </div>
+                        <div class="flex items-center text-sm text-gray-500 gap-2 mb-6">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                            12 de Outubro, 2026
+                        </div>
+                        <a href="#" class="block w-full text-center bg-gray-50 text-marca-azul font-bold py-3 rounded-xl border border-gray-200 hover:bg-marca-azul hover:text-white hover:border-marca-azul transition-colors">Ver Detalhes</a>
+                    </div>
+                </article>
 
+                <!-- Cartão 2 -->
+                <article class="bg-white rounded-2xl shadow-sm hover:shadow-xl transition-shadow duration-300 overflow-hidden border border-gray-100 group">
+                    <div class="h-56 bg-gray-200 overflow-hidden relative">
+                        <img src="https://images.unsplash.com/photo-1585386959984-a4155224a1ad?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Garrafa" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                        <span class="absolute top-4 right-4 bg-marca-laranja text-white text-xs font-bold px-3 py-1 rounded-full shadow-sm">Achado</span>
+                    </div>
+                    <div class="p-6">
+                        <span class="text-xs font-bold text-marca-azul-claro uppercase tracking-wider">Acessórios</span>
+                        <h3 class="text-xl font-bold text-gray-900 mt-2 mb-3">Garrafa de Água Azul</h3>
+                        <div class="flex items-center text-sm text-gray-500 gap-2 mb-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                            Pavilhão Desportivo
+                        </div>
+                        <div class="flex items-center text-sm text-gray-500 gap-2 mb-6">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                            10 de Outubro, 2026
+                        </div>
+                        <a href="#" class="block w-full text-center bg-gray-50 text-marca-azul font-bold py-3 rounded-xl border border-gray-200 hover:bg-marca-azul hover:text-white hover:border-marca-azul transition-colors">Ver Detalhes</a>
+                    </div>
+                </article>
+
+                <!-- Cartão 3 -->
+                <article class="bg-white rounded-2xl shadow-sm hover:shadow-xl transition-shadow duration-300 overflow-hidden border border-gray-100 group">
+                    <div class="h-56 bg-gray-200 overflow-hidden relative">
+                        <img src="https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Chaves" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                        <span class="absolute top-4 right-4 bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full shadow-sm">Procura-se</span>
+                    </div>
+                    <div class="p-6">
+                        <span class="text-xs font-bold text-marca-azul-claro uppercase tracking-wider">Chaves</span>
+                        <h3 class="text-xl font-bold text-gray-900 mt-2 mb-3">Molho de Chaves</h3>
+                        <div class="flex items-center text-sm text-gray-500 gap-2 mb-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                            Sala 12
+                        </div>
+                        <div class="flex items-center text-sm text-gray-500 gap-2 mb-6">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                            8 de Outubro, 2026
+                        </div>
+                        <a href="#" class="block w-full text-center bg-gray-50 text-marca-azul font-bold py-3 rounded-xl border border-gray-200 hover:bg-marca-azul hover:text-white hover:border-marca-azul transition-colors">Ver Detalhes</a>
+                    </div>
+                </article>
+
+            </div>
         </section>
     </main>
 
     <!-- Rodapé -->
-    <footer>
-        <p>&copy; 2026 FindIT School - Rafael Rodrigues. Todos os direitos reservados.</p>
+    <footer class="bg-marca-azul text-blue-200 py-8 text-center mt-auto">
+        <p>&copy; 2026 FindIT School - Rafael Rodrigues. Prova de Aptidão Profissional.</p>
     </footer>
 
-    <!-- Ligação ao JavaScript (para depois) -->
-    <script src="js/script.js"></script>
 </body>
 </html>
