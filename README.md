@@ -1,5 +1,5 @@
 # PAP-Desenvolvimento
-Plataforma web para gestão e recuperação de objetos perdidos e achados numa instituição de ensino. Desenvolvido em PHP, MySQL, HTML, CSS e JavaScript.
+Plataforma web para gestão e recuperação de objetos perdidos e achados numa instituição de ensino. Desenvolvido em HTML, CSS e JavaScript.
 
 # FindIt School – Sistema de Gestão e Recuperação de Objetos Perdidos e Achados
 
