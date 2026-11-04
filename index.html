@@ -1,163 +1,91 @@
 <!DOCTYPE html>
-<html lang="pt-PT" class="scroll-smooth">
+<html lang="pt-PT">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FindIT School - Objetos Perdidos e Achados</title>
+    <title>Teste FindIT School</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Configuração de Cores -->
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        'marca-azul': '#0f3b7a',
-                        'marca-laranja': '#e67e22',
-                        'marca-azul-claro': '#1e5fbf',
-                    }
-                }
-            }
-        }
-    </script>
-
-    <!-- Biblioteca do Supabase (CDN) -->
+    <!-- Supabase Library -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-    <!-- O teu CSS para o Modal e pequenos ajustes -->
-    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Estilo simples para o botão */
+        .btn { background-color: #e67e22; color: white; padding: 10px 20px; border-radius: 5px; font-weight: bold; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; }
+        .modal.active { display: flex; }
+        .modal-content { background: white; padding: 20px; border-radius: 10px; width: 300px; }
+    </style>
 </head>
-<body class="bg-gray-50 text-gray-800 font-sans antialiased flex flex-col min-h-screen">
+<body class="bg-gray-100 p-10 font-sans">
 
-    <!-- Cabeçalho (Navbar) -->
-    <header class="bg-white shadow-sm sticky top-0 z-40">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
-            <a href="index.html" class="flex items-center gap-2">
-                <img src="logo.png" alt="FindIT School" class="h-14 w-auto object-contain">
-            </a>
+    <h1 class="text-3xl font-bold text-blue-900 mb-6">Teste FindIT School</h1>
+
+    <!-- Botão que abre o modal -->
+    <button id="btn-abrir" class="btn">Entrar / Registar</button>
+
+    <!-- O Modal (Janela) -->
+    <div id="meu-modal" class="modal">
+        <div class="modal-content">
+            <h2 class="text-xl font-bold mb-4">Login / Registo</h2>
             
-            <nav class="hidden md:flex gap-8">
-                <a href="#" class="text-marca-azul font-semibold hover:text-marca-laranja transition-colors">Início</a>
-                <a href="#" class="text-marca-azul font-semibold hover:text-marca-laranja transition-colors">Objetos Achados</a>
-            </nav>
-
-            <!-- Área de Autenticação -->
-            <div class="flex items-center gap-4">
-                <!-- Botão que abre o modal (só aparece se não tiver sessão) -->
-                <button id="auth-btn" onclick="openAuthModal()" class="bg-marca-laranja text-white px-5 py-2.5 rounded-lg font-bold shadow-md hover:bg-orange-600 transition-all transform hover:-translate-y-0.5">
-                    Entrar / Registar
-                </button>
-
-                <!-- Informação do utilizador (só aparece se tiver sessão) -->
-                <div id="user-info" class="flex items-center gap-3 hidden">
-                    <span class="text-sm font-semibold text-marca-azul" id="user-email"></span>
-                    <button id="logout-button" class="text-sm bg-gray-200 text-gray-700 px-3 py-2 rounded-lg font-semibold hover:bg-gray-300 transition-colors">Sair</button>
-                </div>
-            </div>
-        </div>
-    </header>
-
-    <!-- Restante conteúdo da página (Hero, Cartões, etc.) -->
-    <main class="flex-grow">
-        <!-- ... (O conteúdo que já tinhas anteriormente para a barra de pesquisa e cartões) ... -->
-        <section class="bg-gradient-to-br from-marca-azul to-marca-azul-claro text-white py-20 px-4 text-center">
-            <h1 class="text-4xl md:text-5xl font-extrabold mb-6 tracking-tight">Perdeste algo na escola?</h1>
-            <p class="text-lg md:text-xl text-blue-100 mb-10 max-w-2xl mx-auto">O FindIT School ajuda-te a encontrar os teus pertences.</p>
-            <!-- Barra de Pesquisa (Exemplo) -->
-            <div class="bg-white p-2 rounded-xl shadow-2xl flex flex-col md:flex-row gap-2 max-w-3xl mx-auto">
-                <input type="text" placeholder="Pesquisar..." class="flex-grow px-4 py-3 text-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-marca-laranja text-lg border-none">
-                <button class="bg-marca-laranja text-white px-8 py-3 rounded-lg font-bold text-lg">Pesquisar</button>
-            </div>
-        </section>
-        <!-- Grelha de Objetos (podes manter os cartões de exemplo) -->
-    </main>
-
-    <!-- Rodapé -->
-    <footer class="bg-marca-azul text-blue-200 py-8 text-center mt-auto">
-        <p>&copy; 2026 FindIT School - Rafael Rodrigues. PAP.</p>
-    </footer>
-
-    <!-- ========================================== -->
-    <!-- MODAL DE AUTENTICAÇÃO (JANELA DE LOGIN) -->
-    <!-- ========================================== -->
-    <div id="auth-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50 p-4">
-        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden relative">
-            <!-- Botão para fechar (X) -->
-            <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-700 text-2xl font-bold">&times;</button>
-
-            <!-- Conteúdo do Modal -->
-            <div class="p-8">
-                <div class="text-center mb-6">
-                    <img src="logo.png" alt="FindIT School" class="h-12 mx-auto mb-4">
-                    <h2 id="auth-title" class="text-2xl font-bold text-marca-azul">Bem-vindo de volta</h2>
-                </div>
-
-                <!-- Mensagens de erro/sucesso -->
-                <div id="auth-message" class="mb-4 text-center text-sm font-semibold h-4"></div>
-
-                <!-- Formulário de LOGIN -->
-                <form id="login-form" class="space-y-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                        <input type="email" id="login-email" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-marca-azul focus:border-marca-azul outline-none">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
-                        <input type="password" id="login-password" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-marca-azul focus:border-marca-azul outline-none">
-                    </div>
-                    <button type="submit" class="w-full bg-marca-azul text-white font-bold py-3 rounded-lg hover:bg-blue-900 transition-colors">Entrar</button>
-                </form>
-
-                <!-- Formulário de REGISTO (escondido por defeito) -->
-                <form id="register-form" class="space-y-4 hidden">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                        <input type="email" id="register-email" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-marca-azul focus:border-marca-azul outline-none">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Password (mínimo 6 caracteres)</label>
-                        <input type="password" id="register-password" required minlength="6" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-marca-azul focus:border-marca-azul outline-none">
-                    </div>
-                    <button type="submit" class="w-full bg-marca-laranja text-white font-bold py-3 rounded-lg hover:bg-orange-600 transition-colors">Criar Conta</button>
-                </form>
-
-                <!-- Link para trocar entre Login e Registo -->
-                <div class="text-center mt-6 text-sm text-gray-600">
-                    <span id="toggle-text">Ainda não tens conta?</span>
-                    <a href="#" id="toggle-auth" class="text-marca-laranja font-bold hover:underline ml-1">Regista-te aqui</a>
-                </div>
-            </div>
+            <input type="email" id="email" placeholder="O teu email" class="border p-2 w-full mb-2 rounded">
+            <input type="password" id="senha" placeholder="A tua password" class="border p-2 w-full mb-4 rounded">
+            
+            <button id="btn-login" class="btn w-full mb-2">Fazer Login</button>
+            <button id="btn-fechar" class="text-gray-500 w-full text-sm hover:underline">Fechar</button>
+            
+            <p id="msg" class="text-center mt-4 text-sm font-bold text-red-500"></p>
         </div>
     </div>
 
-    <!-- Ligação ao JavaScript -->
-    <script src="auth.js"></script>
-    <!-- Script para alternar entre os formulários de Login e Registo -->
+    <!-- JAVASCRIPT -->
     <script>
-        document.getElementById('toggle-auth').addEventListener('click', (e) => {
-            e.preventDefault();
-            const loginForm = document.getElementById('login-form');
-            const registerForm = document.getElementById('register-form');
-            const authTitle = document.getElementById('auth-title');
-            const toggleText = document.getElementById('toggle-text');
-            const toggleLink = document.getElementById('toggle-auth');
+        // 1. COLOCA AS TUAS CHAVES AQUI
+        const SUPABASE_URL = 'https://kswqakffuudugnfudizg.supabase.co';
+        const SUPABASE_ANON_KEY = 'COLOCA_AQUI_A_TUA_PUBLISHABLE_KEY';
 
-            if (loginForm.classList.contains('hidden')) {
-                // Mudar para Login
-                loginForm.classList.remove('hidden');
-                registerForm.classList.add('hidden');
-                authTitle.textContent = 'Bem-vindo de volta';
-                toggleText.textContent = 'Ainda não tens conta?';
-                toggleLink.textContent = 'Regista-te aqui';
+        // 2. Iniciar o Supabase
+        const supabase = supabasejs.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // 3. Elementos do HTML
+        const btnAbrir = document.getElementById('btn-abrir');
+        const modal = document.getElementById('meu-modal');
+        const btnFechar = document.getElementById('btn-fechar');
+        const btnLogin = document.getElementById('btn-login');
+        const msg = document.getElementById('msg');
+
+        // 4. Abrir e Fechar Modal
+        btnAbrir.addEventListener('click', () => {
+            modal.classList.add('active');
+        });
+
+        btnFechar.addEventListener('click', () => {
+            modal.classList.remove('active');
+        });
+
+        // 5. Lógica de Login
+        btnLogin.addEventListener('click', async () => {
+            const email = document.getElementById('email').value;
+            const senha = document.getElementById('senha').value;
+            
+            msg.textContent = "A tentar entrar...";
+            msg.className = "text-center mt-4 text-sm font-bold text-blue-500";
+
+            const { data, error } = await supabase.auth.signInWithPassword({
+                email: email,
+                password: senha,
+            });
+
+            if (error) {
+                msg.textContent = "Erro: " + error.message;
+                msg.className = "text-center mt-4 text-sm font-bold text-red-500";
             } else {
-                // Mudar para Registo
-                loginForm.classList.add('hidden');
-                registerForm.classList.remove('hidden');
-                authTitle.textContent = 'Cria a tua conta';
-                toggleText.textContent = 'Já tens conta?';
-                toggleLink.textContent = 'Entra aqui';
+                msg.textContent = "Login com sucesso!";
+                msg.className = "text-center mt-4 text-sm font-bold text-green-500";
+                setTimeout(() => modal.classList.remove('active'), 1500);
             }
         });
     </script>
