@@ -2,8 +2,8 @@
 
 // 1. Importar o cliente Supabase (a biblioteca já está no index.html via CDN)
 // 2. Configurar as credenciais (SUBSTITUI PELOS TEUS VALORES)
-const SUPABASE_URL = 'O_TEU_SUPABASE_URL';
-const SUPABASE_ANON_KEY = 'A_TUA_SUPABASE_ANON_KEY';
+const SUPABASE_URL = 'https://sb_publishable_XM9rWUkcESRXVrKFFlgNDA_VZ8XgXJl.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_XM9rWUkcESRXVrKFFlgNDA_VZ8XgXJl';
 
 // Inicializar o cliente Supabase
 const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
