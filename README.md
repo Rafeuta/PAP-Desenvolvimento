@@ -7,12 +7,12 @@ Este projeto simula o desenvolvimento de uma aplicação web para gestão de obj
 
 ## Tecnologias Utilizadas
 - Frontend: HTML, CSS, JavaScript
-- Backend: PHP
-- Base de Dados: MySQL
+- Backend: Vercel
+- Base de Dados: SUPABASE(PostgreSQL)
 
 ## Funcionalidades Principais
 - **Área Pública / Aluno:** Consulta de catálogo visual, pesquisa com filtros, submissão de pedidos de posse e registo de avisos ("Procura-se").
-- **Área de Administração (Portaria / Secretaria):** Registo de novos itens, gestão do catálogo, análise de pedidos e atualização do estado dos objetos para "Devolvido".
+- **Área de Administração (Funcionários / Secretaria):** Registo de novos itens, gestão do catálogo, análise de pedidos e atualização do estado dos objetos para "Devolvido".
 
 ## Objetivo
 Reduzir o desperdício e aumentar a taxa de recuperação de pertences, modernizando os processos administrativos da escola.
