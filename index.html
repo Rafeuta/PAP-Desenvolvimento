@@ -5,8 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FindIT School - Objetos Perdidos</title>
     
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
+    <!-- Configuração das Cores -->
     <script>
         tailwind.config = {
             theme: {
@@ -14,29 +16,42 @@
                     colors: {
                         'marca-azul': '#0f3b7a',
                         'marca-laranja': '#e67e22',
+                    },
+                    boxShadow: {
+                        'suave': '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
                     }
                 }
             }
         }
     </script>
+
+    <!-- Biblioteca do Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    
-    <!-- O nosso novo ficheiro CSS -->
+
     <link rel="stylesheet" href="style.css">
 </head>
-<body class="text-gray-800 flex flex-col min-h-screen relative">
+<body class="bg-gray-50 text-gray-800 font-sans flex flex-col min-h-screen">
 
-    <!-- Cabeçalho de Vidro (Glassmorphism) -->
-    <header class="glass-panel sticky top-0 z-40 shadow-sm transition-all duration-300">
+    <!-- Cabeçalho Moderno -->
+    <header class="bg-white/90 backdrop-blur-md border-b border-gray-100 sticky top-0 z-40 transition-all duration-300">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 md:h-24 flex items-center justify-between">
+            
             <a href="index.html" class="flex items-center gap-2 group">
-                <img src="logo.png" alt="FindIT School" class="h-16 md:h-20 w-auto object-contain transition-transform group-hover:scale-105 group-hover:-rotate-2">
+                <img src="logo.png" alt="FindIT School" class="h-16 md:h-20 w-auto object-contain transition-transform group-hover:scale-105">
             </a>
             
             <div class="flex items-center gap-4">
+                <!-- Botão Entrar (Escondido quando logado) -->
                 <button onclick="abrirModal()" id="btn-login-nav" class="btn-premium min-h-[44px] flex items-center">
-                    Entrar (Funcionários)
+                    Entrar
                 </button>
+                
+                <!-- Botão Ir para o Painel (Aparece quando logado) -->
+                <a href="dashboard.html" id="btn-dashboard-nav" class="hidden min-h-[44px] bg-marca-azul text-white px-6 py-2.5 rounded-xl font-bold shadow-md hover:bg-blue-900 transition-all duration-200 flex items-center">
+                    Ir para o Painel
+                </a>
+
+                <!-- Botão Sair (Aparece quando logado) -->
                 <button onclick="fazerLogout()" id="btn-logout-nav" class="hidden min-h-[44px] bg-red-500 text-white px-6 py-2.5 rounded-xl font-bold shadow-md hover:bg-red-600 transition-all duration-200 flex items-center">
                     Sair
                 </button>
@@ -46,7 +61,7 @@
 
     <!-- Conteúdo Principal -->
     <main class="flex-grow">
-        <!-- Hero Section com Mesh Gradient -->
+        <!-- Hero Section -->
         <section class="hero-mesh text-white py-16 px-4 text-center relative overflow-hidden">
             <div class="relative z-10 max-w-4xl mx-auto">
                 <h1 class="text-4xl md:text-6xl font-extrabold mb-6 tracking-tight drop-shadow-lg leading-tight">
@@ -56,7 +71,6 @@
                     Consulta o catálogo em tempo real ou cria um alerta para seres notificado assim que o teu objeto aparecer.
                 </p>
                 
-                <!-- Barra de Pesquisa Premium -->
                 <div class="max-w-3xl mx-auto flex flex-col sm:flex-row gap-3 justify-center p-2">
                     <div class="flex-grow flex gap-2 bg-white rounded-2xl shadow-xl p-1">
                         <input type="text" id="pesquisa" placeholder="O que procuras? (ex: AirPods, Casaco...)" class="input-premium w-full min-h-[50px] px-5 py-3 rounded-xl text-gray-800 bg-gray-50">
@@ -85,7 +99,6 @@
 
         <!-- Catálogo -->
         <section class="max-w-7xl mx-auto px-4 py-8 relative z-10">
-            <!-- Adicionei a classe 'catalogo-grid' -->
             <div id="catalogo" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
                 <!-- Os cartões entram aqui -->
             </div>
@@ -100,7 +113,7 @@
         </div>
     </footer>
 
-    <!-- MODAL DE LOGIN Premium -->
+    <!-- MODAL DE LOGIN -->
     <div id="modal-login" class="fixed inset-0 bg-black/60 hidden items-center justify-center z-50 p-4 backdrop-blur-md transition-opacity duration-300">
         <div class="modal-content bg-white rounded-3xl shadow-2xl w-full max-w-md p-8 relative">
             <button onclick="fecharModal()" class="absolute top-5 right-5 text-gray-400 hover:text-gray-800 bg-gray-100 hover:bg-gray-200 rounded-full w-10 h-10 flex items-center justify-center text-2xl font-bold transition-colors">&times;</button>
