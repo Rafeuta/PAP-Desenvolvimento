@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - FindIT School</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        tailwind.config = {
+            theme: { extend: { colors: { 'marca-azul': '#0f3b7a', 'marca-laranja': '#e67e22' } } }
+        }
+    </script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-gray-100 font-sans flex h-screen overflow-hidden">
+
+    <!-- Sidebar do Funcionário -->
+    <aside class="w-64 bg-marca-azul text-white flex flex-col shadow-xl z-20">
+        <div class="h-24 flex items-center justify-center bg-blue-900 border-b border-blue-800">
+            <img src="logo.png" alt="FindIT" class="h-14 brightness-0 invert">
+        </div>
+        <nav class="flex-grow py-6 px-4 space-y-2">
+            <a href="#" class="block px-4 py-3 bg-white/10 rounded-lg font-bold border-l-4 border-marca-laranja">Registar Objetos</a>
+            <a href="index.html" class="block px-4 py-3 hover:bg-white/5 rounded-lg transition-colors text-blue-200">Ver Site Público</a>
+        </nav>
+        <div class="p-4 border-t border-blue-800">
+            <button id="btn-logout" class="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-2 rounded-lg transition-colors">Sair</button>
+        </div>
+    </aside>
+
+    <!-- Conteúdo Principal -->
+    <main class="flex-grow flex flex-col overflow-y-auto">
+        <!-- Cabeçalho do Dashboard -->
+        <header class="bg-white shadow-sm h-20 flex items-center justify-between px-8 sticky top-0 z-10">
+            <h1 class="text-2xl font-bold text-gray-800">Painel do Funcionário</h1>
+            <div class="flex items-center gap-3">
+                <span id="user-email" class="text-sm font-bold text-gray-600 bg-gray-100 px-3 py-1 rounded-full">A carregar...</span>
+            </div>
+        </header>
+
+        <div class="p-8 max-w-6xl mx-auto w-full">
+            <!-- Formulário de Registo -->
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 mb-8">
+                <h2 class="text-xl font-bold text-marca-azul mb-4">Adicionar Novo Objeto Achado</h2>
+                <form id="form-objeto" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-1">Título do Objeto</label>
+                        <input type="text" id="titulo" required class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-marca-azul">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-1">Categoria</label>
+                        <select id="categoria" required class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-marca-azul">
+                            <option value="Eletrónica">Eletrónica</option>
+                            <option value="Roupa">Roupa</option>
+                            <option value="Material Escolar">Material Escolar</option>
+                            <option value="Chaves">Chaves</option>
+                            <option value="Outros">Outros</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-1">Sala / Local</label>
+                        <input type="text" id="sala" placeholder="Ex: Sala 1.6" required class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-marca-azul">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-1">Fotografia (Obrigatório)</label>
+                        <input type="file" id="foto" accept="image/*" required class="w-full px-4 py-2 border rounded-lg text-sm bg-gray-50">
+                    </div>
+                    <div class="md:col-span-2 flex justify-end mt-2">
+                        <button type="submit" id="btn-submit" class="bg-marca-laranja text-white font-bold py-2.5 px-8 rounded-lg shadow hover:bg-orange-600 transition-all">Guardar Objeto</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Tabela de Objetos -->
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+                <div class="p-6 border-b border-gray-200">
+                    <h2 class="text-xl font-bold text-marca-azul">Objetos Registados</h2>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-gray-50 text-gray-600 text-sm border-b border-gray-200">
+                                <th class="p-4 font-bold">Foto</th>
+                                <th class="p-4 font-bold">Título</th>
+                                <th class="p-4 font-bold">Sala</th>
+                                <th class="p-4 font-bold">Estado</th>
+                                <th class="p-4 font-bold text-center">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabela-corpo">
+                            <!-- Linhas inseridas via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="dashboard.js"></script>
+</body>
+</html>
