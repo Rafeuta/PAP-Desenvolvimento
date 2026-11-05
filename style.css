@@ -1,4 +1,192 @@
-/* Efeito de desfoque no fundo do modal */
-#modal-login {
-    backdrop-filter: blur(4px);
+/* =========================================
+   IMPORTAÇÃO DE FONTE PREMIUM (Google Fonts)
+   ========================================= */
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+:root {
+    --azul-primario: #0f3b7a;
+    --laranja-primario: #e67e22;
+    --fundo-site: #f8fafc;
+}
+
+/* =========================================
+   RESET E ESTILOS GLOBAIS
+   ========================================= */
+body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    background-color: var(--fundo-site);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    /* Fundo com grelha subtil para dar um ar tecnológico */
+    background-image: 
+        linear-gradient(to right, #e2e8f0 1px, transparent 1px),
+        linear-gradient(to bottom, #e2e8f0 1px, transparent 1px);
+    background-size: 40px 40px;
+    background-position: center top;
+}
+
+/* =========================================
+   BARRA DE SCROLL PERSONALIZADA (Estilo App)
+   ========================================= */
+::-webkit-scrollbar {
+    width: 10px;
+}
+::-webkit-scrollbar-track {
+    background: #f1f5f9;
+}
+::-webkit-scrollbar-thumb {
+    background: var(--azul-primario);
+    border-radius: 10px;
+    border: 2px solid #f1f5f9;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: var(--laranja-primario);
+}
+
+/* =========================================
+   ANIMAÇÕES (Keyframes)
+   ========================================= */
+@keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes float {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+    100% { transform: translateY(0px); }
+}
+
+@keyframes pulseGlow {
+    0% { box-shadow: 0 0 0 0 rgba(230, 126, 34, 0.4); }
+    70% { box-shadow: 0 0 0 15px rgba(230, 126, 34, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(230, 126, 34, 0); }
+}
+
+@keyframes scaleIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+/* =========================================
+   HERO SECTION (Efeito Mesh Gradient Animado)
+   ========================================= */
+.hero-mesh {
+    background-color: var(--azul-primario);
+    background-image: 
+        radial-gradient(at 0% 0%, hsla(219, 67%, 27%, 1) 0, transparent 50%), 
+        radial-gradient(at 50% 0%, hsla(219, 70%, 40%, 1) 0, transparent 50%), 
+        radial-gradient(at 100% 0%, hsla(28, 80%, 52%, 1) 0, transparent 50%);
+}
+
+/* =========================================
+   COMPONENTES PERSONALIZADOS
+   ========================================= */
+
+/* Botão Premium com Gradiente e Efeito 3D */
+.btn-premium {
+    background: linear-gradient(135deg, var(--laranja-primario) 0%, #d35400 100%);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 12px 24px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 15px rgba(230, 126, 34, 0.3);
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-premium::after {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%; width: 100%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: all 0.5s;
+}
+
+.btn-premium:hover {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 8px 25px rgba(230, 126, 34, 0.4);
+}
+
+.btn-premium:hover::after {
+    left: 100%;
+}
+
+/* Efeito de Vidro (Glassmorphism) para o Cabeçalho e Modal */
+.glass-panel {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+/* Cartões de Objetos (Efeito 3D no Hover) */
+.card-objeto {
+    background: white;
+    border-radius: 16px;
+    overflow: hidden;
+    transition: all 0.4s ease;
+    animation: fadeUp 0.6s ease backwards;
+    border: 1px solid #f1f5f9;
+}
+
+.card-objeto:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 20px 40px -10px rgba(15, 59, 122, 0.15);
+    border-color: #e2e8f0;
+}
+
+.card-objeto img {
+    transition: transform 0.6s ease;
+}
+
+.card-objeto:hover img {
+    transform: scale(1.1);
+}
+
+/* Barra de Pesquisa com Efeito de Foco Brilhante */
+.input-premium {
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+}
+
+.input-premium:focus {
+    outline: none;
+    border-color: var(--laranja-primario);
+    box-shadow: 0 0 0 4px rgba(230, 126, 34, 0.1);
+    background-color: white;
+}
+
+/* Botões de Filtro (Pílulas) */
+.filter-btn {
+    transition: all 0.3s ease;
+    border: 1px solid transparent;
+}
+
+.filter-btn:hover {
+    transform: translateY(-2px);
+}
+
+.filter-btn.active {
+    background: var(--azul-primario);
+    color: white;
+    box-shadow: 0 4px 12px rgba(15, 59, 122, 0.3);
+}
+
+/* Animação do Modal (Entra a dar um "saltinho") */
+.modal-content {
+    animation: scaleIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* Botão de Alerta a Pulsar */
+.btn-alerta {
+    animation: pulseGlow 2s infinite;
+}
+
+/* Empty State (Ícone a flutuar) */
+.empty-state-icon {
+    animation: float 3s ease-in-out infinite;
 }
