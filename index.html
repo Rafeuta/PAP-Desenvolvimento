@@ -5,10 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FindIT School - Objetos Perdidos</title>
     
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
-    <!-- Configuração das Cores -->
     <script>
         tailwind.config = {
             theme: {
@@ -18,43 +17,57 @@
                         'marca-laranja': '#e67e22',
                     },
                     boxShadow: {
-                        'suave': '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
+                        'premium': '0 10px 40px -10px rgba(0,0,0,0.08)',
+                        'premium-hover': '0 20px 40px -10px rgba(15, 59, 122, 0.15)',
                     }
                 }
             }
         }
     </script>
-
-    <!-- Biblioteca do Supabase -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
     <link rel="stylesheet" href="style.css">
 </head>
 <body class="bg-gray-50 text-gray-800 font-sans flex flex-col min-h-screen">
 
-    <!-- Cabeçalho Moderno -->
-    <header class="bg-white/90 backdrop-blur-md border-b border-gray-100 sticky top-0 z-40 transition-all duration-300">
+    <!-- Cabeçalho Premium -->
+    <header class="bg-white/80 backdrop-blur-lg border-b border-gray-100 sticky top-0 z-50 transition-all duration-300">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 md:h-24 flex items-center justify-between">
             
-            <a href="index.html" class="flex items-center gap-2 group">
-                <img src="logo.png" alt="FindIT School" class="h-16 md:h-20 w-auto object-contain transition-transform group-hover:scale-105">
+            <!-- Logótipo -->
+            <a href="index.html" class="flex items-center group">
+                <img src="logo.png" alt="FindIT School" class="h-14 md:h-18 w-auto object-contain transition-transform duration-300 group-hover:scale-105">
             </a>
             
+            <!-- Área de Utilizador -->
             <div class="flex items-center gap-4">
-                <!-- Botão Entrar (Escondido quando logado) -->
-                <button onclick="abrirModal()" id="btn-login-nav" class="btn-premium min-h-[44px] flex items-center">
+                
+                <!-- Botão Entrar (Não Logado) -->
+                <button onclick="abrirModal()" id="btn-login-nav" class="bg-marca-azul text-white px-6 py-2.5 rounded-full font-bold shadow-md hover:bg-blue-900 hover:shadow-lg transition-all duration-300 flex items-center gap-2 text-sm md:text-base">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"></path></svg>
                     Entrar
                 </button>
-                
-                <!-- Botão Ir para o Painel (Aparece quando logado) -->
-                <a href="dashboard.html" id="btn-dashboard-nav" class="hidden min-h-[44px] bg-marca-azul text-white px-6 py-2.5 rounded-xl font-bold shadow-md hover:bg-blue-900 transition-all duration-200 flex items-center">
-                    Ir para o Painel
-                </a>
 
-                <!-- Botão Sair (Aparece quando logado) -->
-                <button onclick="fazerLogout()" id="btn-logout-nav" class="hidden min-h-[44px] bg-red-500 text-white px-6 py-2.5 rounded-xl font-bold shadow-md hover:bg-red-600 transition-all duration-200 flex items-center">
-                    Sair
-                </button>
+                <!-- Menu de Perfil (Logado) - Oculto por defeito -->
+                <div id="user-menu-container" class="hidden relative">
+                    <button onclick="toggleUserMenu()" class="flex items-center gap-2 bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded-full transition-colors border border-gray-200">
+                        <div class="w-8 h-8 bg-marca-laranja rounded-full flex items-center justify-center text-white font-bold text-sm">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                        </div>
+                        <span class="text-sm font-bold text-gray-700 hidden md:block">A minha conta</span>
+                        <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    <!-- Dropdown -->
+                    <div id="user-dropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-premium border border-gray-100 py-2 z-50">
+                        <a href="dashboard.html" class="block px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 hover:text-marca-azul flex items-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+                            Ir para o Painel
+                        </a>
+                        <hr class="my-1 border-gray-100">
+                        <button onclick="fazerLogout()" class="w-full text-left px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-50 flex items-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                            Sair
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     </header>
@@ -62,66 +75,71 @@
     <!-- Conteúdo Principal -->
     <main class="flex-grow">
         <!-- Hero Section -->
-        <section class="hero-mesh text-white py-16 px-4 text-center relative overflow-hidden">
+        <section class="hero-mesh text-white pt-20 pb-32 px-4 text-center relative overflow-hidden">
             <div class="relative z-10 max-w-4xl mx-auto">
                 <h1 class="text-4xl md:text-6xl font-extrabold mb-6 tracking-tight drop-shadow-lg leading-tight">
                     Encontra o que <span class="text-marca-laranja">perdeste.</span>
                 </h1>
-                <p class="text-lg md:text-xl text-blue-100 mb-10 max-w-2xl mx-auto font-medium">
-                    Consulta o catálogo em tempo real ou cria um alerta para seres notificado assim que o teu objeto aparecer.
+                <p class="text-lg md:text-xl text-blue-100 mb-8 max-w-2xl mx-auto font-medium">
+                    Consulta o catálogo em tempo real ou cria um alerta para seres notificado.
                 </p>
-                
-                <div class="max-w-3xl mx-auto flex flex-col sm:flex-row gap-3 justify-center p-2">
-                    <div class="flex-grow flex gap-2 bg-white rounded-2xl shadow-xl p-1">
-                        <input type="text" id="pesquisa" placeholder="O que procuras? (ex: AirPods, Casaco...)" class="input-premium w-full min-h-[50px] px-5 py-3 rounded-xl text-gray-800 bg-gray-50">
-                        <button onclick="carregarObjetos()" class="min-h-[50px] bg-marca-azul text-white px-8 py-3 rounded-xl font-bold hover:bg-blue-900 transition-all shadow-md hover:shadow-lg">
-                            Pesquisar
-                        </button>
-                    </div>
-                    <button onclick="alert('Em breve: Formulário de Alerta')" class="btn-alerta min-h-[50px] bg-white text-marca-azul px-6 py-3 rounded-2xl font-bold shadow-xl hover:bg-gray-50 transition-all flex items-center justify-center gap-2 border-2 border-transparent hover:border-marca-laranja">
-                        <svg class="w-6 h-6 text-marca-laranja" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
-                        Criar Alerta
-                    </button>
-                </div>
             </div>
         </section>
 
-        <!-- Filtros Rápidos -->
-        <section class="max-w-7xl mx-auto px-4 pt-12 pb-4 relative z-20 -mt-8">
-            <div class="bg-white rounded-2xl shadow-lg p-4 flex flex-wrap gap-3 justify-center border border-gray-100">
-                <button onclick="filtrarPorCategoria('Todos')" class="filter-btn active px-6 py-2.5 rounded-full text-sm font-bold bg-white text-gray-600 hover:bg-gray-50">Todos</button>
-                <button onclick="filtrarPorCategoria('Eletrónica')" class="filter-btn px-6 py-2.5 rounded-full text-sm font-bold bg-white text-gray-600 border-gray-200 hover:bg-gray-50">Eletrónica</button>
-                <button onclick="filtrarPorCategoria('Roupa')" class="filter-btn px-6 py-2.5 rounded-full text-sm font-bold bg-white text-gray-600 border-gray-200 hover:bg-gray-50">Roupa</button>
-                <button onclick="filtrarPorCategoria('Material Escolar')" class="filter-btn px-6 py-2.5 rounded-full text-sm font-bold bg-white text-gray-600 border-gray-200 hover:bg-gray-50">Material Escolar</button>
-                <button onclick="filtrarPorCategoria('Chaves')" class="filter-btn px-6 py-2.5 rounded-full text-sm font-bold bg-white text-gray-600 border-gray-200 hover:bg-gray-50">Chaves</button>
+        <!-- Command Bar (Pesquisa + Filtros) Flutuante -->
+        <section class="max-w-5xl mx-auto px-4 relative z-20 -mt-16">
+            <div class="bg-white rounded-2xl shadow-premium p-2 sm:p-3 flex flex-col md:flex-row gap-2 items-center">
+                
+                <!-- Input de Pesquisa -->
+                <div class="flex-grow w-full flex items-center bg-gray-50 rounded-xl px-4 py-3 border border-transparent focus-within:border-marca-azul focus-within:bg-white transition-all">
+                    <svg class="w-5 h-5 text-gray-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                    <input type="text" id="pesquisa" placeholder="O que procuras? (ex: AirPods, Casaco...)" class="w-full bg-transparent focus:outline-none text-gray-800 font-medium placeholder-gray-400">
+                </div>
+
+                <!-- Divisor -->
+                <div class="hidden md:block w-px h-10 bg-gray-200"></div>
+
+                <!-- Filtros Rápidos -->
+                <div class="flex gap-2 overflow-x-auto w-full md:w-auto pb-2 md:pb-0 hide-scrollbar">
+                    <button onclick="filtrarPorCategoria('Todos')" class="filter-btn active whitespace-nowrap px-4 py-2 rounded-xl text-sm font-bold bg-marca-azul text-white shadow-md">Todos</button>
+                    <button onclick="filtrarPorCategoria('Eletrónica')" class="filter-btn whitespace-nowrap px-4 py-2 rounded-xl text-sm font-bold bg-gray-50 text-gray-600 hover:bg-gray-100 transition-colors">Eletrónica</button>
+                    <button onclick="filtrarPorCategoria('Roupa')" class="filter-btn whitespace-nowrap px-4 py-2 rounded-xl text-sm font-bold bg-gray-50 text-gray-600 hover:bg-gray-100 transition-colors">Roupa</button>
+                    <button onclick="filtrarPorCategoria('Material Escolar')" class="filter-btn whitespace-nowrap px-4 py-2 rounded-xl text-sm font-bold bg-gray-50 text-gray-600 hover:bg-gray-100 transition-colors">Material</button>
+                    <button onclick="filtrarPorCategoria('Chaves')" class="filter-btn whitespace-nowrap px-4 py-2 rounded-xl text-sm font-bold bg-gray-50 text-gray-600 hover:bg-gray-100 transition-colors">Chaves</button>
+                </div>
+
+                <!-- Botão Pesquisar -->
+                <button onclick="carregarObjetos()" class="w-full md:w-auto bg-marca-laranja text-white px-8 py-3 rounded-xl font-bold hover:bg-orange-600 shadow-md transition-all md:ml-2 flex-shrink-0">
+                    Pesquisar
+                </button>
             </div>
         </section>
 
         <!-- Catálogo -->
-        <section class="max-w-7xl mx-auto px-4 py-8 relative z-10">
-            <div id="catalogo" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
-                <!-- Os cartões entram aqui -->
+        <section class="max-w-7xl mx-auto px-4 py-12 relative z-10">
+            <div id="catalogo" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                <!-- Injetado via JS -->
             </div>
         </section>
     </main>
 
     <!-- Rodapé -->
-    <footer class="bg-marca-azul text-blue-200 py-10 text-center mt-auto relative z-10">
+    <footer class="bg-white border-t border-gray-100 py-10 text-center mt-auto">
         <div class="max-w-7xl mx-auto px-4 flex flex-col items-center">
             <img src="logo.png" alt="FindIT" class="h-10 mb-4 opacity-50 grayscale hover:grayscale-0 transition-all duration-300">
-            <p class="text-sm font-medium">&copy; 2026 FindIT School - Rafael Rodrigues. PAP.</p>
+            <p class="text-sm font-medium text-gray-500">&copy; 2026 FindIT School - Rafael Rodrigues. PAP.</p>
         </div>
     </footer>
 
     <!-- MODAL DE LOGIN -->
-    <div id="modal-login" class="fixed inset-0 bg-black/60 hidden items-center justify-center z-50 p-4 backdrop-blur-md transition-opacity duration-300">
+    <div id="modal-login" class="fixed inset-0 bg-gray-900/60 hidden items-center justify-center z-[100] p-4 backdrop-blur-sm transition-opacity duration-300">
         <div class="modal-content bg-white rounded-3xl shadow-2xl w-full max-w-md p-8 relative">
             <button onclick="fecharModal()" class="absolute top-5 right-5 text-gray-400 hover:text-gray-800 bg-gray-100 hover:bg-gray-200 rounded-full w-10 h-10 flex items-center justify-center text-2xl font-bold transition-colors">&times;</button>
             
             <div class="text-center mb-8">
-                <img src="logo.png" alt="FindIT" class="h-20 mx-auto mb-4 drop-shadow-md">
+                <img src="logo.png" alt="FindIT" class="h-16 mx-auto mb-4 drop-shadow-md">
                 <h2 class="text-2xl font-extrabold text-marca-azul tracking-tight">Área Restrita</h2>
-                <p class="text-gray-500 text-sm mt-1 font-medium">Acesso exclusivo para funcionários da ETPC</p>
+                <p class="text-gray-500 text-sm mt-1 font-medium">Acesso exclusivo para funcionários</p>
             </div>
 
             <div id="msg-erro" class="text-red-500 text-sm text-center mb-4 hidden font-bold bg-red-50 p-3 rounded-xl border border-red-200"></div>
@@ -129,13 +147,13 @@
             <div class="space-y-5">
                 <div>
                     <label class="block text-sm font-bold text-gray-700 mb-2">Email Institucional</label>
-                    <input type="email" id="email" placeholder="funcionario@etpc.pt" class="input-premium w-full min-h-[48px] px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl">
+                    <input type="email" id="email" placeholder="funcionario@etpc.pt" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-marca-azul focus:bg-white transition-all">
                 </div>
                 <div>
                     <label class="block text-sm font-bold text-gray-700 mb-2">Password</label>
-                    <input type="password" id="password" placeholder="••••••••" class="input-premium w-full min-h-[48px] px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl">
+                    <input type="password" id="password" placeholder="••••••••" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-marca-azul focus:bg-white transition-all">
                 </div>
-                <button onclick="fazerLogin()" class="btn-premium w-full min-h-[48px] py-3 rounded-xl mt-4 text-lg">
+                <button onclick="fazerLogin()" class="w-full bg-marca-azul text-white font-bold py-3 rounded-xl hover:bg-blue-900 shadow-lg hover:shadow-xl transition-all hover:-translate-y-0.5 mt-2">
                     Entrar no Sistema
                 </button>
             </div>
