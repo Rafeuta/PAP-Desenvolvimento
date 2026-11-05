@@ -1,8 +1,8 @@
 // ==========================================
 // CONFIGURAÇÃO DO SUPABASE
 // ==========================================
-const SUPABASE_URL = 'COLOCA_AQUI_O_TEU_PROJECT_URL';
-const SUPABASE_ANON_KEY = 'COLOCA_AQUI_A_TUA_PUBLISHABLE_KEY';
+const SUPABASE_URL = 'https://kswqakffuudugnfudizg.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_XM9rWUkcESRXVrKFFlgNDA_VZ8XgXJl';
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // Variável para guardar o utilizador atual
