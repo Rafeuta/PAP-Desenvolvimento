@@ -1,7 +1,4 @@
-/* O Tailwind CSS está a tratar do design principal no index.html. 
-   Este ficheiro serve para adicionarmos animações ou estilos personalizados mais tarde. */
-
-body {
-    margin: 0;
-    padding: 0;
+/* Efeito de desfoque no fundo do modal */
+#modal-login {
+    backdrop-filter: blur(4px);
 }
