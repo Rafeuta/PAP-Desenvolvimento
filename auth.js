@@ -5,106 +5,141 @@
 const SUPABASE_URL = 'https://kswqakffuudugnfudizg.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_XM9rWUkcESRXVrKFFlgNDA_VZ8XgXJl';
 
-// Inicializar o cliente Supabase
-const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+// 2. Iniciar o Supabase
+const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-// 3. Selecionar os elementos do DOM (o modal e os formulários)
-const authModal = document.getElementById('auth-modal');
-const authTitle = document.getElementById('auth-title');
-const loginForm = document.getElementById('login-form');
-const registerForm = document.getElementById('register-form');
-const authMessage = document.getElementById('auth-message');
-const logoutButton = document.getElementById('logout-button');
-const userEmailSpan = document.getElementById('user-email');
+// ==========================================
+// LÓGICA DO MODAL (ABRIR/FECHAR)
+// ==========================================
+const modal = document.getElementById('modal-login');
 
-// 4. Função para abrir e fechar o modal
-window.openAuthModal = function() {
-    authModal.classList.remove('hidden');
-    authModal.classList.add('flex');
-};
+function abrirModal() {
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+}
 
-window.closeAuthModal = function() {
-    authModal.classList.add('hidden');
-    authModal.classList.remove('flex');
-    // Limpar mensagens de erro e formulários
-    authMessage.textContent = '';
-    loginForm.reset();
-    registerForm.reset();
-};
+function fecharModal() {
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+    document.getElementById('msg-erro').classList.add('hidden');
+}
 
-// 5. Lógica de Registo (Sign Up)
-registerForm.addEventListener('submit', async (e) => {
-    e.preventDefault(); // Impedir o recarregamento da página
-    const email = document.getElementById('register-email').value;
-    const password = document.getElementById('register-password').value;
+// ==========================================
+// LÓGICA DE LOGIN E LOGOUT
+// ==========================================
+async function fazerLogin() {
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+    const msgErro = document.getElementById('msg-erro');
 
-    // Chamar a API do Supabase para criar o utilizador
-    const { data, error } = await supabase.auth.signUp({
+    if(!email || !password) {
+        msgErro.textContent = "Preenche o email e a password.";
+        msgErro.classList.remove('hidden');
+        return;
+    }
+
+    // Tentar fazer login no Supabase
+    const { data, error } = await supabaseClient.auth.signInWithPassword({
         email: email,
         password: password,
     });
 
     if (error) {
-        authMessage.textContent = 'Erro ao registar: ' + error.message;
-        authMessage.className = 'text-red-500 text-sm text-center font-semibold';
+        msgErro.textContent = "Erro: " + error.message;
+        msgErro.classList.remove('hidden');
     } else {
-        authMessage.textContent = 'Registo efetuado! Verifica o teu email para confirmar a conta.';
-        authMessage.className = 'text-green-500 text-sm text-center font-semibold';
-        // Opcional: Fechar o modal após alguns segundos
-        setTimeout(() => closeAuthModal(), 3000);
-    }
-});
-
-// 6. Lógica de Login (Sign In)
-loginForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const email = document.getElementById('login-email').value;
-    const password = document.getElementById('login-password').value;
-
-    // Chamar a API do Supabase para autenticar
-    const { data, error } = await supabase.auth.signInWithPassword({
-        email: email,
-        password: password,
-    });
-
-    if (error) {
-        authMessage.textContent = 'Erro ao entrar: ' + error.message;
-        authMessage.className = 'text-red-500 text-sm text-center font-semibold';
-    } else {
-        authMessage.textContent = 'Login efetuado com sucesso!';
-        authMessage.className = 'text-green-500 text-sm text-center font-semibold';
-        updateUI(data.user); // Atualizar a interface
-        setTimeout(() => closeAuthModal(), 1500);
-    }
-});
-
-// 7. Lógica de Logout
-logoutButton.addEventListener('click', async () => {
-    await supabase.auth.signOut();
-    updateUI(null); // Limpar a interface
-});
-
-// 8. Atualizar a UI consoante o estado de autenticação
-function updateUI(user) {
-    if (user) {
-        // Utilizador com sessão iniciada
-        userEmailSpan.textContent = user.email;
-        logoutButton.classList.remove('hidden');
-        // Esconder o botão de "Entrar / Registar" (podes adicionar um ID a ele)
-        document.getElementById('auth-btn').classList.add('hidden'); 
-    } else {
-        // Utilizador com sessão terminada
-        userEmailSpan.textContent = '';
-        logoutButton.classList.add('hidden');
-        document.getElementById('auth-btn').classList.remove('hidden');
+        fecharModal();
+        atualizarInterface(data.user);
     }
 }
 
-// 9. Verificar se o utilizador já tem uma sessão ativa ao carregar a página
-supabase.auth.onAuthStateChange((event, session) => {
-    if (session) {
-        updateUI(session.user);
+async function fazerLogout() {
+    await supabaseClient.auth.signOut();
+    atualizarInterface(null);
+}
+
+// ==========================================
+// ATUALIZAR O ECRÃ (Muda os botões)
+// ==========================================
+function atualizarInterface(user) {
+    const btnLogin = document.getElementById('btn-login-nav');
+    const btnLogout = document.getElementById('btn-logout-nav');
+
+    if (user) {
+        // Se o utilizador estiver logado
+        btnLogin.classList.add('hidden');
+        btnLogout.classList.remove('hidden');
+        // Aqui podes redirecionar para o dashboard no futuro:
+        // window.location.href = 'dashboard.html'; 
     } else {
-        updateUI(null);
+        // Se não estiver logado
+        btnLogin.classList.remove('hidden');
+        btnLogout.classList.add('hidden');
+    }
+}
+
+// Verificar se o utilizador já está logado ao carregar a página
+supabaseClient.auth.onAuthStateChange((event, session) => {
+    if (session) {
+        atualizarInterface(session.user);
+    } else {
+        atualizarInterface(null);
     }
 });
+
+// ==========================================
+// CARREGAR O CATÁLOGO PÚBLICO
+// ==========================================
+async function carregarObjetos() {
+    const catalogoDiv = document.getElementById('catalogo');
+    const termoPesquisa = document.getElementById('pesquisa').value.toLowerCase();
+    
+    catalogoDiv.innerHTML = '<p class="text-gray-500 col-span-full">A carregar...</p>';
+
+    // Ir buscar os dados à tabela 'objetos'
+    const { data: objetos, error } = await supabaseClient
+        .from('objetos')
+        .select('*')
+        .order('criado_em', { ascending: false });
+
+    if (error) {
+        catalogoDiv.innerHTML = `<p class="text-red-500 col-span-full">Erro ao carregar o catálogo: ${error.message}</p>`;
+        return;
+    }
+
+    if (objetos.length === 0) {
+        catalogoDiv.innerHTML = '<p class="text-gray-500 col-span-full">Nenhum objeto registado ainda.</p>';
+        return;
+    }
+
+    // Filtrar localmente se houver pesquisa
+    const objetosFiltrados = objetos.filter(obj => 
+        obj.titulo.toLowerCase().includes(termoPesquisa) || 
+        obj.categoria.toLowerCase().includes(termoPesquisa)
+    );
+
+    catalogoDiv.innerHTML = ''; // Limpar
+
+    // Criar os cartões
+    objetosFiltrados.forEach(obj => {
+        // Se não houver foto, usa uma de placeholder
+        const foto = obj.foto_url ? obj.foto_url : 'https://via.placeholder.com/300x200?text=Sem+Foto';
+        
+        catalogoDiv.innerHTML += `
+            <div class="bg-white rounded-xl shadow-sm hover:shadow-lg transition-all overflow-hidden border border-gray-100">
+                <img src="${foto}" class="w-full h-48 object-cover">
+                <div class="p-4">
+                    <span class="text-xs font-bold text-marca-azul bg-blue-50 px-2 py-1 rounded">${obj.categoria}</span>
+                    <h3 class="text-lg font-bold text-gray-900 mt-2">${obj.titulo}</h3>
+                    <p class="text-sm text-gray-500 mt-1"><b>Sala:</b> ${obj.sala}</p>
+                    <p class="text-sm text-gray-500"><b>Estado:</b> ${obj.estado}</p>
+                </div>
+            </div>
+        `;
+    });
+}
+
+// Carregar os objetos quando a página abre
+window.onload = () => {
+    carregarObjetos();
+};
