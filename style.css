@@ -1,51 +1,51 @@
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 
 :root {
-    --navy-deep: #0b132b;
-    --navy-light: #1c2541;
-    --emerald: #10b981;
-    --emerald-hover: #059669;
+    /* Cores baseadas no Logótipo FindIT */
+    --brand-navy: #0b1b3d;       /* Azul muito escuro (fundo) */
+    --brand-blue: #0f3b7a;       /* Azul principal */
+    --brand-light-blue: #1e5fbf; /* Azul claro (gradientes) */
+    --brand-orange: #e67e22;     /* Laranja do logótipo */
+    --brand-orange-hover: #d35400;
+    
     --bg-light: #f8fafc;
+    --text-main: #1e293b;
+    --text-muted: #475569; /* Cinza mais escuro para melhor contraste */
 }
 
 body {
     font-family: 'Plus Jakarta Sans', sans-serif;
     background-color: var(--bg-light);
-    color: #334155;
+    color: var(--text-main);
+    font-size: 16px; /* Aumento da fonte base */
     -webkit-font-smoothing: antialiased;
     background-image: 
-        linear-gradient(rgba(11, 19, 43, 0.03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(11, 19, 43, 0.03) 1px, transparent 1px);
+        linear-gradient(rgba(15, 59, 122, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(15, 59, 122, 0.03) 1px, transparent 1px);
     background-size: 30px 30px;
 }
 
 /* Scrollbar */
 ::-webkit-scrollbar { width: 8px; }
 ::-webkit-scrollbar-track { background: var(--bg-light); }
-::-webkit-scrollbar-thumb { background: var(--navy-light); border-radius: 4px; }
-::-webkit-scrollbar-thumb:hover { background: var(--emerald); }
+::-webkit-scrollbar-thumb { background: var(--brand-blue); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--brand-orange); }
 
 /* Animações */
-@keyframes float {
-    0% { transform: translateY(0px); }
-    50% { transform: translateY(-12px); }
-    100% { transform: translateY(0px); }
-}
-
 @keyframes fadeInUp {
     from { opacity: 0; transform: translateY(30px); }
     to { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes pulseGlow {
-    0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
-    70% { box-shadow: 0 0 0 15px rgba(16, 185, 129, 0); }
-    100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+    0% { box-shadow: 0 0 0 0 rgba(230, 126, 34, 0.4); }
+    70% { box-shadow: 0 0 0 15px rgba(230, 126, 34, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(230, 126, 34, 0); }
 }
 
 /* Classes Utilitárias */
 .hero-section {
-    background: radial-gradient(circle at top left, var(--navy-light) 0%, var(--navy-deep) 100%);
+    background: radial-gradient(circle at top left, var(--brand-blue) 0%, var(--brand-navy) 100%);
     position: relative;
     overflow: hidden;
 }
@@ -54,63 +54,87 @@ body {
     content: '';
     position: absolute;
     top: -50%; left: -50%; width: 200%; height: 200%;
-    background: radial-gradient(circle, rgba(16,185,129,0.15) 0%, transparent 60%);
-    animation: rotate 20s linear infinite;
+    background: radial-gradient(circle, rgba(230,126,34,0.15) 0%, transparent 60%);
+    animation: rotate 25s linear infinite;
 }
 
 .glass-card {
-    background: rgba(255, 255, 255, 0.7);
+    background: rgba(255, 255, 255, 0.8);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(255, 255, 255, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.6);
     box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.05);
 }
 
-.btn-emerald {
-    background: linear-gradient(135deg, var(--emerald) 0%, var(--emerald-hover) 100%);
+/* Botão Principal (Laranja do Logo) */
+.btn-primary {
+    background: linear-gradient(135deg, var(--brand-orange) 0%, var(--brand-orange-hover) 100%);
     color: white;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+    box-shadow: 0 4px 15px rgba(230, 126, 34, 0.3);
 }
 
-.btn-emerald:hover {
+.btn-primary:hover {
     transform: translateY(-2px) scale(1.02);
-    box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4);
+    box-shadow: 0 8px 25px rgba(230, 126, 34, 0.5);
 }
 
-.btn-outline-navy {
-    border: 2px solid var(--navy-deep);
-    color: var(--navy-deep);
+/* Botão Secundário (Contorno Claro) */
+.btn-secondary {
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    color: white;
     transition: all 0.3s;
 }
 
-.btn-outline-navy:hover {
-    background: var(--navy-deep);
-    color: white;
+.btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: white;
     transform: translateY(-2px);
 }
 
+/* Cartões da Montra */
 .card-objeto {
     animation: fadeInUp 0.6s ease backwards;
     transition: all 0.3s ease;
+    background: white;
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid #e2e8f0;
 }
 
 .card-objeto:hover {
     transform: translateY(-8px);
-    box-shadow: 0 25px 50px -12px rgba(11, 19, 43, 0.15);
+    box-shadow: 0 25px 50px -12px rgba(15, 59, 122, 0.15);
+    border-color: #cbd5e1;
 }
 
+/* Filtros da Montra */
 .filter-btn {
     transition: all 0.3s ease;
 }
 
 .filter-btn.active {
-    background: var(--navy-deep) !important;
+    background: var(--brand-blue) !important;
     color: white !important;
-    box-shadow: 0 4px 12px rgba(11, 19, 43, 0.3);
+    box-shadow: 0 4px 12px rgba(15, 59, 122, 0.3);
 }
 
-/* Detalhes do FAQ */
+/* Hover dos Cartões de Inovação */
+.innovation-card {
+    transition: all 0.4s ease;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.innovation-card:hover {
+    transform: translateY(-6px);
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(230, 126, 34, 0.5);
+    box-shadow: 0 10px 30px -10px rgba(230, 126, 34, 0.2);
+}
+
+/* FAQ */
 details > summary { list-style: none; cursor: pointer; }
 details > summary::-webkit-details-marker { display: none; }
 details[open] summary ~ * { animation: sweep .3s ease-in-out; }
