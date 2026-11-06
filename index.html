@@ -13,9 +13,9 @@
             theme: {
                 extend: {
                     colors: {
-                        'navy': '#0b132b',
-                        'navy-light': '#1c2541',
-                        'emerald': '#10b981',
+                        'navy': '#0b1b3d',
+                        'brand-blue': '#0f3b7a',
+                        'brand-orange': '#e67e22',
                     },
                     fontFamily: { sans: ['Plus Jakarta Sans', 'sans-serif'] }
                 }
@@ -27,34 +27,36 @@
 <body class="flex flex-col min-h-screen">
 
     <!-- HEADER PREMIUM -->
-    <header class="fixed w-full top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-gray-100 transition-all duration-300">
+    <header class="fixed w-full top-0 z-50 bg-white/90 backdrop-blur-xl border-b border-gray-100 transition-all duration-300">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
             <a href="index.html" class="flex items-center gap-2 group">
                 <img src="logo.png" alt="FindIT" class="h-12 md:h-14 w-auto transition-transform group-hover:scale-105">
             </a>
             
             <!-- Navbar (Desktop) -->
-            <nav class="hidden md:flex items-center gap-8 text-sm font-bold text-gray-500">
-                <a href="#inicio" class="hover:text-navy transition-colors">Início</a>
-                <a href="#montra" class="hover:text-navy transition-colors">Montra de Objetos</a>
-                <a href="#como-funciona" class="hover:text-navy transition-colors">Como Funciona</a>
-                <a href="#futuro" class="hover:text-navy transition-colors">Inovação</a>
+            <nav class="hidden md:flex items-center gap-8 text-sm font-bold text-slate-600">
+                <a href="#inicio" class="hover:text-brand-blue transition-colors">Início</a>
+                <a href="#montra" class="hover:text-brand-blue transition-colors">Montra de Objetos</a>
+                <a href="#como-funciona" class="hover:text-brand-blue transition-colors">Como Funciona</a>
+                <a href="#futuro" class="hover:text-brand-blue transition-colors">Inovação</a>
             </nav>
 
             <div class="flex items-center gap-4">
-                <button onclick="abrirModal()" id="btn-login-nav" class="hidden md:flex btn-outline-navy px-5 py-2.5 rounded-xl text-sm font-bold items-center gap-2">
+                <!-- Botão Área Reservada (Cores do logo, mais escuro) -->
+                <button onclick="abrirModal()" id="btn-login-nav" class="hidden md:flex border-2 border-brand-blue text-brand-blue hover:bg-brand-blue hover:text-white px-5 py-2.5 rounded-xl text-sm font-bold items-center gap-2 transition-all">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
                     Área Reservada
                 </button>
+                
                 <!-- Menu de Perfil (Logado) -->
                 <div id="user-menu-container" class="hidden relative">
-                    <button onclick="toggleUserMenu()" class="flex items-center gap-2 bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded-full transition-colors border border-gray-200">
-                        <div class="w-8 h-8 bg-emerald rounded-full flex items-center justify-center text-white font-bold text-sm">U</div>
-                        <span class="text-sm font-bold text-gray-700 hidden md:block">A minha conta</span>
+                    <button onclick="toggleUserMenu()" class="flex items-center gap-2 bg-gray-50 hover:bg-gray-100 px-3 py-2 rounded-full transition-colors border border-gray-200">
+                        <div class="w-8 h-8 bg-brand-orange rounded-full flex items-center justify-center text-white font-bold text-sm">U</div>
+                        <span class="text-sm font-bold text-slate-700 hidden md:block">A minha conta</span>
                         <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                     </button>
                     <div id="user-dropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-xl border border-gray-100 py-2 z-50">
-                        <a href="dashboard.html" class="block px-4 py-2 text-sm font-bold text-gray-700 hover:bg-gray-50">Ir para o Painel</a>
+                        <a href="dashboard.html" class="block px-4 py-2 text-sm font-bold text-slate-700 hover:bg-gray-50">Ir para o Painel</a>
                         <hr class="my-1 border-gray-100">
                         <button onclick="fazerLogout()" class="w-full text-left px-4 py-2 text-sm font-bold text-red-600 hover:bg-red-50">Sair</button>
                     </div>
@@ -64,232 +66,230 @@
     </header>
 
     <!-- HERO SECTION -->
-    <section id="inicio" class="hero-section pt-32 pb-24 px-4 text-center mt-10">
-        <div class="relative z-10 max-w-4xl mx-auto">
-            <span class="inline-block py-1 px-3 rounded-full bg-emerald/10 text-emerald font-bold text-sm mb-6 border border-emerald/20">
+    <section id="inicio" class="hero-section pt-36 pb-28 px-4 text-center mt-10">
+        <div class="relative z-10 max-w-5xl mx-auto">
+            <span class="inline-block py-1.5 px-4 rounded-full bg-brand-orange/20 text-brand-orange font-bold text-sm mb-6 border border-brand-orange/30 backdrop-blur-md">
                 🚀 A nova era dos perdidos e achados na ETPC
             </span>
-            <h1 class="text-4xl md:text-6xl font-extrabold text-white mb-6 leading-tight">
+            <h1 class="text-4xl md:text-6xl font-extrabold text-white mb-6 leading-tight drop-shadow-lg">
                 Perdeste algo na escola? <br>
-                <span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald to-teal-300">Nós ajudamos-te a encontrar.</span>
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-orange to-yellow-400">Nós ajudamos-te a encontrar.</span>
             </h1>
-            <p class="text-lg md:text-xl text-blue-100 mb-10 max-w-2xl mx-auto font-medium">
+            <p class="text-lg md:text-xl text-blue-100 mb-10 max-w-2xl mx-auto font-medium leading-relaxed">
                 A plataforma inteligente que centraliza os achados da tua escola. Sem filas, sem burocracia. Consulta o nosso catálogo digital e recupera os teus pertences num instante.
             </p>
-            <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                <a href="#montra" class="btn-emerald px-8 py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-2">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                    Ver Objetos Encontrados
+            
+            <!-- Apenas 1 Botão Principal (Foco no Aluno) -->
+            <div class="flex justify-center">
+                <a href="#montra" class="btn-primary px-10 py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-3">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                    Explorar Achados
                 </a>
-                <button onclick="abrirModal()" class="bg-white/10 hover:bg-white/20 text-white backdrop-blur-md border border-white/20 px-8 py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-2 transition-all">
-                    Acesso Funcionários
-                </button>
             </div>
         </div>
     </section>
 
     <!-- DUAS ÁREAS -->
-    <section class="py-20 px-4 max-w-6xl mx-auto">
+    <section class="py-24 px-4 max-w-7xl mx-auto">
         <div class="text-center mb-16">
-            <h2 class="text-3xl md:text-4xl font-extrabold text-navy mb-4">Duas áreas, uma só missão.</h2>
-            <p class="text-gray-500 text-lg">Desenhado para ser simples para os alunos e poderoso para a gestão.</p>
+            <h2 class="text-3xl md:text-4xl font-extrabold text-brand-blue mb-4">Duas áreas, uma só missão.</h2>
+            <p class="text-slate-600 text-lg">Desenhado para ser simples para os alunos e poderoso para a gestão.</p>
         </div>
-        <div class="grid md:grid-cols-2 gap-8">
+        <div class="grid md:grid-cols-2 gap-10">
             <!-- Montra -->
-            <div class="glass-card p-8 rounded-3xl group">
-                <div class="w-16 h-16 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+            <div class="glass-card p-10 rounded-3xl group border-t-4 border-t-brand-blue">
+                <div class="w-16 h-16 bg-blue-50 text-brand-blue rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
                     <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
                 </div>
-                <h3 class="text-2xl font-bold text-navy mb-3">A Montra (Alunos e Pais)</h3>
-                <p class="text-gray-600 leading-relaxed">Acesso livre e instantâneo. Encontra o teu objeto através de uma barra de pesquisa inteligente e filtros por categorias. Vê a fotografia, o estado de conservação e o local exato onde foi encontrado.</p>
+                <h3 class="text-2xl font-bold text-brand-blue mb-3">A Montra (Alunos e Pais)</h3>
+                <p class="text-slate-600 leading-relaxed text-lg">Acesso livre e instantâneo. Encontra o teu objeto através de uma barra de pesquisa inteligente e filtros por categorias. Vê a fotografia, o estado de conservação e o local exato onde foi encontrado.</p>
             </div>
             <!-- Cérebro -->
-            <div class="glass-card p-8 rounded-3xl group">
-                <div class="w-16 h-16 bg-emerald/10 text-emerald rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+            <div class="glass-card p-10 rounded-3xl group border-t-4 border-t-brand-orange">
+                <div class="w-16 h-16 bg-orange-50 text-brand-orange rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
                     <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
                 </div>
-                <h3 class="text-2xl font-bold text-navy mb-3">O Cérebro (Painel Restrito)</h3>
-                <p class="text-gray-600 leading-relaxed">Segurança máxima para a equipa da escola. Sistema de login protegido por perfis. Registo rápido com upload de fotografias para a nuvem e controlo de estados (Achado / Devolvido) com um simples clique.</p>
+                <h3 class="text-2xl font-bold text-brand-blue mb-3">O Cérebro (Painel Restrito)</h3>
+                <p class="text-slate-600 leading-relaxed text-lg">Segurança máxima para a equipa da escola. Sistema de login protegido por perfis. Registo rápido com upload de fotografias para a nuvem e controlo de estados (Achado / Devolvido) com um simples clique.</p>
             </div>
         </div>
     </section>
 
     <!-- MONTRA DE OBJETOS (CATÁLOGO) -->
-    <section id="montra" class="py-20 bg-white border-y border-gray-100">
+    <section id="montra" class="py-24 bg-white border-y border-gray-200">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex flex-col md:flex-row justify-between items-end mb-10 gap-4">
+            <div class="flex flex-col md:flex-row justify-between items-end mb-10 gap-6">
                 <div>
-                    <h2 class="text-3xl font-extrabold text-navy">Montra de Objetos</h2>
-                    <p class="text-gray-500 mt-2">Explora os itens que foram encontrados na escola.</p>
+                    <h2 class="text-3xl md:text-4xl font-extrabold text-brand-blue">Montra de Objetos</h2>
+                    <p class="text-slate-600 text-lg mt-2">Explora os itens que foram encontrados na escola.</p>
                 </div>
                 
                 <!-- Pesquisa e Filtros -->
                 <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
-                    <div class="relative w-full md:w-64">
-                        <input type="text" id="pesquisa" placeholder="Pesquisar objeto..." class="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald outline-none transition-all">
-                        <svg class="w-5 h-5 text-gray-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                    <div class="relative w-full md:w-80">
+                        <input type="text" id="pesquisa" placeholder="Pesquisar objeto..." class="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-brand-orange focus:border-brand-orange outline-none transition-all text-slate-700">
+                        <svg class="w-6 h-6 text-gray-400 absolute left-4 top-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                     </div>
-                    <button onclick="carregarObjetos()" class="btn-emerald px-6 py-2 rounded-xl font-bold shadow-md">Procurar</button>
+                    <button onclick="carregarObjetos()" class="btn-primary px-8 py-3 rounded-xl font-bold shadow-md">Procurar</button>
                 </div>
             </div>
 
             <!-- Filtros Rápidos -->
-            <div class="flex flex-wrap gap-2 mb-8">
-                <button onclick="filtrarPorCategoria('Todos')" class="filter-btn active px-4 py-2 rounded-lg text-sm font-bold bg-gray-100 text-gray-600">Todos</button>
-                <button onclick="filtrarPorCategoria('Eletrónica')" class="filter-btn px-4 py-2 rounded-lg text-sm font-bold bg-gray-100 text-gray-600 hover:bg-gray-200">Eletrónica</button>
-                <button onclick="filtrarPorCategoria('Roupa')" class="filter-btn px-4 py-2 rounded-lg text-sm font-bold bg-gray-100 text-gray-600 hover:bg-gray-200">Roupa</button>
-                <button onclick="filtrarPorCategoria('Material Escolar')" class="filter-btn px-4 py-2 rounded-lg text-sm font-bold bg-gray-100 text-gray-600 hover:bg-gray-200">Material Escolar</button>
-                <button onclick="filtrarPorCategoria('Chaves')" class="filter-btn px-4 py-2 rounded-lg text-sm font-bold bg-gray-100 text-gray-600 hover:bg-gray-200">Chaves</button>
+            <div class="flex flex-wrap gap-3 mb-10">
+                <button onclick="filtrarPorCategoria('Todos')" class="filter-btn active px-6 py-2.5 rounded-xl text-sm font-bold bg-gray-100 text-slate-600">Todos</button>
+                <button onclick="filtrarPorCategoria('Eletrónica')" class="filter-btn px-6 py-2.5 rounded-xl text-sm font-bold bg-gray-100 text-slate-600 hover:bg-gray-200">Eletrónica</button>
+                <button onclick="filtrarPorCategoria('Roupa')" class="filter-btn px-6 py-2.5 rounded-xl text-sm font-bold bg-gray-100 text-slate-600 hover:bg-gray-200">Roupa</button>
+                <button onclick="filtrarPorCategoria('Material Escolar')" class="filter-btn px-6 py-2.5 rounded-xl text-sm font-bold bg-gray-100 text-slate-600 hover:bg-gray-200">Material Escolar</button>
+                <button onclick="filtrarPorCategoria('Chaves')" class="filter-btn px-6 py-2.5 rounded-xl text-sm font-bold bg-gray-100 text-slate-600 hover:bg-gray-200">Chaves</button>
             </div>
 
             <!-- Grelha -->
-            <div id="catalogo" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            <div id="catalogo" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
                 <!-- Injetado via auth.js -->
             </div>
         </div>
     </section>
 
     <!-- COMO FUNCIONA -->
-    <section id="como-funciona" class="py-20 px-4 max-w-6xl mx-auto">
+    <section id="como-funciona" class="py-24 px-4 max-w-7xl mx-auto">
         <div class="text-center mb-16">
-            <h2 class="text-3xl md:text-4xl font-extrabold text-navy mb-4">Recuperar os teus pertences nunca foi tão fácil.</h2>
+            <h2 class="text-3xl md:text-4xl font-extrabold text-brand-blue mb-4">Recuperar os teus pertences nunca foi tão fácil.</h2>
         </div>
         <div class="grid md:grid-cols-3 gap-8 relative">
-            <!-- Linha de ligação (escondida no mobile) -->
             <div class="hidden md:block absolute top-1/2 left-0 w-full h-0.5 bg-gray-200 -z-10 transform -translate-y-1/2"></div>
             
-            <div class="text-center bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                <div class="w-16 h-16 bg-navy text-white text-2xl font-black rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">1</div>
-                <h3 class="text-xl font-bold text-navy mb-2">O Achado é Registado</h3>
-                <p class="text-gray-500">A equipa da portaria encontra o objeto, tira uma fotografia e insere os dados no sistema.</p>
+            <div class="text-center bg-white p-8 rounded-3xl shadow-sm border border-gray-200 hover:shadow-lg transition-shadow">
+                <div class="w-16 h-16 bg-brand-blue text-white text-2xl font-black rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg shadow-blue-900/30 rotate-3 transition-transform hover:rotate-0">1</div>
+                <h3 class="text-xl font-bold text-brand-blue mb-3">O Achado é Registado</h3>
+                <p class="text-slate-600 text-lg">A equipa da portaria encontra o objeto, tira uma fotografia e insere os dados no sistema.</p>
             </div>
-            <div class="text-center bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                <div class="w-16 h-16 bg-emerald text-white text-2xl font-black rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">2</div>
-                <h3 class="text-xl font-bold text-navy mb-2">Publicação Imediata</h3>
-                <p class="text-gray-500">O objeto aparece instantaneamente na Montra Digital. Tu podes pesquisar por ele em tempo real.</p>
+            <div class="text-center bg-white p-8 rounded-3xl shadow-sm border border-gray-200 hover:shadow-lg transition-shadow">
+                <div class="w-16 h-16 bg-brand-orange text-white text-2xl font-black rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg shadow-orange-500/30 -rotate-3 transition-transform hover:rotate-0">2</div>
+                <h3 class="text-xl font-bold text-brand-blue mb-3">Publicação Imediata</h3>
+                <p class="text-slate-600 text-lg">O objeto aparece instantaneamente na Montra Digital. Tu podes pesquisar por ele em tempo real.</p>
             </div>
-            <div class="text-center bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                <div class="w-16 h-16 bg-navy text-white text-2xl font-black rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">3</div>
-                <h3 class="text-xl font-bold text-navy mb-2">Devolução Confirmada</h3>
-                <p class="text-gray-500">Identificas o teu objeto, diriges-te à secretaria e a equipa atualiza o estado para "Devolvido".</p>
+            <div class="text-center bg-white p-8 rounded-3xl shadow-sm border border-gray-200 hover:shadow-lg transition-shadow">
+                <div class="w-16 h-16 bg-brand-blue text-white text-2xl font-black rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg shadow-blue-900/30 rotate-3 transition-transform hover:rotate-0">3</div>
+                <h3 class="text-xl font-bold text-brand-blue mb-3">Devolução Confirmada</h3>
+                <p class="text-slate-600 text-lg">Identificas o teu objeto, diriges-te à secretaria e a equipa atualiza o estado para "Devolvido".</p>
             </div>
         </div>
     </section>
 
     <!-- FUTURO (INOVAÇÃO) -->
-    <section id="futuro" class="py-24 px-4 bg-navy relative overflow-hidden">
-        <!-- Elemento gráfico -->
-        <div class="absolute top-0 right-0 w-96 h-96 bg-emerald/20 rounded-full blur-3xl"></div>
+    <section id="futuro" class="py-28 px-4 bg-navy relative overflow-hidden">
+        <div class="absolute top-0 right-0 w-[500px] h-[500px] bg-brand-blue/30 rounded-full blur-3xl"></div>
+        <div class="absolute bottom-0 left-0 w-[500px] h-[500px] bg-brand-orange/10 rounded-full blur-3xl"></div>
         
-        <div class="max-w-6xl mx-auto relative z-10">
+        <div class="max-w-7xl mx-auto relative z-10">
             <div class="text-center mb-16">
                 <h2 class="text-3xl md:text-4xl font-extrabold text-white mb-4">O futuro é inteligente.</h2>
-                <p class="text-gray-400 text-lg">Inovações que vão revolucionar a forma como recuperas os teus objetos.</p>
+                <p class="text-blue-100 text-lg">Inovações que vão revolucionar a forma como recuperas os teus objetos.</p>
             </div>
             <div class="grid md:grid-cols-2 gap-6">
-                <div class="bg-white/5 border border-white/10 p-8 rounded-3xl hover:bg-white/10 transition-colors">
-                    <div class="text-emerald mb-4"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg></div>
+                <div class="innovation-card p-8 rounded-3xl">
+                    <div class="text-brand-orange mb-4"><svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg></div>
                     <h3 class="text-xl font-bold text-white mb-2">Alertas Inteligentes por Email</h3>
-                    <p class="text-gray-400">Deixa de procurar. Se um objeto corresponder à tua descrição, o sistema avisa-te automaticamente.</p>
+                    <p class="text-blue-100 text-lg">Deixa de procurar. Se um objeto corresponder à tua descrição, o sistema avisa-te automaticamente.</p>
                 </div>
-                <div class="bg-white/5 border border-white/10 p-8 rounded-3xl hover:bg-white/10 transition-colors">
-                    <div class="text-emerald mb-4"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path></svg></div>
+                <div class="innovation-card p-8 rounded-3xl">
+                    <div class="text-brand-orange mb-4"><svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path></svg></div>
                     <h3 class="text-xl font-bold text-white mb-2">Reconhecimento por IA</h3>
-                    <p class="text-gray-400">O funcionário tira uma foto e a Inteligência Artificial preenche automaticamente a categoria e o nome do objeto.</p>
+                    <p class="text-blue-100 text-lg">O funcionário tira uma foto e a Inteligência Artificial preenche automaticamente a categoria e o nome do objeto.</p>
                 </div>
-                <div class="bg-white/5 border border-white/10 p-8 rounded-3xl hover:bg-white/10 transition-colors">
-                    <div class="text-emerald mb-4"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg></div>
+                <div class="innovation-card p-8 rounded-3xl">
+                    <div class="text-brand-orange mb-4"><svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg></div>
                     <h3 class="text-xl font-bold text-white mb-2">Experiência PWA (App Mobile)</h3>
-                    <p class="text-gray-400">O FindIT School pode ser instalado diretamente no teu telemóvel. Abre como uma app nativa, sem precisar de ir à loja.</p>
+                    <p class="text-blue-100 text-lg">O FindIT School pode ser instalado diretamente no teu telemóvel. Abre como uma app nativa.</p>
                 </div>
-                <div class="bg-white/5 border border-white/10 p-8 rounded-3xl hover:bg-white/10 transition-colors">
-                    <div class="text-emerald mb-4"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg></div>
+                <div class="innovation-card p-8 rounded-3xl">
+                    <div class="text-brand-orange mb-4"><svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg></div>
                     <h3 class="text-xl font-bold text-white mb-2">Rastreio por Salas</h3>
-                    <p class="text-gray-400">Cruzamento de dados de salas para saber quais turmas estiveram lá antes de um objeto ser perdido.</p>
+                    <p class="text-blue-100 text-lg">Cruzamento de dados de salas para saber quais turmas estiveram lá antes de um objeto ser perdido.</p>
                 </div>
             </div>
         </div>
     </section>
 
     <!-- FAQ -->
-    <section class="py-20 px-4 max-w-3xl mx-auto">
-        <h2 class="text-3xl font-extrabold text-center text-navy mb-10">Ainda tens dúvidas?</h2>
+    <section class="py-24 px-4 max-w-4xl mx-auto">
+        <h2 class="text-3xl md:text-4xl font-extrabold text-center text-brand-blue mb-12">Ainda tens dúvidas?</h2>
         <div class="space-y-4">
-            <details class="group bg-white p-6 rounded-2xl border border-gray-100 shadow-sm cursor-pointer">
-                <summary class="flex justify-between items-center font-bold text-navy">
+            <details class="group bg-white p-6 rounded-2xl border border-gray-200 shadow-sm cursor-pointer hover:border-brand-blue transition-colors">
+                <summary class="flex justify-between items-center font-bold text-lg text-brand-blue">
                     Qualquer pessoa pode ver a montra de objetos?
-                    <span class="transition group-open:rotate-180"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></span>
+                    <span class="transition group-open:rotate-180 text-brand-orange"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></span>
                 </summary>
-                <p class="text-gray-500 mt-4 leading-relaxed">Sim. A montra é 100% pública para facilitar a procura pelos alunos e encarregados de educação. Não é necessário fazer login para ver o catálogo.</p>
+                <p class="text-slate-600 mt-4 leading-relaxed text-lg">Sim. A montra é 100% pública para facilitar a procura pelos alunos e encarregados de educação. Não é necessário fazer login para ver o catálogo.</p>
             </details>
-            <details class="group bg-white p-6 rounded-2xl border border-gray-100 shadow-sm cursor-pointer">
-                <summary class="flex justify-between items-center font-bold text-navy">
+            <details class="group bg-white p-6 rounded-2xl border border-gray-200 shadow-sm cursor-pointer hover:border-brand-blue transition-colors">
+                <summary class="flex justify-between items-center font-bold text-lg text-brand-blue">
                     Como comprovo que o objeto é meu na hora de levantar?
-                    <span class="transition group-open:rotate-180"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></span>
+                    <span class="transition group-open:rotate-180 text-brand-orange"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></span>
                 </summary>
-                <p class="text-gray-500 mt-4 leading-relaxed">Dirige-te à secretaria com o número do registo. Poderás ter de descrever características específicas do objeto (marcas, conteúdo no interior, etc.) para validar a posse.</p>
+                <p class="text-slate-600 mt-4 leading-relaxed text-lg">Dirige-te à secretaria com o número do registo. Poderás ter de descrever características específicas do objeto (marcas, conteúdo no interior, etc.) para validar a posse.</p>
             </details>
-            <details class="group bg-white p-6 rounded-2xl border border-gray-100 shadow-sm cursor-pointer">
-                <summary class="flex justify-between items-center font-bold text-navy">
+            <details class="group bg-white p-6 rounded-2xl border border-gray-200 shadow-sm cursor-pointer hover:border-brand-blue transition-colors">
+                <summary class="flex justify-between items-center font-bold text-lg text-brand-blue">
                     Quem pode registar novos pertences no sistema?
-                    <span class="transition group-open:rotate-180"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></span>
+                    <span class="transition group-open:rotate-180 text-brand-orange"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></span>
                 </summary>
-                <p class="text-gray-500 mt-4 leading-relaxed">Apenas funcionários da escola (secretaria, portaria) e o Administrador do sistema têm permissões para inserir, editar ou apagar registos.</p>
+                <p class="text-slate-600 mt-4 leading-relaxed text-lg">Apenas funcionários da escola (secretaria, portaria) e o Administrador do sistema têm permissões para inserir, editar ou apagar registos.</p>
             </details>
         </div>
     </section>
 
     <!-- FOOTER -->
     <footer class="bg-navy pt-16 pb-8 border-t border-white/10">
-        <div class="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
+        <div class="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
             <div class="col-span-1 md:col-span-2">
-                <img src="logo.png" alt="FindIT" class="h-12 brightness-0 invert mb-4 opacity-80">
-                <p class="text-gray-400 text-sm max-w-sm">Projeto desenvolvido para a Prova de Aptidão Profissional da ETPC. A plataforma inteligente de gestão de perdidos e achados escolares.</p>
+                <img src="logo.png" alt="FindIT" class="h-14 brightness-0 invert mb-6 opacity-90">
+                <p class="text-blue-100 text-base max-w-sm leading-relaxed">Projeto desenvolvido para a Prova de Aptidão Profissional da ETPC. A plataforma inteligente de gestão de perdidos e achados escolares.</p>
             </div>
             <div>
-                <h4 class="text-white font-bold mb-4">Links Rápidos</h4>
-                <ul class="space-y-2 text-sm text-gray-400">
-                    <li><a href="#inicio" class="hover:text-emerald transition-colors">Início</a></li>
-                    <li><a href="#montra" class="hover:text-emerald transition-colors">Montra</a></li>
-                    <li><a href="#como-funciona" class="hover:text-emerald transition-colors">Como Funciona</a></li>
+                <h4 class="text-white font-bold mb-6 text-lg">Links Rápidos</h4>
+                <ul class="space-y-3 text-base text-blue-100">
+                    <li><a href="#inicio" class="hover:text-brand-orange transition-colors">Início</a></li>
+                    <li><a href="#montra" class="hover:text-brand-orange transition-colors">Montra</a></li>
+                    <li><a href="#como-funciona" class="hover:text-brand-orange transition-colors">Como Funciona</a></li>
                 </ul>
             </div>
             <div>
-                <h4 class="text-white font-bold mb-4">Sistema</h4>
-                <ul class="space-y-2 text-sm text-gray-400">
-                    <li><button onclick="abrirModal()" class="hover:text-emerald transition-colors">Acesso Restrito</button></li>
-                    <li><a href="#" class="hover:text-emerald transition-colors">Aviso de Privacidade</a></li>
+                <h4 class="text-white font-bold mb-6 text-lg">Sistema</h4>
+                <ul class="space-y-3 text-base text-blue-100">
+                    <li><button onclick="abrirModal()" class="hover:text-brand-orange transition-colors">Acesso Restrito</button></li>
+                    <li><a href="#" class="hover:text-brand-orange transition-colors">Aviso de Privacidade</a></li>
                 </ul>
             </div>
         </div>
-        <div class="text-center text-xs text-gray-500 border-t border-white/10 pt-8">
+        <div class="text-center text-sm text-blue-200/50 border-t border-white/10 pt-8">
             &copy; 2026 FindIT School - Rafael Rodrigues. Todos os direitos reservados.
         </div>
     </footer>
 
-    <!-- MODAL DE LOGIN (Mantido igual, mas com as novas cores) -->
-    <div id="modal-login" class="fixed inset-0 bg-navy/80 hidden items-center justify-center z-[100] p-4 backdrop-blur-md transition-opacity duration-300">
+    <!-- MODAL DE LOGIN -->
+    <div id="modal-login" class="fixed inset-0 bg-navy/90 hidden items-center justify-center z-[100] p-4 backdrop-blur-md transition-opacity duration-300">
         <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md p-8 relative scale-100">
             <button onclick="fecharModal()" class="absolute top-5 right-5 text-gray-400 hover:text-gray-800 bg-gray-100 hover:bg-gray-200 rounded-full w-10 h-10 flex items-center justify-center text-2xl font-bold transition-colors">&times;</button>
             
             <div class="text-center mb-8">
                 <img src="logo.png" alt="FindIT" class="h-16 mx-auto mb-4 drop-shadow-md">
-                <h2 class="text-2xl font-extrabold text-navy tracking-tight">Área Reservada</h2>
-                <p class="text-gray-500 text-sm mt-1 font-medium">Acesso exclusivo para funcionários</p>
+                <h2 class="text-2xl font-extrabold text-brand-blue tracking-tight">Área Reservada</h2>
+                <p class="text-slate-500 text-sm mt-1 font-medium">Acesso exclusivo para funcionários</p>
             </div>
 
             <div id="msg-erro" class="text-red-500 text-sm text-center mb-4 hidden font-bold bg-red-50 p-3 rounded-xl border border-red-200"></div>
             
             <div class="space-y-5">
                 <div>
-                    <label class="block text-sm font-bold text-gray-700 mb-2">Email</label>
-                    <input type="email" id="email" placeholder="funcionario@etpc.pt" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald focus:bg-white transition-all">
+                    <label class="block text-sm font-bold text-slate-700 mb-2">Email</label>
+                    <input type="email" id="email" placeholder="funcionario@etpc.pt" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-orange focus:bg-white transition-all">
                 </div>
                 <div>
-                    <label class="block text-sm font-bold text-gray-700 mb-2">Password</label>
-                    <input type="password" id="password" placeholder="••••••••" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald focus:bg-white transition-all">
+                    <label class="block text-sm font-bold text-slate-700 mb-2">Password</label>
+                    <input type="password" id="password" placeholder="••••••••" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-orange focus:bg-white transition-all">
                 </div>
-                <button onclick="fazerLogin()" class="btn-emerald w-full font-bold py-3 rounded-xl mt-2">
+                <button onclick="fazerLogin()" class="btn-primary w-full font-bold py-3 rounded-xl mt-2 text-lg">
                     Entrar no Sistema
                 </button>
             </div>
