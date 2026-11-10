@@ -8,7 +8,41 @@ const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 let currentUser = null;
 
 // ==========================================
-// VERIFICAÇÃO DE SEGURANÇA E CARREGAMENTO
+// LÓGICA DE PRÉ-VISUALIZAÇÃO DA FOTO E MB
+// ==========================================
+const inputFoto = document.getElementById('foto');
+const previewImg = document.getElementById('preview-img');
+const imagePreviewDiv = document.getElementById('image-preview');
+const uploadPlaceholder = document.getElementById('upload-placeholder');
+const fileSizeInfo = document.getElementById('file-size-info');
+const fileSizeText = document.getElementById('file-size-text');
+
+if (inputFoto) {
+    inputFoto.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                previewImg.src = e.target.result;
+                imagePreviewDiv.classList.remove('hidden');
+                uploadPlaceholder.classList.add('hidden');
+            }
+            reader.readAsDataURL(file);
+
+            const fileSizeMB = (file.size / (1024 * 1024)).toFixed(2);
+            fileSizeText.textContent = fileSizeMB;
+            fileSizeInfo.classList.remove('hidden');
+        } else {
+            imagePreviewDiv.classList.add('hidden');
+            uploadPlaceholder.classList.remove('hidden');
+            fileSizeInfo.classList.add('hidden');
+            previewImg.src = '';
+        }
+    });
+}
+
+// ==========================================
+// VERIFICAÇÃO DE SEGURANÇA
 // ==========================================
 async function verificarSessao() {
     const { data: { session }, error } = await supabaseClient.auth.getSession();
@@ -39,7 +73,7 @@ document.getElementById('btn-logout').addEventListener('click', async () => {
 });
 
 // ==========================================
-// INSERIR OBJETO (COM UPLOAD DE FOTO)
+// INSERIR OBJETO E FAZER UPLOAD
 // ==========================================
 document.getElementById('form-objeto').addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -58,11 +92,14 @@ document.getElementById('form-objeto').addEventListener('submit', async (e) => {
         const fileExt = fotoFile.name.split('.').pop();
         const fileName = `${Date.now()}.${fileExt}`;
 
+        // 1. Upload da Foto
         const { data: uploadData, error: uploadError } = await supabaseClient.storage.from('objetos').upload(fileName, fotoFile);
         if (uploadError) throw uploadError;
 
+        // 2. Obter URL da Foto
         const { data: { publicUrl } } = supabaseClient.storage.from('objetos').getPublicUrl(fileName);
 
+        // 3. Inserir na Tabela
         const { error: insertError } = await supabaseClient.from('objetos').insert([{
             titulo: titulo,
             categoria: categoria,
@@ -76,6 +113,12 @@ document.getElementById('form-objeto').addEventListener('submit', async (e) => {
 
         alert("Objeto registado com sucesso!");
         document.getElementById('form-objeto').reset();
+        
+        // Reset visual da imagem
+        imagePreviewDiv.classList.add('hidden');
+        uploadPlaceholder.classList.remove('hidden');
+        fileSizeInfo.classList.add('hidden');
+        
         carregarTabelaObjetos();
 
     } catch (error) {
@@ -87,11 +130,11 @@ document.getElementById('form-objeto').addEventListener('submit', async (e) => {
 });
 
 // ==========================================
-// CARREGAR TABELA DE OBJETOS (DESIGN PREMIUM)
+// CARREGAR TABELA COM BOTÃO NOTIFICAR
 // ==========================================
 async function carregarTabelaObjetos() {
     const tbody = document.getElementById('tabela-corpo');
-    tbody.innerHTML = '<tr><td colspan="5" class="p-8 text-center"><svg class="animate-spin h-8 w-8 text-marca-azul mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg></td></tr>';
+    tbody.innerHTML = '<tr><td colspan="5" class="p-8 text-center"><svg class="animate-spin h-8 w-8 text-brand-blue mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg></td></tr>';
 
     const { data: objetos, error } = await supabaseClient.from('objetos').select('*').order('criado_em', { ascending: false });
 
@@ -121,8 +164,8 @@ async function carregarTabelaObjetos() {
     
     objetos.forEach(obj => {
         const foto = obj.foto_url || 'https://via.placeholder.com/100';
-        
         const isDevolvido = obj.estado === 'Devolvido';
+        
         const statusBadge = isDevolvido 
             ? `<span class="inline-flex items-center gap-1.5 py-1 px-3 rounded-full text-xs font-bold bg-green-100 text-green-700 border border-green-200"><span class="w-1.5 h-1.5 rounded-full bg-green-500"></span> Devolvido</span>`
             : `<span class="inline-flex items-center gap-1.5 py-1 px-3 rounded-full text-xs font-bold bg-orange-100 text-orange-700 border border-orange-200"><span class="w-1.5 h-1.5 rounded-full bg-orange-500"></span> Achado</span>`;
@@ -147,7 +190,13 @@ async function carregarTabelaObjetos() {
                         ${statusBadge}
                     </button>
                 </td>
-                <td class="p-5 text-center">
+                <td class="p-5 text-center flex items-center justify-center gap-2">
+                    <!-- Botão Notificar -->
+                    <button onclick="abrirModalNotificar('${obj.titulo}', '${obj.sala}')" class="text-brand-blue hover:text-blue-800 hover:bg-blue-50 p-2.5 rounded-lg transition-all" title="Notificar Alunos por Email">
+                        <svg class="w-5 h-5 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                    </button>
+                    
+                    <!-- Botão Apagar -->
                     <button onclick="apagarObjeto(${obj.id})" class="text-gray-400 hover:text-red-500 hover:bg-red-50 p-2.5 rounded-lg transition-all" title="Eliminar Objeto">
                         <svg class="w-5 h-5 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                     </button>
@@ -155,6 +204,23 @@ async function carregarTabelaObjetos() {
             </tr>
         `;
     });
+}
+
+// ==========================================
+// AÇÕES (NOTIFICAR, MUDAR ESTADO, APAGAR)
+// ==========================================
+function abrirModalNotificar(titulo, sala) {
+    const emails = prompt(`Notificar alunos sobre: ${titulo} (Sala: ${sala})\n\nInsere os emails separados por vírgula:`);
+    if (!emails) return;
+
+    const listaEmails = emails.split(',').map(e => e.trim());
+    
+    // Simulação de envio para a consola (Para a PAP, mostras que a função foi chamada)
+    console.log(`A enviar emails para: ${listaEmails.join(', ')}`);
+    console.log(`Assunto: Objeto Encontrado: ${titulo}`);
+    console.log(`Mensagem: Encontrámos um(a) ${titulo} na sala ${sala}. Dirige-te à secretaria.`);
+    
+    alert(`Notificações simuladas com sucesso para: ${listaEmails.length} alunos.\n\n(Verifica a consola F12 para veres os detalhes ou o Mailtrap se configurado).`);
 }
 
 async function alterarEstado(id, estadoAtual) {
