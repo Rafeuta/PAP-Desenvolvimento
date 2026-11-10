@@ -8,85 +8,126 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
         tailwind.config = {
-            theme: { extend: { colors: { 'marca-azul': '#0f3b7a', 'marca-laranja': '#e67e22' } } }
+            theme: {
+                extend: {
+                    colors: {
+                        'brand-blue': '#0f3b7a',
+                        'brand-orange': '#e67e22',
+                        'sidebar': '#111827' // Admin tem uma sidebar mais escura
+                    },
+                    boxShadow: {
+                        'premium': '0 10px 40px -10px rgba(0,0,0,0.08)',
+                    }
+                }
+            }
         }
     </script>
     <link rel="stylesheet" href="style.css">
 </head>
-<body class="bg-gray-100 font-sans flex h-screen overflow-hidden">
+<body class="bg-gray-50 font-sans flex h-screen overflow-hidden text-gray-800">
 
-    <!-- Sidebar do Admin (Com mais opções) -->
-    <aside class="w-64 bg-gray-900 text-white flex flex-col shadow-xl z-20">
-        <div class="h-24 flex items-center justify-center bg-black border-b border-gray-800">
-            <img src="logo.png" alt="FindIT" class="h-14 brightness-0 invert">
-            <span class="ml-2 text-xs bg-marca-laranja px-2 py-1 rounded font-bold uppercase">Admin</span>
+    <!-- Sidebar Admin -->
+    <aside class="w-64 bg-sidebar text-gray-300 flex flex-col shadow-2xl z-30 transition-all duration-300">
+        <div class="h-24 flex items-center justify-center border-b border-gray-800 bg-black/40 p-4 relative">
+            <img src="logo.png" alt="FindIT" class="h-12 w-auto brightness-0 invert object-contain">
+            <span class="absolute bottom-2 right-2 text-[10px] bg-brand-orange text-white px-2 py-0.5 rounded font-bold uppercase tracking-wider">Admin</span>
         </div>
+        
         <nav class="flex-grow py-6 px-4 space-y-2">
-            <a href="#" class="block px-4 py-3 bg-white/10 rounded-lg font-bold border-l-4 border-marca-laranja">Gestão de Objetos</a>
-            <a href="#" onclick="alert('Funcionalidade em desenvolvimento')" class="block px-4 py-3 hover:bg-white/5 rounded-lg transition-colors text-gray-300">Gestão de Funcionários</a>
-            <a href="index.html" class="block px-4 py-3 hover:bg-white/5 rounded-lg transition-colors text-gray-300">Ver Site Público</a>
+            <a href="#" class="flex items-center gap-3 px-4 py-3 bg-white/10 text-white rounded-xl font-bold border-l-4 border-brand-orange transition-all">
+                <svg class="w-5 h-5 text-brand-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+                Gestão de Objetos
+            </a>
+            <a href="index.html" class="flex items-center gap-3 px-4 py-3 hover:bg-white/5 hover:text-white rounded-xl font-medium transition-all">
+                <svg class="w-5 h-5 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                Ver Site Público
+            </a>
         </nav>
+
         <div class="p-4 border-t border-gray-800">
-            <button id="btn-logout" class="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-2 rounded-lg transition-colors">Sair</button>
+            <button id="btn-logout" class="w-full flex items-center justify-center gap-2 bg-red-500/10 text-red-400 hover:bg-red-500 hover:text-white font-bold py-3 rounded-xl transition-all duration-300">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                Terminar Sessão
+            </button>
         </div>
     </aside>
 
-    <!-- Conteúdo Principal (Igual ao do funcionário) -->
-    <main class="flex-grow flex flex-col overflow-y-auto">
-        <header class="bg-white shadow-sm h-20 flex items-center justify-between px-8 sticky top-0 z-10">
-            <h1 class="text-2xl font-bold text-gray-800">Painel de Administração</h1>
-            <span id="user-email" class="text-sm font-bold text-gray-600 bg-gray-100 px-3 py-1 rounded-full">A carregar...</span>
+    <!-- Main Content (Igual ao dashboard mas com cor diferente no topo) -->
+    <main class="flex-grow flex flex-col overflow-y-auto bg-gray-50 relative">
+        
+        <header class="bg-white/80 backdrop-blur-md shadow-sm h-20 flex items-center justify-between px-8 sticky top-0 z-20 border-b border-gray-100">
+            <h1 class="text-xl font-extrabold text-gray-800 flex items-center gap-2">
+                <svg class="w-6 h-6 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+                Painel de Administração
+            </h1>
+            
+            <div class="flex items-center gap-3 bg-gray-50 border border-gray-200 rounded-full px-2 py-1.5 pr-4">
+                <div class="w-8 h-8 bg-gray-900 rounded-full flex items-center justify-center text-white font-bold text-xs">AD</div>
+                <span id="user-email" class="text-sm font-bold text-gray-700">A carregar...</span>
+            </div>
         </header>
 
-        <div class="p-8 max-w-6xl mx-auto w-full">
-            <!-- Formulário de Registo (Admin também pode adicionar) -->
-            <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 mb-8">
-                <h2 class="text-xl font-bold text-gray-800 mb-4">Adicionar Novo Objeto</h2>
-                <form id="form-objeto" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-bold text-gray-700 mb-1">Título</label>
-                        <input type="text" id="titulo" required class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-gray-800">
+        <!-- O resto do conteúdo é exatamente igual ao dashboard -->
+        <div class="p-8 max-w-6xl mx-auto w-full space-y-8">
+            <div class="bg-white rounded-3xl shadow-premium border border-gray-100 overflow-hidden">
+                <div class="px-8 py-6 border-b border-gray-100 bg-gray-50/50">
+                    <h2 class="text-lg font-extrabold text-gray-800">Registar Novo Objeto</h2>
+                </div>
+                
+                <form id="form-objeto" class="p-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-1">
+                        <label class="block text-sm font-bold text-gray-700">Título do Objeto</label>
+                        <input type="text" id="titulo" required class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-gray-800 focus:bg-white transition-all">
                     </div>
-                    <div>
-                        <label class="block text-sm font-bold text-gray-700 mb-1">Categoria</label>
-                        <select id="categoria" required class="w-full px-4 py-2 border rounded-lg">
+                    <div class="space-y-1">
+                        <label class="block text-sm font-bold text-gray-700">Categoria</label>
+                        <select id="categoria" required class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl appearance-none">
                             <option value="Eletrónica">Eletrónica</option>
                             <option value="Roupa">Roupa</option>
                             <option value="Material Escolar">Material Escolar</option>
                             <option value="Chaves">Chaves</option>
                         </select>
                     </div>
-                    <div>
-                        <label class="block text-sm font-bold text-gray-700 mb-1">Sala</label>
-                        <input type="text" id="sala" required class="w-full px-4 py-2 border rounded-lg">
+                    <div class="space-y-1 md:col-span-2">
+                        <label class="block text-sm font-bold text-gray-700">Sala / Local</label>
+                        <input type="text" id="sala" required class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl">
                     </div>
-                    <div>
-                        <label class="block text-sm font-bold text-gray-700 mb-1">Foto</label>
-                        <input type="file" id="foto" accept="image/*" required class="w-full px-4 py-2 border rounded-lg text-sm bg-gray-50">
+                    <div class="space-y-1 md:col-span-2 mt-2">
+                        <label class="block text-sm font-bold text-gray-700 mb-1">Fotografia (Obrigatório)</label>
+                        <div id="dropzone" class="mt-1 flex flex-col justify-center items-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-xl hover:border-gray-800 transition-colors bg-gray-50 hover:bg-gray-100 cursor-pointer relative group">
+                            <input id="foto" type="file" accept="image/*" required class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10">
+                            <div id="upload-placeholder" class="space-y-1 text-center">
+                                <svg class="mx-auto h-12 w-12 text-gray-400 group-hover:text-gray-800 transition-colors" stroke="currentColor" fill="none" viewBox="0 0 48 48"><path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                                <div class="flex text-sm text-gray-600 justify-center"><span class="relative rounded-md font-bold text-gray-800">Carregar um ficheiro</span><p class="pl-1">ou arrastar e largar</p></div>
+                            </div>
+                            <div id="image-preview" class="hidden w-full h-48 relative"><img id="preview-img" src="" alt="Preview" class="w-full h-full object-contain rounded-lg"></div>
+                        </div>
+                        <div id="file-size-info" class="hidden text-sm font-bold text-gray-800 mt-2 text-right">Tamanho: <span id="file-size-text">0</span> MB</div>
                     </div>
-                    <div class="md:col-span-2 flex justify-end mt-2">
-                        <button type="submit" id="btn-submit" class="bg-gray-900 text-white font-bold py-2.5 px-8 rounded-lg shadow hover:bg-black transition-all">Guardar Objeto</button>
+                    <div class="md:col-span-2 flex justify-end mt-4">
+                        <button type="submit" id="btn-submit" class="bg-gray-900 text-white font-bold py-3 px-8 rounded-xl shadow-lg hover:bg-black transition-all flex items-center gap-2">
+                            Guardar Objeto
+                        </button>
                     </div>
                 </form>
             </div>
 
-            <!-- Tabela de Objetos (Admin vê TODOS e pode apagar) -->
-            <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
-                <div class="p-6 border-b border-gray-200 flex justify-between items-center">
-                    <h2 class="text-xl font-bold text-gray-800">Todos os Objetos do Sistema</h2>
+            <div class="bg-white rounded-3xl shadow-premium border border-gray-100 overflow-hidden">
+                <div class="px-8 py-6 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
+                    <h2 class="text-lg font-extrabold text-gray-800">Todos os Objetos do Sistema</h2>
                 </div>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse">
                         <thead>
-                            <tr class="bg-gray-50 text-gray-600 text-sm border-b border-gray-200">
-                                <th class="p-4 font-bold">Foto</th>
-                                <th class="p-4 font-bold">Título</th>
-                                <th class="p-4 font-bold">Sala</th>
-                                <th class="p-4 font-bold">Estado</th>
-                                <th class="p-4 font-bold text-center">Ações</th>
+                            <tr class="bg-white text-gray-400 text-xs uppercase tracking-wider border-b border-gray-100">
+                                <th class="p-5 font-bold">Fotografia</th>
+                                <th class="p-5 font-bold">Título / Categoria</th>
+                                <th class="p-5 font-bold">Localização</th>
+                                <th class="p-5 font-bold">Estado</th>
+                                <th class="p-5 font-bold text-center">Ações</th>
                             </tr>
                         </thead>
-                        <tbody id="tabela-corpo">
+                        <tbody id="tabela-corpo" class="divide-y divide-gray-50">
                             <!-- Inserido via JS -->
                         </tbody>
                     </table>
