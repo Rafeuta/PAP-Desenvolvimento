@@ -98,21 +98,21 @@ function atualizarInterface(user) {
 
     if (user) {
         // Se o utilizador ESTÁ logado:
-        // Esconde o botão de Login
         if (btnLogin) {
             btnLogin.classList.add('hidden');
             btnLogin.classList.remove('flex');
+            btnLogin.classList.remove('md:flex'); // Remove a classe que força a visibilidade em ecrãs grandes
+            btnLogin.style.display = 'none';     // Força o esconderijo via CSS inline
         }
-        // Mostra o menu "A minha conta"
         if (userMenu) userMenu.classList.remove('hidden');
     } else {
         // Se o utilizador NÃO ESTÁ logado:
-        // Mostra o botão de Login
         if (btnLogin) {
             btnLogin.classList.remove('hidden');
-            btnLogin.classList.add('flex'); 
+            btnLogin.classList.add('flex');
+            btnLogin.classList.add('md:flex');
+            btnLogin.style.display = '';         // Limpa o estilo inline
         }
-        // Esconde o menu "A minha conta"
         if (userMenu) userMenu.classList.add('hidden');
     }
 }
