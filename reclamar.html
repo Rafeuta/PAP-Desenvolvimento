@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reclamar Objeto - FindIT School</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        tailwind.config = {
+            theme: { extend: { colors: { 'navy': '#0b1b3d', 'brand-blue': '#0f3b7a', 'brand-orange': '#e67e22' } } }
+        }
+    </script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-gray-50 flex flex-col min-h-screen font-sans">
+
+    <!-- Header Simples -->
+    <header class="bg-white shadow-sm py-4">
+        <div class="max-w-4xl mx-auto px-4 flex items-center justify-between">
+            <a href="index.html" class="flex items-center gap-2">
+                <img src="logo.png" alt="FindIT" class="h-12">
+            </a>
+            <a href="index.html" class="text-brand-blue font-bold hover:text-brand-orange transition-colors">&larr; Voltar ao Catálogo</a>
+        </div>
+    </header>
+
+    <main class="flex-grow flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl shadow-xl w-full max-w-lg p-8 relative">
+            
+            <!-- Título -->
+            <div class="text-center mb-8">
+                <div class="w-16 h-16 bg-orange-100 text-brand-orange rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                </div>
+                <h1 class="text-2xl font-extrabold text-brand-blue">Reclamar Propriedade</h1>
+                <p class="text-gray-500 mt-2">Preenche os dados para enviares um email à secretaria a justificar que este objeto te pertence.</p>
+            </div>
+
+            <!-- Informação do Objeto (Preenchido via JS) -->
+            <div id="info-objeto" class="bg-blue-50 border border-blue-100 rounded-xl p-4 mb-6 text-sm text-brand-blue font-bold">
+                A carregar informação do objeto...
+            </div>
+
+            <!-- Formulário -->
+            <form id="form-reclamacao" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-1">O teu Nome</label>
+                    <input type="text" id="nome" required class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-brand-orange outline-none">
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-1">O teu Email</label>
+                    <input type="email" id="email" required class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-brand-orange outline-none">
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-1">Justificação (Porque é teu?)</label>
+                    <textarea id="justificacao" required rows="4" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-brand-orange outline-none" placeholder="Ex: Tem um autocolante no fundo, o meu nome está escrito no interior..."></textarea>
+                </div>
+                
+                <button type="submit" id="btn-enviar" class="w-full bg-brand-orange text-white font-bold py-3 rounded-xl hover:bg-orange-600 transition-all shadow-md mt-4">
+                    Enviar Reclamação por Email
+                </button>
+            </form>
+
+        </div>
+    </main>
+
+    <!-- O script para esta página -->
+    <script>
+        const SUPABASE_URL = 'COLOCA_AQUI_O_TEU_PROJECT_URL';
+        const SUPABASE_ANON_KEY = 'COLOCA_AQUI_A_TUA_PUBLISHABLE_KEY';
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // Pegar o ID do objeto do URL (ex: reclamar.html?id=5)
+        const params = new URLSearchParams(window.location.search);
+        const objetoId = params.get('id');
+        let objetoInfo = null;
+
+        // Carregar a informação do objeto para mostrar ao aluno
+        async function carregarInfoObjeto() {
+            if (!objetoId) {
+                document.getElementById('info-objeto').textContent = "Erro: Objeto não encontrado.";
+                return;
+            }
+
+            const { data, error } = await supabaseClient.from('objetos').select('titulo, sala').eq('id', objetoId).single();
+            
+            if (data) {
+                objetoInfo = data;
+                document.getElementById('info-objeto').innerHTML = `
+                    <p>Estás a reclamar: <span class="text-brand-orange">${data.titulo}</span></p>
+                    <p class="text-xs font-normal text-gray-500 mt-1">Encontrado em: ${data.sala}</p>
+                `;
+            }
+        }
+
+        // Enviar o formulário
+        document.getElementById('form-reclamacao').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('btn-enviar');
+            btn.textContent = "A enviar...";
+            btn.disabled = true;
+
+            const nome = document.getElementById('nome').value;
+            const email = document.getElementById('email').value;
+            const justificacao = document.getElementById('justificacao').value;
+
+            // AQUI VAMOS SIMULAR O ENVIO DO EMAIL
+            // Na PAP, podes explicar que chamaste uma Edge Function do Supabase aqui.
+            console.log("--- SIMULAÇÃO DE ENVIO DE EMAIL ---");
+            console.log(`Para: secretaria@etpc.pt`);
+            console.log(`De: ${email} (${nome})`);
+            console.log(`Assunto: Reclamação de Objeto - ${objetoInfo.titulo}`);
+            console.log(`Justificação: ${justificacao}`);
+            console.log("-----------------------------------");
+
+            setTimeout(() => {
+                alert(`O teu pedido foi enviado com sucesso para a secretaria!\n\nO email de justificação foi registado. Aguarda contacto.`);
+                window.location.href = 'index.html'; // Volta ao início
+            }, 1500);
+        });
+
+        // Iniciar
+        window.onload = carregarInfoObjeto;
+    </script>
+</body>
+</html>
