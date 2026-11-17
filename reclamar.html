@@ -83,16 +83,25 @@
                 return;
             }
 
-            const { data, error } = await supabaseClient.from('objetos').select('titulo, sala').eq('id', objetoId).single();
-            
-            if (data) {
-                objetoInfo = data;
-                document.getElementById('info-objeto').innerHTML = `
-                    <p>Estás a reclamar: <span class="text-brand-orange">${data.titulo}</span></p>
-                    <p class="text-xs font-normal text-gray-500 mt-1">Encontrado em: ${data.sala}</p>
-                `;
-            }
-        }
+           // Chamar a Edge Function do Supabase
+const { data, error } = await supabaseClient.functions.invoke('enviar-reclamacao', {
+    body: {
+        nome: nome,
+        email: email,
+        justificacao: justificacao,
+        tituloObjeto: objetoInfo.titulo,
+        sala: objetoInfo.sala
+    }
+});
+
+if (error) {
+    alert("Erro ao enviar: " + error.message);
+    btn.textContent = "Enviar Reclamação por Email";
+    btn.disabled = false;
+} else {
+    alert("Pedido enviado com sucesso! Verifica a caixa de entrada do Mailtrap para veres o email.");
+    window.location.href = 'index.html';
+}
 
         // Enviar o formulário
         document.getElementById('form-reclamacao').addEventListener('submit', async (e) => {
