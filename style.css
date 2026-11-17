@@ -1,41 +1,74 @@
-/* Importação da fonte Inter (mais limpa e institucional) */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+/* Importação da fonte Inter com pesos variados para melhor hierarquia */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
 body {
     font-family: 'Inter', sans-serif;
     -webkit-font-smoothing: antialiased;
-    background-color: #f8fafc; /* Fundo cinza muito claro */
+    -moz-osx-font-smoothing: grayscale;
+    background-color: #f8fafc;
+    color: #1e293b;
 }
 
-/* Estilo dos Botões de Filtro */
+/* Scrollbar personalizada moderna e discreta */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+::-webkit-scrollbar-track {
+    background: #f1f5f9;
+}
+::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+/* Estilo dos Botões de Filtro (Design Premium) */
 .filter-btn {
-    transition: all 0.2s ease;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     border: 1px solid transparent;
+    position: relative;
+}
+
+.filter-btn:hover {
+    background-color: #f1f5f9;
+    color: #0f3b7a;
 }
 
 .filter-btn.active {
-    background-color: #0f3b7a !important; /* Azul institucional */
-    color: white !important;
-    box-shadow: 0 2px 4px rgba(15, 59, 122, 0.2);
+    background-color: #eff6ff !important; /* Azul muito claro */
+    color: #0f3b7a !important;
+    border-left: 3px solid #0f3b7a !important; /* Indicador lateral elegante */
+    font-weight: 700 !important;
 }
 
 /* Estilo dos Cartões do Catálogo */
 .card-objeto {
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .card-objeto:hover {
     transform: translateY(-4px);
-    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    border-color: #bfdbfe;
 }
 
-/* Scrollbar personalizada e discreta */
-::-webkit-scrollbar { width: 8px; }
-::-webkit-scrollbar-track { background: #f1f5f9; }
-::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+/* Utilitário para limitar texto a 1 linha com reticências */
+.line-clamp-1 {
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
 
-/* Remover decorações desnecessárias que davam ar de IA */
-.hero-mesh {
-    background-color: #0b1b3d; /* Azul escuro sólido */
+/* Animação suave para elementos que aparecem */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+    animation: fadeIn 0.4s ease-out forwards;
 }
