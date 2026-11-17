@@ -250,3 +250,37 @@ window.onload = () => {
         carregarObjetos();
     }
 };
+
+        catalogoDiv.innerHTML += `
+            <div class="card-objeto flex flex-col group bg-white rounded-2xl shadow-sm hover:shadow-premium transition-all duration-300 border border-gray-100 overflow-hidden" style="animation-delay: ${animationDelay}">
+                
+                <!-- Imagem e Etiqueta de Estado -->
+                <div class="h-52 overflow-hidden bg-gray-100 flex items-center justify-center relative">
+                    <img src="${foto}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+                    <div class="absolute top-3 right-3 px-3 py-1.5 rounded-lg text-xs font-extrabold shadow-md backdrop-blur-md uppercase tracking-wide ${badgeClass}">
+                        ${obj.estado}
+                    </div>
+                </div>
+
+                <!-- Informação do Objeto -->
+                <div class="p-5 flex-grow flex flex-col">
+                    <span class="text-[11px] font-extrabold text-marca-azul bg-blue-50 px-2.5 py-1 rounded-md self-start mb-3 uppercase tracking-wider">${obj.categoria}</span>
+                    
+                    <h3 class="text-lg font-extrabold text-gray-900 leading-tight mb-2 group-hover:text-marca-azul transition-colors line-clamp-2">${obj.titulo}</h3>
+                    
+                    <div class="mt-auto pt-4 border-t border-gray-100 flex flex-col gap-3">
+                        <p class="text-sm text-gray-500 flex items-center gap-1.5 font-medium">
+                            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg> 
+                            Sala ${obj.sala}
+                        </p>
+                        
+                        <!-- BOTÃO DE RECLAMAR -->
+                        <a href="reclamar.html?id=${obj.id}" class="w-full block text-center bg-gray-50 text-marca-azul font-bold py-2.5 rounded-lg border border-gray-200 hover:bg-marca-laranja hover:text-white hover:border-marca-laranja transition-colors text-sm">
+                            Este objeto é meu
+                        </a>
+                    </div>
+                </div>
+            </div>
+        `;
+
+
