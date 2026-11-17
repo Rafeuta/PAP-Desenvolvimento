@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-PT">
+<html lang="pt-PT" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,129 +8,171 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
         tailwind.config = {
-            theme: { extend: { colors: { 'navy': '#0b1b3d', 'brand-blue': '#0f3b7a', 'brand-orange': '#e67e22' } } }
+            theme: {
+                extend: {
+                    colors: { 'navy': '#0b1b3d', 'brand-blue': '#0f3b7a', 'brand-orange': '#e67e22', 'brand-orange-hover': '#d35400', 'surface': '#f8fafc' },
+                    fontFamily: { sans: ['Inter', 'sans-serif'] }
+                }
+            }
         }
     </script>
     <link rel="stylesheet" href="style.css">
 </head>
-<body class="bg-gray-50 flex flex-col min-h-screen font-sans">
+<body class="bg-surface text-gray-800 antialiased min-h-screen flex flex-col">
 
-    <!-- Header Simples -->
-    <header class="bg-white shadow-sm py-4">
-        <div class="max-w-4xl mx-auto px-4 flex items-center justify-between">
-            <a href="index.html" class="flex items-center gap-2">
-                <img src="logo.png" alt="FindIT" class="h-12">
+    <!-- HEADER INSTITUCIONAL -->
+    <header class="bg-white border-b border-gray-200 sticky top-0 z-40 shadow-sm">
+        <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+            <a href="index.html" class="flex items-center gap-3 group">
+                <img src="logo.png" alt="FindIT School" class="h-10 w-auto transition-transform group-hover:scale-105">
+                <span class="text-lg font-extrabold text-navy">FindIT <span class="text-brand-orange">School</span></span>
             </a>
-            <a href="index.html" class="text-brand-blue font-bold hover:text-brand-orange transition-colors">&larr; Voltar ao Catálogo</a>
+            <a href="index.html" class="text-sm font-semibold text-gray-600 hover:text-brand-blue flex items-center gap-2 transition-colors">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                Voltar ao Catálogo
+            </a>
         </div>
     </header>
 
-    <main class="flex-grow flex items-center justify-center p-4">
-        <div class="bg-white rounded-3xl shadow-xl w-full max-w-lg p-8 relative">
-            
-            <!-- Título -->
-            <div class="text-center mb-8">
-                <div class="w-16 h-16 bg-orange-100 text-brand-orange rounded-full flex items-center justify-center mx-auto mb-4">
-                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
-                </div>
-                <h1 class="text-2xl font-extrabold text-brand-blue">Reclamar Propriedade</h1>
-                <p class="text-gray-500 mt-2">Preenche os dados para enviares um email à secretaria a justificar que este objeto te pertence.</p>
+    <main class="flex-grow max-w-6xl mx-auto px-6 py-12 w-full">
+        
+        <!-- Breadcrumb -->
+        <nav class="mb-6 flex items-center gap-2 text-sm text-gray-500">
+            <a href="index.html" class="hover:text-brand-blue transition-colors">Catálogo</a>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+            <span class="text-gray-900 font-semibold">Reclamar Objeto</span>
+        </nav>
+
+        <!-- Estado de Carregamento -->
+        <div id="loading-state" class="flex flex-col items-center justify-center py-20">
+            <svg class="animate-spin h-10 w-10 text-brand-blue mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+            <p class="text-gray-500 font-medium">A carregar detalhes do objeto...</p>
+        </div>
+
+        <!-- Conteúdo Principal (Oculto até carregar) -->
+        <div id="claim-content" class="hidden">
+            <div class="text-center mb-10">
+                <h1 class="text-3xl md:text-4xl font-extrabold text-navy mb-3">Reclamar Propriedade</h1>
+                <p class="text-gray-600 max-w-2xl mx-auto">Preenche os teus dados para enviares um pedido à secretaria. Receberás uma resposta por email após validação.</p>
             </div>
 
-            <!-- Informação do Objeto (Preenchido via JS) -->
-            <div id="info-objeto" class="bg-blue-50 border border-blue-100 rounded-xl p-4 mb-6 text-sm text-brand-blue font-bold">
-                A carregar informação do objeto...
-            </div>
-
-            <!-- Formulário -->
-            <form id="form-reclamacao" class="space-y-4">
-                <div>
-                    <label class="block text-sm font-bold text-gray-700 mb-1">O teu Nome</label>
-                    <input type="text" id="nome" required class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-brand-orange outline-none">
-                </div>
-                <div>
-                    <label class="block text-sm font-bold text-gray-700 mb-1">O teu Email</label>
-                    <input type="email" id="email" required class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-brand-orange outline-none">
-                </div>
-                <div>
-                    <label class="block text-sm font-bold text-gray-700 mb-1">Justificação (Porque é teu?)</label>
-                    <textarea id="justificacao" required rows="4" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-brand-orange outline-none" placeholder="Ex: Tem um autocolante no fundo, o meu nome está escrito no interior..."></textarea>
-                </div>
+            <div class="grid md:grid-cols-2 gap-8 items-start">
                 
-                <button type="submit" id="btn-enviar" class="w-full bg-brand-orange text-white font-bold py-3 rounded-xl hover:bg-orange-600 transition-all shadow-md mt-4">
-                    Enviar Reclamação por Email
-                </button>
-            </form>
+                <!-- Lado Esquerdo: Detalhes do Objeto -->
+                <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-card sticky top-24">
+                    <div class="flex items-center gap-2 mb-5">
+                        <div class="w-10 h-10 bg-brand-blue/10 rounded-lg flex items-center justify-center">
+                            <svg class="w-5 h-5 text-brand-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
+                        </div>
+                        <h2 class="text-lg font-bold text-navy">Objeto a Reclamar</h2>
+                    </div>
 
+                    <div class="aspect-video bg-gray-100 rounded-xl overflow-hidden mb-5 border border-gray-200">
+                        <img id="obj-foto" src="" alt="Foto do objeto" class="w-full h-full object-cover">
+                    </div>
+
+                    <div class="space-y-4">
+                        <div>
+                            <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Título</p>
+                            <p id="obj-titulo" class="text-xl font-bold text-gray-900"></p>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Categoria</p>
+                                <span id="obj-categoria" class="inline-block text-sm font-bold text-brand-blue bg-blue-50 px-3 py-1.5 rounded-lg"></span>
+                            </div>
+                            <div>
+                                <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Local</p>
+                                <p id="obj-sala" class="text-sm font-semibold text-gray-700 flex items-center gap-1.5 mt-1">
+                                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path></svg>
+                                    <span id="obj-sala-texto"></span>
+                                </p>
+                            </div>
+                        </div>
+
+                        <div>
+                            <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Data de Registo</p>
+                            <p id="obj-data" class="text-sm font-medium text-gray-700"></p>
+                        </div>
+
+                        <!-- Aviso Importante -->
+                        <div class="bg-orange-50 border border-orange-200 p-4 rounded-xl mt-5">
+                            <div class="flex items-start gap-3">
+                                <svg class="w-5 h-5 text-brand-orange flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                <div>
+                                    <p class="text-sm font-bold text-orange-900 mb-1">Importante</p>
+                                    <p class="text-sm text-orange-800 leading-relaxed">Após a aprovação do teu pedido, dirige-te à secretaria com o teu <strong>Cartão de Aluno</strong> para levantar o objeto.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Lado Direito: Formulário -->
+                <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-card">
+                    <div class="flex items-center gap-2 mb-5">
+                        <div class="w-10 h-10 bg-brand-orange/10 rounded-lg flex items-center justify-center">
+                            <svg class="w-5 h-5 text-brand-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                        </div>
+                        <h2 class="text-lg font-bold text-navy">Os Teus Dados</h2>
+                    </div>
+
+                    <form id="form-reclamacao" class="space-y-5">
+                        <div>
+                            <label for="nome" class="block text-sm font-bold text-gray-700 mb-1.5">Nome Completo <span class="text-red-500">*</span></label>
+                            <input type="text" id="nome" required class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-brand-blue/20 focus:border-brand-blue outline-none transition-all" placeholder="Ex: Rafael Rodrigues">
+                        </div>
+
+                        <div>
+                            <label for="email" class="block text-sm font-bold text-gray-700 mb-1.5">Email Institucional <span class="text-red-500">*</span></label>
+                            <input type="email" id="email" required class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-brand-blue/20 focus:border-brand-blue outline-none transition-all" placeholder="Ex: aluno@etpc.pt">
+                            <p class="text-xs text-gray-500 mt-1">Usa o teu email da escola para validação.</p>
+                        </div>
+
+                        <div>
+                            <label for="turma" class="block text-sm font-bold text-gray-700 mb-1.5">Turma <span class="text-red-500">*</span></label>
+                            <input type="text" id="turma" required class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-brand-blue/20 focus:border-brand-blue outline-none transition-all" placeholder="Ex: 12º TGPSI">
+                        </div>
+
+                        <div>
+                            <label for="justificacao" class="block text-sm font-bold text-gray-700 mb-1.5">Justificação <span class="text-red-500">*</span></label>
+                            <textarea id="justificacao" rows="5" required class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-brand-blue/20 focus:border-brand-blue outline-none transition-all resize-none" placeholder="Descreve marcas específicas, conteúdo (se for uma mochila), ou qualquer detalhe que comprove que o objeto é teu. Sê o mais detalhado possível."></textarea>
+                            <p class="text-xs text-gray-500 mt-1">Quanto mais detalhada for a justificação, mais rápido o pedido será aprovado.</p>
+                        </div>
+
+                        <button type="submit" id="btn-submit-claim" class="w-full bg-brand-orange text-white font-bold py-3.5 rounded-xl hover:bg-brand-orange-hover transition-all duration-300 shadow-lg shadow-brand-orange/20 hover:shadow-xl hover:shadow-brand-orange/30 flex items-center justify-center gap-2 mt-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
+                            Enviar Pedido à Secretaria
+                        </button>
+
+                        <p class="text-xs text-center text-gray-500 mt-2">
+                            Ao submeter, aceitas que os teus dados sejam partilhados com a secretaria da ETPC para efeitos de validação.
+                        </p>
+                    </form>
+                </div>
+            </div>
         </div>
     </main>
 
-    <!-- O script para esta página -->
-    <script>
-        const SUPABASE_URL = 'COLOCA_AQUI_O_TEU_PROJECT_URL';
-        const SUPABASE_ANON_KEY = 'COLOCA_AQUI_A_TUA_PUBLISHABLE_KEY';
-        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    <!-- FOOTER -->
+    <footer class="bg-navy py-10 text-center border-t-4 border-brand-orange mt-auto">
+        <div class="max-w-7xl mx-auto px-6">
+            <img src="logo.png" alt="FindIT" class="h-10 mx-auto mb-4 brightness-0 invert opacity-80">
+            <p class="text-blue-200 text-sm font-medium">&copy; 2026 FindIT School - Rafael Rodrigues.</p>
+            <p class="text-blue-300/60 text-xs mt-1">Projeto de Aptidão Profissional (PAP) - ETPC</p>
+        </div>
+    </footer>
 
-        // Pegar o ID do objeto do URL (ex: reclamar.html?id=5)
-        const params = new URLSearchParams(window.location.search);
-        const objetoId = params.get('id');
-        let objetoInfo = null;
+    <!-- TOAST NOTIFICATION -->
+    <div id="toast" class="fixed bottom-6 right-6 transform translate-y-20 opacity-0 transition-all duration-300 z-50 bg-white border-l-4 border-brand-blue shadow-2xl rounded-lg p-4 flex items-center gap-3 max-w-sm">
+        <div id="toast-icon"></div>
+        <div>
+            <h4 id="toast-title" class="font-bold text-gray-900 text-sm">Sucesso</h4>
+            <p id="toast-message" class="text-gray-600 text-xs mt-0.5">Operação realizada com sucesso.</p>
+        </div>
+    </div>
 
-        // Carregar a informação do objeto para mostrar ao aluno
-        async function carregarInfoObjeto() {
-            if (!objetoId) {
-                document.getElementById('info-objeto').textContent = "Erro: Objeto não encontrado.";
-                return;
-            }
-
-           // Chamar a Edge Function do Supabase
-const { data, error } = await supabaseClient.functions.invoke('enviar-reclamacao', {
-    body: {
-        nome: nome,
-        email: email,
-        justificacao: justificacao,
-        tituloObjeto: objetoInfo.titulo,
-        sala: objetoInfo.sala
-    }
-});
-
-if (error) {
-    alert("Erro ao enviar: " + error.message);
-    btn.textContent = "Enviar Reclamação por Email";
-    btn.disabled = false;
-} else {
-    alert("Pedido enviado com sucesso! Verifica a caixa de entrada do Mailtrap para veres o email.");
-    window.location.href = 'index.html';
-}
-
-        // Enviar o formulário
-        document.getElementById('form-reclamacao').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const btn = document.getElementById('btn-enviar');
-            btn.textContent = "A enviar...";
-            btn.disabled = true;
-
-            const nome = document.getElementById('nome').value;
-            const email = document.getElementById('email').value;
-            const justificacao = document.getElementById('justificacao').value;
-
-            // AQUI VAMOS SIMULAR O ENVIO DO EMAIL
-            // Na PAP, podes explicar que chamaste uma Edge Function do Supabase aqui.
-            console.log("--- SIMULAÇÃO DE ENVIO DE EMAIL ---");
-            console.log(`Para: secretaria@etpc.pt`);
-            console.log(`De: ${email} (${nome})`);
-            console.log(`Assunto: Reclamação de Objeto - ${objetoInfo.titulo}`);
-            console.log(`Justificação: ${justificacao}`);
-            console.log("-----------------------------------");
-
-            setTimeout(() => {
-                alert(`O teu pedido foi enviado com sucesso para a secretaria!\n\nO email de justificação foi registado. Aguarda contacto.`);
-                window.location.href = 'index.html'; // Volta ao início
-            }, 1500);
-        });
-
-        // Iniciar
-        window.onload = carregarInfoObjeto;
-    </script>
+    <script src="reclamar.js"></script>
 </body>
 </html>
