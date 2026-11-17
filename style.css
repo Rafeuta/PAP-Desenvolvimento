@@ -1,141 +1,41 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
-
-:root {
-    /* Cores baseadas no Logótipo FindIT */
-    --brand-navy: #0b1b3d;       /* Azul muito escuro (fundo) */
-    --brand-blue: #0f3b7a;       /* Azul principal */
-    --brand-light-blue: #1e5fbf; /* Azul claro (gradientes) */
-    --brand-orange: #e67e22;     /* Laranja do logótipo */
-    --brand-orange-hover: #d35400;
-    
-    --bg-light: #f8fafc;
-    --text-main: #1e293b;
-    --text-muted: #475569; /* Cinza mais escuro para melhor contraste */
-}
+/* Importação da fonte Inter (mais limpa e institucional) */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
 body {
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    background-color: var(--bg-light);
-    color: var(--text-main);
-    font-size: 16px; /* Aumento da fonte base */
+    font-family: 'Inter', sans-serif;
     -webkit-font-smoothing: antialiased;
-    background-image: 
-        linear-gradient(rgba(15, 59, 122, 0.03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(15, 59, 122, 0.03) 1px, transparent 1px);
-    background-size: 30px 30px;
+    background-color: #f8fafc; /* Fundo cinza muito claro */
 }
 
-/* Scrollbar */
-::-webkit-scrollbar { width: 8px; }
-::-webkit-scrollbar-track { background: var(--bg-light); }
-::-webkit-scrollbar-thumb { background: var(--brand-blue); border-radius: 4px; }
-::-webkit-scrollbar-thumb:hover { background: var(--brand-orange); }
-
-/* Animações */
-@keyframes fadeInUp {
-    from { opacity: 0; transform: translateY(30px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes pulseGlow {
-    0% { box-shadow: 0 0 0 0 rgba(230, 126, 34, 0.4); }
-    70% { box-shadow: 0 0 0 15px rgba(230, 126, 34, 0); }
-    100% { box-shadow: 0 0 0 0 rgba(230, 126, 34, 0); }
-}
-
-/* Classes Utilitárias */
-.hero-section {
-    background: radial-gradient(circle at top left, var(--brand-blue) 0%, var(--brand-navy) 100%);
-    position: relative;
-    overflow: hidden;
-}
-
-.hero-section::before {
-    content: '';
-    position: absolute;
-    top: -50%; left: -50%; width: 200%; height: 200%;
-    background: radial-gradient(circle, rgba(230,126,34,0.15) 0%, transparent 60%);
-    animation: rotate 25s linear infinite;
-}
-
-.glass-card {
-    background: rgba(255, 255, 255, 0.8);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(255, 255, 255, 0.6);
-    box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.05);
-}
-
-/* Botão Principal (Laranja do Logo) */
-.btn-primary {
-    background: linear-gradient(135deg, var(--brand-orange) 0%, var(--brand-orange-hover) 100%);
-    color: white;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 4px 15px rgba(230, 126, 34, 0.3);
-}
-
-.btn-primary:hover {
-    transform: translateY(-2px) scale(1.02);
-    box-shadow: 0 8px 25px rgba(230, 126, 34, 0.5);
-}
-
-/* Botão Secundário (Contorno Claro) */
-.btn-secondary {
-    background: rgba(255, 255, 255, 0.05);
-    border: 2px solid rgba(255, 255, 255, 0.3);
-    color: white;
-    transition: all 0.3s;
-}
-
-.btn-secondary:hover {
-    background: rgba(255, 255, 255, 0.15);
-    border-color: white;
-    transform: translateY(-2px);
-}
-
-/* Cartões da Montra */
-.card-objeto {
-    animation: fadeInUp 0.6s ease backwards;
-    transition: all 0.3s ease;
-    background: white;
-    border-radius: 16px;
-    overflow: hidden;
-    border: 1px solid #e2e8f0;
-}
-
-.card-objeto:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 25px 50px -12px rgba(15, 59, 122, 0.15);
-    border-color: #cbd5e1;
-}
-
-/* Filtros da Montra */
+/* Estilo dos Botões de Filtro */
 .filter-btn {
-    transition: all 0.3s ease;
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
 }
 
 .filter-btn.active {
-    background: var(--brand-blue) !important;
+    background-color: #0f3b7a !important; /* Azul institucional */
     color: white !important;
-    box-shadow: 0 4px 12px rgba(15, 59, 122, 0.3);
+    box-shadow: 0 2px 4px rgba(15, 59, 122, 0.2);
 }
 
-/* Hover dos Cartões de Inovação */
-.innovation-card {
-    transition: all 0.4s ease;
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+/* Estilo dos Cartões do Catálogo */
+.card-objeto {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.innovation-card:hover {
-    transform: translateY(-6px);
-    background: rgba(255, 255, 255, 0.08);
-    border-color: rgba(230, 126, 34, 0.5);
-    box-shadow: 0 10px 30px -10px rgba(230, 126, 34, 0.2);
+.card-objeto:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
 }
 
-/* FAQ */
-details > summary { list-style: none; cursor: pointer; }
-details > summary::-webkit-details-marker { display: none; }
-details[open] summary ~ * { animation: sweep .3s ease-in-out; }
-@keyframes sweep { 0% { opacity: 0; transform: translateY(-10px); } 100% { opacity: 1; transform: translateY(0); } }
+/* Scrollbar personalizada e discreta */
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: #f1f5f9; }
+::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+/* Remover decorações desnecessárias que davam ar de IA */
+.hero-mesh {
+    background-color: #0b1b3d; /* Azul escuro sólido */
+}
