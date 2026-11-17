@@ -69,7 +69,7 @@ async function fazerLogin() {
         msgErro.classList.remove('hidden');
     } else {
         // 2. Verificar o cargo do utilizador na tabela 'utilizadores'
-        const { data: perfil, error: perfilError } = await supabaseClient
+        const { data: perfil } = await supabaseClient
             .from('utilizadores')
             .select('cargo')
             .eq('id', data.user.id)
@@ -97,12 +97,22 @@ function atualizarInterface(user) {
     const userMenu = document.getElementById('user-menu-container');
 
     if (user) {
-        // Se estiver logado, esconde o botão Entrar e mostra o menu do perfil
-        if (btnLogin) btnLogin.classList.add('hidden');
+        // Se o utilizador ESTÁ logado:
+        // Esconde o botão de Login
+        if (btnLogin) {
+            btnLogin.classList.add('hidden');
+            btnLogin.classList.remove('flex');
+        }
+        // Mostra o menu "A minha conta"
         if (userMenu) userMenu.classList.remove('hidden');
     } else {
-        // Se não estiver logado, mostra o botão Entrar e esconde o menu
-        if (btnLogin) btnLogin.classList.remove('hidden');
+        // Se o utilizador NÃO ESTÁ logado:
+        // Mostra o botão de Login
+        if (btnLogin) {
+            btnLogin.classList.remove('hidden');
+            btnLogin.classList.add('flex'); 
+        }
+        // Esconde o menu "A minha conta"
         if (userMenu) userMenu.classList.add('hidden');
     }
 }
@@ -122,18 +132,11 @@ supabaseClient.auth.onAuthStateChange((event, session) => {
 function filtrarPorCategoria(categoria) {
     categoriaAtiva = categoria;
     
-    // Atualizar o visual dos botões
     const botoes = document.querySelectorAll('.filter-btn');
     botoes.forEach(btn => {
-        // Remove a classe 'active' (que tem o fundo azul escuro) de todos
-        btn.classList.remove('bg-marca-azul', 'text-white', 'shadow-md');
-        // Adiciona as classes de inativo (fundo cinza claro)
-        btn.classList.add('bg-gray-50', 'text-gray-600', 'hover:bg-gray-100');
-
-        // Se for o botão clicado, aplica o estilo ativo
+        btn.classList.remove('active');
         if (btn.textContent.trim() === categoria) {
-            btn.classList.remove('bg-gray-50', 'text-gray-600', 'hover:bg-gray-100');
-            btn.classList.add('bg-marca-azul', 'text-white', 'shadow-md');
+            btn.classList.add('active');
         }
     });
 
@@ -146,15 +149,15 @@ async function carregarObjetos() {
 
     const termoPesquisa = document.getElementById('pesquisa') ? document.getElementById('pesquisa').value.toLowerCase() : '';
     
-    // Estado de carregamento (Spinner)
+    // Estado de carregamento
     catalogoDiv.innerHTML = `
         <div class="col-span-full flex flex-col items-center justify-center py-20">
-            <svg class="animate-spin h-10 w-10 text-marca-laranja mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+            <svg class="animate-spin h-10 w-10 text-brand-orange mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
             <p class="text-gray-500 font-medium">A carregar catálogo...</p>
         </div>
     `;
 
-    // Ir buscar os dados à tabela 'objetos' (ordenados do mais recente para o mais antigo)
+    // Ir buscar os dados à tabela 'objetos'
     const { data: objetos, error } = await supabaseClient
         .from('objetos')
         .select('*')
@@ -165,34 +168,30 @@ async function carregarObjetos() {
         return;
     }
 
-    // Empty State Inicial (Se a tabela não tiver nenhum objeto)
+    // Empty State (Nenhum objeto na base de dados)
     if (objetos.length === 0) {
         catalogoDiv.innerHTML = `
-            <div class="col-span-full flex flex-col items-center justify-center py-20 bg-white rounded-3xl border border-dashed border-gray-300 shadow-sm">
+            <div class="col-span-full flex flex-col items-center justify-center py-20 bg-white rounded-3xl border border-dashed border-gray-300">
                 <svg class="empty-state-icon w-20 h-20 text-gray-300 mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                <h3 class="text-2xl font-extrabold text-gray-800">O catálogo está vazio</h3>
+                <h3 class="text-2xl font-extrabold text-gray-700">O catálogo está vazio</h3>
                 <p class="text-gray-500 mt-2 font-medium">Ainda não foram registados objetos perdidos na escola.</p>
             </div>
         `;
         return;
     }
 
-    // Filtrar por texto (pesquisa) e por categoria (botões)
+    // Filtrar por texto e por categoria
     const objetosFiltrados = objetos.filter(obj => {
         const matchTexto = obj.titulo.toLowerCase().includes(termoPesquisa) || obj.categoria.toLowerCase().includes(termoPesquisa);
         const matchCategoria = categoriaAtiva === 'Todos' || obj.categoria === categoriaAtiva;
         return matchTexto && matchCategoria;
     });
 
-    // Se a pesquisa não devolver resultados
     if (objetosFiltrados.length === 0) {
         catalogoDiv.innerHTML = `
-            <div class="col-span-full flex flex-col items-center justify-center py-16 bg-white rounded-3xl border border-dashed border-gray-300 shadow-sm">
-                <div class="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mb-4">
-                    <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                </div>
-                <h3 class="text-xl font-bold text-gray-800">Sem resultados</h3>
-                <p class="text-gray-500 mt-2">Não encontrámos nada com esses termos. Tenta outra palavra.</p>
+            <div class="col-span-full flex flex-col items-center justify-center py-16 bg-white rounded-3xl border border-dashed border-gray-300">
+                <h3 class="text-xl font-bold text-gray-700">Sem resultados</h3>
+                <p class="text-gray-500 mt-2">Não encontrámos nada com esses termos.</p>
             </div>
         `;
         return;
@@ -200,16 +199,12 @@ async function carregarObjetos() {
 
     catalogoDiv.innerHTML = ''; 
 
-    // Desenhar os cartões com o Design Premium
+    // Desenhar os cartões
     objetosFiltrados.forEach((obj, index) => {
         const foto = obj.foto_url ? obj.foto_url : 'https://via.placeholder.com/400x300?text=Sem+Foto';
-        
-        // Efeito cascata (cada cartão aparece com um pequeno atraso)
         const animationDelay = (index * 0.08) + 's';
-
-        // Definir a cor da etiqueta de estado
         const isDevolvido = obj.estado.toLowerCase() === 'devolvido';
-        const badgeClass = isDevolvido ? 'bg-green-500/90 text-white' : 'bg-marca-laranja/90 text-white';
+        const badgeClass = isDevolvido ? 'bg-green-500/90 text-white' : 'bg-brand-orange/90 text-white';
 
         catalogoDiv.innerHTML += `
             <div class="card-objeto flex flex-col group bg-white rounded-2xl shadow-sm hover:shadow-premium transition-all duration-300 border border-gray-100 overflow-hidden" style="animation-delay: ${animationDelay}">
@@ -224,15 +219,20 @@ async function carregarObjetos() {
 
                 <!-- Informação do Objeto -->
                 <div class="p-5 flex-grow flex flex-col">
-                    <span class="text-[11px] font-extrabold text-marca-azul bg-blue-50 px-2.5 py-1 rounded-md self-start mb-3 uppercase tracking-wider">${obj.categoria}</span>
+                    <span class="text-[11px] font-extrabold text-brand-blue bg-blue-50 px-2.5 py-1 rounded-md self-start mb-3 uppercase tracking-wider">${obj.categoria}</span>
                     
-                    <h3 class="text-lg font-extrabold text-gray-900 leading-tight mb-2 group-hover:text-marca-azul transition-colors line-clamp-2">${obj.titulo}</h3>
+                    <h3 class="text-lg font-extrabold text-gray-900 leading-tight mb-2 group-hover:text-brand-blue transition-colors line-clamp-2">${obj.titulo}</h3>
                     
-                    <div class="mt-auto pt-4 border-t border-gray-100 flex items-center justify-between">
+                    <div class="mt-auto pt-4 border-t border-gray-100 flex flex-col gap-3">
                         <p class="text-sm text-gray-500 flex items-center gap-1.5 font-medium">
                             <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg> 
                             Sala ${obj.sala}
                         </p>
+                        
+                        <!-- BOTÃO DE RECLAMAR -->
+                        <a href="reclamar.html?id=${obj.id}" class="w-full block text-center bg-gray-50 text-brand-blue font-bold py-2.5 rounded-lg border border-gray-200 hover:bg-brand-orange hover:text-white hover:border-brand-orange transition-colors text-sm">
+                            Este objeto é meu
+                        </a>
                     </div>
                 </div>
             </div>
@@ -243,44 +243,10 @@ async function carregarObjetos() {
 // ==========================================
 // INICIALIZAÇÃO DA PÁGINA
 // ==========================================
-// Quando a página carregar, vai buscar os objetos
 window.onload = () => {
     // Se estivermos na página pública, carrega o catálogo
     if (document.getElementById('catalogo')) {
         carregarObjetos();
     }
 };
-
-        catalogoDiv.innerHTML += `
-            <div class="card-objeto flex flex-col group bg-white rounded-2xl shadow-sm hover:shadow-premium transition-all duration-300 border border-gray-100 overflow-hidden" style="animation-delay: ${animationDelay}">
-                
-                <!-- Imagem e Etiqueta de Estado -->
-                <div class="h-52 overflow-hidden bg-gray-100 flex items-center justify-center relative">
-                    <img src="${foto}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
-                    <div class="absolute top-3 right-3 px-3 py-1.5 rounded-lg text-xs font-extrabold shadow-md backdrop-blur-md uppercase tracking-wide ${badgeClass}">
-                        ${obj.estado}
-                    </div>
-                </div>
-
-                <!-- Informação do Objeto -->
-                <div class="p-5 flex-grow flex flex-col">
-                    <span class="text-[11px] font-extrabold text-marca-azul bg-blue-50 px-2.5 py-1 rounded-md self-start mb-3 uppercase tracking-wider">${obj.categoria}</span>
-                    
-                    <h3 class="text-lg font-extrabold text-gray-900 leading-tight mb-2 group-hover:text-marca-azul transition-colors line-clamp-2">${obj.titulo}</h3>
-                    
-                    <div class="mt-auto pt-4 border-t border-gray-100 flex flex-col gap-3">
-                        <p class="text-sm text-gray-500 flex items-center gap-1.5 font-medium">
-                            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg> 
-                            Sala ${obj.sala}
-                        </p>
-                        
-                        <!-- BOTÃO DE RECLAMAR -->
-                        <a href="reclamar.html?id=${obj.id}" class="w-full block text-center bg-gray-50 text-marca-azul font-bold py-2.5 rounded-lg border border-gray-200 hover:bg-marca-laranja hover:text-white hover:border-marca-laranja transition-colors text-sm">
-                            Este objeto é meu
-                        </a>
-                    </div>
-                </div>
-            </div>
-        `;
-
 
