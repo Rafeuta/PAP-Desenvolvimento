@@ -371,3 +371,265 @@ window.onload = async () => {
     if (onloadAnterior) await onloadAnterior();
     carregarContactos();
 };
+
+// ==========================================
+// GESTÃO DE CONTACTOS (EMAILS)
+// ==========================================
+const WEB3FORMS_ACCESS_KEY = 'd7697e7b-29d7-4933-a5c6-72a68d2c77b8';
+let listaContactos = [];
+
+// Sistema de Notificação Toast
+function mostrarNotificacao(titulo, mensagem, tipo = 'sucesso') {
+    const toast = document.getElementById('toast');
+    if (!toast) {
+        // Criar toast se não existir
+        const novoToast = document.createElement('div');
+        novoToast.id = 'toast';
+        novoToast.className = 'fixed bottom-6 right-6 transform translate-y-20 opacity-0 transition-all duration-300 z-50 bg-white border-l-4 border-brand-blue shadow-2xl rounded-lg p-4 flex items-center gap-3 max-w-sm';
+        novoToast.innerHTML = `
+            <div id="toast-icon"></div>
+            <div>
+                <h4 id="toast-title" class="font-bold text-gray-900 text-sm"></h4>
+                <p id="toast-message" class="text-gray-600 text-xs mt-0.5"></p>
+            </div>
+        `;
+        document.body.appendChild(novoToast);
+        return mostrarNotificacao(titulo, mensagem, tipo);
+    }
+    
+    document.getElementById('toast-title').textContent = titulo;
+    document.getElementById('toast-message').textContent = mensagem;
+    
+    if (tipo === 'sucesso') {
+        toast.className = 'fixed bottom-6 right-6 transform translate-y-0 opacity-100 transition-all duration-300 z-50 bg-white border-l-4 border-green-500 shadow-2xl rounded-lg p-4 flex items-center gap-3 max-w-sm';
+        document.getElementById('toast-icon').innerHTML = '<svg class="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>';
+    } else {
+        toast.className = 'fixed bottom-6 right-6 transform translate-y-0 opacity-100 transition-all duration-300 z-50 bg-white border-l-4 border-red-500 shadow-2xl rounded-lg p-4 flex items-center gap-3 max-w-sm';
+        document.getElementById('toast-icon').innerHTML = '<svg class="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>';
+    }
+    
+    setTimeout(() => {
+        toast.classList.add('translate-y-20', 'opacity-0');
+    }, 4000);
+}
+
+// Funções de Modal
+function abrirModal(id) {
+    const modal = document.getElementById(id);
+    if (modal) {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+    }
+}
+
+function fecharModal(id) {
+    const modal = document.getElementById(id);
+    if (modal) {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+    }
+}
+
+// Carregar contactos da base de dados
+async function carregarContactos() {
+    const tbody = document.getElementById('tabela-contactos');
+    if (!tbody) {
+        console.log('Tabela de contactos não encontrada no HTML');
+        return;
+    }
+
+    tbody.innerHTML = '<tr><td colspan="4" class="p-8 text-center"><svg class="animate-spin h-6 w-6 text-brand-blue mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg></td></tr>';
+
+    try {
+        const { data, error } = await supabaseClient
+            .from('contactos_email')
+            .select('*')
+            .order('criado_em', { ascending: false });
+
+        if (error) {
+            console.error('Erro ao carregar contactos:', error);
+            tbody.innerHTML = `<tr><td colspan="4" class="p-8 text-center text-red-500">Erro: ${error.message}</td></tr>`;
+            return;
+        }
+
+        listaContactos = data || [];
+
+        if (listaContactos.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="4" class="p-12 text-center text-gray-500">Nenhum contacto na lista. Adiciona emails de delegados de turma.</td></tr>';
+        } else {
+            tbody.innerHTML = listaContactos.map(c => `
+                <tr class="hover:bg-gray-50 transition-colors">
+                    <td class="p-4 font-semibold text-gray-900">${c.nome}</td>
+                    <td class="p-4 text-gray-600">${c.email}</td>
+                    <td class="p-4 text-gray-600">${c.turma || '—'}</td>
+                    <td class="p-4 text-center">
+                        <button onclick="apagarContacto(${c.id})" class="text-gray-400 hover:text-red-500 hover:bg-red-50 p-2 rounded-lg transition-all">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        const totalEl = document.getElementById('total-contactos');
+        if (totalEl) {
+            totalEl.textContent = `Total: ${listaContactos.length} contacto${listaContactos.length !== 1 ? 's' : ''}`;
+        }
+    } catch (error) {
+        console.error('Erro inesperado:', error);
+        tbody.innerHTML = `<tr><td colspan="4" class="p-8 text-center text-red-500">Erro: ${error.message}</td></tr>`;
+    }
+}
+
+// Adicionar contacto
+async function adicionarContacto(e) {
+    e.preventDefault();
+    
+    const nome = document.getElementById('contacto-nome')?.value.trim();
+    const email = document.getElementById('contacto-email')?.value.trim();
+    const turma = document.getElementById('contacto-turma')?.value.trim();
+
+    if (!nome || !email) {
+        mostrarNotificacao('Erro', 'Nome e email são obrigatórios.', 'erro');
+        return;
+    }
+
+    try {
+        const { error } = await supabaseClient
+            .from('contactos_email')
+            .insert([{ nome, email, turma }]);
+
+        if (error) {
+            console.error('Erro ao inserir:', error);
+            if (error.code === '23505') {
+                mostrarNotificacao('Erro', 'Este email já está na lista.', 'erro');
+            } else {
+                mostrarNotificacao('Erro', error.message, 'erro');
+            }
+            return;
+        }
+
+        mostrarNotificacao('Sucesso', `${nome} foi adicionado à lista.`);
+        fecharModal('modal-adicionar-email');
+        
+        const form = document.getElementById('form-adicionar-contacto');
+        if (form) form.reset();
+        
+        await carregarContactos();
+    } catch (error) {
+        console.error('Erro:', error);
+        mostrarNotificacao('Erro', 'Erro ao adicionar contacto.', 'erro');
+    }
+}
+
+// Apagar contacto
+async function apagarContacto(id) {
+    if (!confirm('Remover este contacto da lista?')) return;
+    
+    try {
+        const { error } = await supabaseClient
+            .from('contactos_email')
+            .delete()
+            .eq('id', id);
+
+        if (error) {
+            mostrarNotificacao('Erro', error.message, 'erro');
+            return;
+        }
+
+        mostrarNotificacao('Removido', 'Contacto eliminado com sucesso.');
+        await carregarContactos();
+    } catch (error) {
+        console.error('Erro:', error);
+        mostrarNotificacao('Erro', 'Erro ao eliminar contacto.', 'erro');
+    }
+}
+
+// Abrir modal de envio em massa
+function abrirModalEnvioMassa() {
+    if (listaContactos.length === 0) {
+        mostrarNotificacao('Lista Vazia', 'Adiciona contactos antes de enviares emails.', 'erro');
+        return;
+    }
+    const contador = document.getElementById('contador-destinatarios');
+    if (contador) {
+        contador.textContent = `${listaContactos.length} destinatário${listaContactos.length !== 1 ? 's' : ''}`;
+    }
+    abrirModal('modal-envio-massa');
+}
+
+// Enviar email em massa
+async function enviarEmailMassa(e) {
+    e.preventDefault();
+    
+    const assunto = document.getElementById('massa-assunto')?.value;
+    const mensagem = document.getElementById('massa-mensagem')?.value;
+    const btn = document.getElementById('btn-enviar-massa');
+    
+    if (!assunto || !mensagem) {
+        mostrarNotificacao('Erro', 'Assunto e mensagem são obrigatórios.', 'erro');
+        return;
+    }
+
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg> A enviar...';
+    btn.disabled = true;
+
+    let enviados = 0;
+    let erros = 0;
+
+    for (const contacto of listaContactos) {
+        try {
+            const formData = new FormData();
+            formData.append('access_key', WEB3FORMS_ACCESS_KEY);
+            formData.append('subject', assunto);
+            formData.append('from_name', 'FindIT School');
+            formData.append('Nome', contacto.nome);
+            formData.append('Turma', contacto.turma || 'N/A');
+            formData.append('Mensagem', mensagem);
+
+            const res = await fetch('https://api.web3forms.com/submit', {
+                method: 'POST',
+                body: formData
+            });
+            const result = await res.json();
+            
+            if (result.success) {
+                enviados++;
+            } else {
+                erros++;
+            }
+        } catch (error) {
+            console.error(`Erro ao enviar para ${contacto.email}:`, error);
+            erros++;
+        }
+    }
+
+    btn.innerHTML = originalText;
+    btn.disabled = false;
+
+    if (erros === 0) {
+        mostrarNotificacao('Enviados!', `${enviados} email${enviados !== 1 ? 's' : ''} enviado${enviados !== 1 ? 's' : ''} com sucesso.`);
+    } else {
+        mostrarNotificacao('Envio Parcial', `${enviados} enviados, ${erros} falharam.`, 'erro');
+    }
+
+    fecharModal('modal-envio-massa');
+    const form = document.getElementById('form-envio-massa');
+    if (form) form.reset();
+}
+
+// Inicializar quando o DOM estiver pronto
+document.addEventListener('DOMContentLoaded', () => {
+    carregarContactos();
+
+    const formAdicionar = document.getElementById('form-adicionar-contacto');
+    if (formAdicionar) {
+        formAdicionar.addEventListener('submit', adicionarContacto);
+    }
+
+    const formMassa = document.getElementById('form-envio-massa');
+    if (formMassa) {
+        formMassa.addEventListener('submit', enviarEmailMassa);
+    }
+});
