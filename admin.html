@@ -134,6 +134,44 @@
                 </div>
             </div>
         </div>
+        <!-- SECÇÃO DE GESTÃO DE EMAILS -->
+<div class="mt-10 bg-white rounded-2xl border border-gray-200 shadow-card overflow-hidden">
+    <div class="p-6 border-b border-gray-100 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+            <h2 class="text-lg font-bold text-gray-900 flex items-center gap-2">
+                <svg class="w-5 h-5 text-brand-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                Lista de Contactos para Notificação
+            </h2>
+            <p class="text-sm text-gray-500 mt-1">Guarda emails de delegados de turma para enviar notificações em massa.</p>
+        </div>
+        <button onclick="abrirModal('modal-adicionar-email')" class="bg-brand-orange text-white font-bold px-5 py-2.5 rounded-xl hover:bg-orange-700 transition-all shadow-md flex items-center gap-2 text-sm">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+            Adicionar Email
+        </button>
+    </div>
+
+    <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+            <thead class="bg-gray-50 text-xs font-bold text-gray-500 uppercase tracking-wider">
+                <tr>
+                    <th class="p-4">Nome</th>
+                    <th class="p-4">Email</th>
+                    <th class="p-4">Turma</th>
+                    <th class="p-4 text-center">Ações</th>
+                </tr>
+            </thead>
+            <tbody id="tabela-contactos" class="divide-y divide-gray-100 text-sm"></tbody>
+        </table>
+    </div>
+
+    <div class="p-4 bg-gray-50 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-3">
+        <p id="total-contactos" class="text-sm text-gray-600 font-medium">Total: 0 contactos</p>
+        <button onclick="abrirModalEnvioMassa()" class="bg-brand-blue text-white font-bold px-5 py-2.5 rounded-xl hover:bg-blue-900 transition-all shadow-md flex items-center gap-2 text-sm">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
+            Enviar Email a Todos
+        </button>
+    </div>
+</div>
     </main>
 
     <script src="dashboard.js"></script>
