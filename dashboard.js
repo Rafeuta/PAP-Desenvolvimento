@@ -236,3 +236,138 @@ async function apagarObjeto(id) {
 }
 
 window.onload = () => { verificarSessao(); };
+
+// ==========================================
+// GESTÃO DE CONTACTOS + ENVIO EM MASSA (WEB3FORMS)
+// ==========================================
+const WEB3FORMS_ACCESS_KEY = 'd7697e7b-29d7-4933-a5c6-72a68d2c77b8';
+let listaContactos = [];
+
+function abrirModal(id) {
+    const modal = document.getElementById(id);
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+}
+
+function fecharModal(id) {
+    const modal = document.getElementById(id);
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+}
+
+async function carregarContactos() {
+    const tbody = document.getElementById('tabela-contactos');
+    if (!tbody) return;
+
+    tbody.innerHTML = `<tr><td colspan="4" class="p-8 text-center"><svg class="animate-spin h-6 w-6 text-brand-blue mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg></td></tr>`;
+
+    const { data, error } = await supabaseClient.from('contactos_email').select('*').order('criado_em', { ascending: false });
+
+    if (error) {
+        tbody.innerHTML = `<tr><td colspan="4" class="p-8 text-center text-red-500">Erro: ${error.message}</td></tr>`;
+        return;
+    }
+
+    listaContactos = data || [];
+
+    if (listaContactos.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="4" class="p-12 text-center text-gray-500">Nenhum contacto na lista. Adiciona emails de delegados de turma.</td></tr>`;
+    } else {
+        tbody.innerHTML = listaContactos.map(c => `
+            <tr class="hover:bg-gray-50 transition-colors">
+                <td class="p-4 font-semibold text-gray-900">${c.nome}</td>
+                <td class="p-4 text-gray-600">${c.email}</td>
+                <td class="p-4 text-gray-600">${c.turma || '—'}</td>
+                <td class="p-4 text-center">
+                    <button onclick="apagarContacto(${c.id})" class="text-gray-400 hover:text-red-500 hover:bg-red-50 p-2 rounded-lg transition-all">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                    </button>
+                </td>
+            </tr>`).join('');
+    }
+
+    document.getElementById('total-contactos').textContent = `Total: ${listaContactos.length} contacto${listaContactos.length !== 1 ? 's' : ''}`;
+}
+
+document.getElementById('form-adicionar-contacto')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const nome = document.getElementById('contacto-nome').value.trim();
+    const email = document.getElementById('contacto-email').value.trim();
+    const turma = document.getElementById('contacto-turma').value.trim();
+
+    const { error } = await supabaseClient.from('contactos_email').insert([{ nome, email, turma }]);
+
+    if (error) {
+        mostrarNotificacao('Erro', error.code === '23505' ? 'Este email já está na lista.' : error.message, 'erro');
+    } else {
+        mostrarNotificacao('Sucesso', `${nome} adicionado à lista.`);
+        fecharModal('modal-adicionar-email');
+        document.getElementById('form-adicionar-contacto').reset();
+        carregarContactos();
+    }
+});
+
+async function apagarContacto(id) {
+    if (!confirm('Remover este contacto?')) return;
+    await supabaseClient.from('contactos_email').delete().eq('id', id);
+    mostrarNotificacao('Removido', 'Contacto eliminado.');
+    carregarContactos();
+}
+
+function abrirModalEnvioMassa() {
+    if (listaContactos.length === 0) {
+        mostrarNotificacao('Lista Vazia', 'Adiciona contactos antes de enviares emails.', 'erro');
+        return;
+    }
+    document.getElementById('contador-destinatarios').textContent = `${listaContactos.length} destinatário${listaContactos.length !== 1 ? 's' : ''}`;
+    abrirModal('modal-envio-massa');
+}
+
+document.getElementById('form-envio-massa')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const assunto = document.getElementById('massa-assunto').value;
+    const mensagem = document.getElementById('massa-mensagem').value;
+    const btn = document.getElementById('btn-enviar-massa');
+    const originalText = btn.innerHTML;
+
+    btn.innerHTML = `<svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg> A enviar...`;
+    btn.disabled = true;
+
+    let enviados = 0, erros = 0;
+
+    for (const contacto of listaContactos) {
+        try {
+            const formData = new FormData();
+            formData.append('access_key', WEB3FORMS_ACCESS_KEY);
+            formData.append('subject', assunto);
+            formData.append('from_name', 'FindIT School');
+            formData.append('Nome', contacto.nome);
+            formData.append('Turma', contacto.turma || 'N/A');
+            formData.append('Mensagem', mensagem);
+
+            const res = await fetch('https://api.web3forms.com/submit', { method: 'POST', body: formData });
+            const result = await res.json();
+            if (result.success) enviados++;
+            else erros++;
+        } catch {
+            erros++;
+        }
+    }
+
+    btn.innerHTML = originalText;
+    btn.disabled = false;
+    mostrarNotificacao(
+        erros === 0 ? 'Enviados!' : 'Envio Parcial',
+        `${enviados} enviados, ${erros} falharam.`,
+        erros === 0 ? 'sucesso' : 'erro'
+    );
+    fecharModal('modal-envio-massa');
+    document.getElementById('form-envio-massa').reset();
+});
+
+// Adicionar ao window.onload existente
+const onloadAnterior = window.onload;
+window.onload = async () => {
+    if (onloadAnterior) await onloadAnterior();
+    carregarContactos();
+};
