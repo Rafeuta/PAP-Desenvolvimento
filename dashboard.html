@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-PT">
+<html lang="pt-PT" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,275 +10,324 @@
         tailwind.config = {
             theme: {
                 extend: {
-                    colors: {
-                        'brand-blue': '#0f3b7a',
-                        'brand-orange': '#e67e22',
-                        'sidebar': '#0f172a'
-                    },
-                    boxShadow: {
-                        'premium': '0 10px 40px -10px rgba(0,0,0,0.08)',
-                    }
+                    colors: { 'navy': '#0b1b3d', 'brand-blue': '#0f3b7a', 'brand-orange': '#e67e22', 'surface': '#f8fafc' },
+                    fontFamily: { sans: ['Inter', 'sans-serif'] }
                 }
             }
         }
     </script>
     <link rel="stylesheet" href="style.css">
+    <style>
+        /* Layout flex para garantir que nada é cortado */
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            display: flex;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        .sidebar {
+            width: 260px;
+            flex-shrink: 0;
+        }
+        .main-content {
+            flex: 1;
+            min-width: 0;
+            overflow-y: auto;
+            min-height: 100vh;
+        }
+        /* Mobile: sidebar escondida por defeito */
+        @media (max-width: 768px) {
+            .sidebar {
+                position: fixed;
+                left: -260px;
+                top: 0;
+                height: 100vh;
+                z-index: 50;
+                transition: left 0.3s ease;
+            }
+            .sidebar.open {
+                left: 0;
+            }
+            .sidebar-overlay {
+                display: none;
+                position: fixed;
+                inset: 0;
+                background: rgba(0,0,0,0.5);
+                z-index: 40;
+            }
+            .sidebar-overlay.active {
+                display: block;
+            }
+        }
+    </style>
 </head>
-<body class="bg-gray-50 font-sans flex h-screen overflow-hidden text-gray-800">
+<body class="bg-surface text-gray-800 antialiased">
 
-    <!-- Sidebar -->
-    <aside class="w-64 bg-sidebar text-gray-300 flex flex-col shadow-2xl z-30 transition-all duration-300">
-        <div class="h-24 flex items-center justify-center border-b border-gray-800 bg-black/20 p-4">
-            <img src="logo.png" alt="FindIT" class="h-12 w-auto brightness-0 invert object-contain">
+    <!-- Overlay para mobile -->
+    <div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar bg-navy text-white flex flex-col">
+        <div class="p-6 border-b border-white/10">
+            <a href="index.html" class="flex items-center gap-3">
+                <img src="logo.png" alt="FindIT" class="h-10 w-auto">
+                <span class="text-lg font-extrabold">FindIT <span class="text-brand-orange">School</span></span>
+            </a>
         </div>
         
-        <nav class="flex-grow py-6 px-4 space-y-2">
-            <a href="#" class="flex items-center gap-3 px-4 py-3 bg-white/10 text-white rounded-xl font-bold border-l-4 border-brand-orange transition-all">
-                <svg class="w-5 h-5 text-brand-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+        <nav class="flex-1 p-4 space-y-2">
+            <a href="#" class="flex items-center gap-3 px-4 py-3 bg-white/10 rounded-lg text-white font-semibold">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
                 Registar Objetos
             </a>
-            <a href="index.html" class="flex items-center gap-3 px-4 py-3 hover:bg-white/5 hover:text-white rounded-xl font-medium transition-all">
-                <svg class="w-5 h-5 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+            <a href="index.html" class="flex items-center gap-3 px-4 py-3 text-gray-300 hover:bg-white/5 hover:text-white rounded-lg transition-colors">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
                 Ver Site Público
             </a>
         </nav>
 
-        <div class="p-4 border-t border-gray-800">
-            <button id="btn-logout" class="w-full flex items-center justify-center gap-2 bg-red-500/10 text-red-400 hover:bg-red-500 hover:text-white font-bold py-3 rounded-xl transition-all duration-300">
+        <div class="p-4 border-t border-white/10">
+            <button id="btn-logout" class="w-full flex items-center gap-3 px-4 py-3 text-red-300 hover:bg-red-500/10 hover:text-red-200 rounded-lg transition-colors">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
                 Terminar Sessão
             </button>
         </div>
     </aside>
 
-    <!-- Main Content -->
-    <main class="flex-grow flex flex-col overflow-y-auto bg-gray-50 relative">
-        
-        <header class="bg-white/80 backdrop-blur-md shadow-sm h-20 flex items-center justify-between px-8 sticky top-0 z-20 border-b border-gray-100">
-            <h1 class="text-xl font-extrabold text-gray-800 flex items-center gap-2">
+    <!-- CONTEÚDO PRINCIPAL -->
+    <div class="main-content">
+        <!-- Header Mobile -->
+        <header class="md:hidden bg-white border-b border-gray-200 p-4 flex items-center justify-between sticky top-0 z-30">
+            <button onclick="toggleSidebar()" class="p-2 text-gray-600 hover:bg-gray-100 rounded-lg">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+            </button>
+            <span class="font-bold text-navy">FindIT School</span>
+            <div class="w-8 h-8 bg-brand-blue rounded-full flex items-center justify-center text-white text-xs font-bold">AD</div>
+        </header>
+
+        <!-- Header Desktop -->
+        <header class="hidden md:flex bg-white border-b border-gray-200 px-8 py-4 items-center justify-between sticky top-0 z-30">
+            <h1 class="text-xl font-extrabold text-navy flex items-center gap-2">
                 <svg class="w-6 h-6 text-brand-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
                 Gestão de Objetos
             </h1>
-            
-            <div class="flex items-center gap-3 bg-gray-50 border border-gray-200 rounded-full px-2 py-1.5 pr-4">
-                <div class="w-8 h-8 bg-brand-blue rounded-full flex items-center justify-center text-white font-bold text-xs">AD</div>
-                <span id="user-email" class="text-sm font-bold text-gray-700">A carregar...</span>
+            <div class="flex items-center gap-3">
+                <div class="w-9 h-9 bg-brand-blue rounded-full flex items-center justify-center text-white font-bold text-sm">AD</div>
+                <span id="user-email" class="text-sm font-semibold text-gray-700">carregar...</span>
             </div>
         </header>
 
-        <div class="p-8 max-w-6xl mx-auto w-full space-y-8">
+        <!-- CONTEÚDO -->
+        <main class="p-4 md:p-8 space-y-8">
             
-            <!-- Formulário Premium -->
-            <div class="bg-white rounded-3xl shadow-premium border border-gray-100 overflow-hidden">
-                <div class="px-8 py-6 border-b border-gray-100 bg-gray-50/50">
-                    <h2 class="text-lg font-extrabold text-brand-blue">Registar Novo Objeto</h2>
+            <!-- FORMULÁRIO DE REGISTO -->
+            <section class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+                <div class="p-6 border-b border-gray-100">
+                    <h2 class="text-lg font-bold text-navy">Registar Novo Objeto</h2>
                     <p class="text-sm text-gray-500 mt-1">Preenche os dados do objeto encontrado.</p>
                 </div>
                 
-                <form id="form-objeto" class="p-8 grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="space-y-1">
-                        <label class="block text-sm font-bold text-gray-700">Título do Objeto</label>
-                        <div class="relative">
-                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path></svg>
-                            </div>
-                            <input type="text" id="titulo" required placeholder="Ex: AirPods Brancos" class="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-brand-orange focus:bg-white transition-all">
+                <form id="form-objeto" class="p-6 space-y-5">
+                    <div class="grid md:grid-cols-2 gap-5">
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-1.5">Título do Objeto</label>
+                            <input type="text" id="titulo" required class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:bg-white focus:ring-2 focus:ring-brand-blue/20 focus:border-brand-blue outline-none" placeholder="Ex: AirPods Brancos">
                         </div>
-                    </div>
-                    
-                    <div class="space-y-1">
-                        <label class="block text-sm font-bold text-gray-700">Categoria</label>
-                        <div class="relative">
-                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
-                            </div>
-                            <select id="categoria" required class="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-brand-orange focus:bg-white transition-all appearance-none">
-                                <option value="Eletrónica">Eletrónica</option>
-                                <option value="Roupa">Roupa</option>
-                                <option value="Material Escolar">Material Escolar</option>
-                                <option value="Chaves">Chaves</option>
-                                <option value="Outros">Outros</option>
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-1.5">Categoria</label>
+                            <select id="categoria" required class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:bg-white focus:ring-2 focus:ring-brand-blue/20 focus:border-brand-blue outline-none">
+                                <option>Eletrónica</option>
+                                <option>Roupa</option>
+                                <option>Material Escolar</option>
+                                <option>Chaves</option>
+                                <option>Outros</option>
                             </select>
                         </div>
                     </div>
+                    
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-1.5">Sala / Local</label>
+                        <input type="text" id="sala" required class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:bg-white focus:ring-2 focus:ring-brand-blue/20 focus:border-brand-blue outline-none" placeholder="Ex: Sala 1.6, Pavilhão, Refeitório...">
+                    </div>
 
-                    <div class="space-y-1 md:col-span-2">
-                        <label class="block text-sm font-bold text-gray-700">Sala / Local</label>
-                        <div class="relative">
-                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                            </div>
-                            <input type="text" id="sala" required placeholder="Ex: Sala 1.6, Pavilhão, Refeitório..." class="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-brand-orange focus:bg-white transition-all">
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-1.5">Fotografia (Obrigatório)</label>
+                        <label class="flex flex-col items-center justify-center border-2 border-dashed border-gray-300 rounded-lg p-8 hover:border-brand-blue hover:bg-blue-50/30 cursor-pointer transition-all">
+                            <input type="file" id="foto" accept="image/*" required class="hidden">
+                            <svg class="w-10 h-10 text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                            <p class="text-sm font-semibold text-gray-700">Carregar um ficheiro ou arrastar e largar</p>
+                            <p class="text-xs text-gray-500 mt-1">PNG, JPG, GIF até 10MB</p>
+                        </label>
+                        <div id="image-preview" class="hidden mt-3">
+                            <img id="preview-img" class="max-h-40 rounded-lg border border-gray-200">
+                            <p class="text-xs text-brand-blue font-bold mt-1">Tamanho: <span id="file-size-text">0</span> MB</p>
                         </div>
                     </div>
 
-                    <!-- Upload de Ficheiro com Pré-visualização e Contador -->
-                    <div class="space-y-1 md:col-span-2 mt-2">
-                        <label class="block text-sm font-bold text-gray-700 mb-1">Fotografia (Obrigatório)</label>
-                        
-                        <div id="dropzone" class="mt-1 flex flex-col justify-center items-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-xl hover:border-brand-blue transition-colors bg-gray-50 hover:bg-blue-50/30 cursor-pointer relative group">
-                            <input id="foto" type="file" accept="image/*" required class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10">
-                            
-                            <div id="upload-placeholder" class="space-y-1 text-center">
-                                <svg class="mx-auto h-12 w-12 text-gray-400 group-hover:text-brand-blue transition-colors" stroke="currentColor" fill="none" viewBox="0 0 48 48">
-                                    <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                                </svg>
-                                <div class="flex text-sm text-gray-600 justify-center">
-                                    <span class="relative rounded-md font-bold text-brand-blue hover:text-blue-800">Carregar um ficheiro</span>
-                                    <p class="pl-1">ou arrastar e largar</p>
-                                </div>
-                                <p class="text-xs text-gray-500">PNG, JPG, GIF até 10MB</p>
-                            </div>
-
-                            <div id="image-preview" class="hidden w-full h-48 relative">
-                                <img id="preview-img" src="" alt="Preview" class="w-full h-full object-contain rounded-lg">
-                            </div>
-                        </div>
-                        
-                        <div id="file-size-info" class="hidden text-sm font-bold text-brand-blue mt-2 text-right">
-                            Tamanho: <span id="file-size-text">0</span> MB
-                        </div>
-                    </div>
-
-                    <div class="md:col-span-2 flex justify-end mt-4">
-                        <button type="submit" id="btn-submit" class="bg-brand-blue text-white font-bold py-3 px-8 rounded-xl shadow-lg hover:bg-blue-900 hover:shadow-xl hover:-translate-y-0.5 transition-all flex items-center gap-2">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path></svg>
+                    <div class="flex justify-end pt-2">
+                        <button type="submit" id="btn-submit" class="bg-brand-blue text-white font-bold px-6 py-2.5 rounded-lg hover:bg-blue-900 transition-all flex items-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
                             Guardar Objeto
                         </button>
                     </div>
                 </form>
-            </div>
+            </section>
 
-            <!-- Tabela Premium -->
-            <div class="bg-white rounded-3xl shadow-premium border border-gray-100 overflow-hidden">
-                <div class="px-8 py-6 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
-                    <h2 class="text-lg font-extrabold text-brand-blue">Objetos no Sistema</h2>
+            <!-- TABELA DE OBJETOS -->
+            <section class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+                <div class="p-6 border-b border-gray-100">
+                    <h2 class="text-lg font-bold text-navy">Objetos no Sistema</h2>
                 </div>
                 <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse">
-                        <thead>
-                            <tr class="bg-white text-gray-400 text-xs uppercase tracking-wider border-b border-gray-100">
-                                <th class="p-5 font-bold">Fotografia</th>
-                                <th class="p-5 font-bold">Título / Categoria</th>
-                                <th class="p-5 font-bold">Localização</th>
-                                <th class="p-5 font-bold">Estado</th>
-                                <th class="p-5 font-bold text-center">Ações</th>
+                    <table class="w-full text-left">
+                        <thead class="bg-gray-50 text-xs font-bold text-gray-500 uppercase">
+                            <tr>
+                                <th class="p-4">Fotografia</th>
+                                <th class="p-4">Título / Categoria</th>
+                                <th class="p-4">Localização</th>
+                                <th class="p-4">Estado</th>
+                                <th class="p-4 text-center">Ações</th>
                             </tr>
                         </thead>
-                        <tbody id="tabela-corpo" class="divide-y divide-gray-50">
-                            <!-- Inserido via JS -->
-                        </tbody>
+                        <tbody id="tabela-corpo" class="divide-y divide-gray-100 text-sm"></tbody>
                     </table>
                 </div>
+            </section>
+
+            <!-- LISTA DE CONTACTOS -->
+            <section class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+                <div class="p-6 border-b border-gray-100 flex flex-col md:flex-row md:items-center justify-between gap-3">
+                    <div>
+                        <h2 class="text-lg font-bold text-navy flex items-center gap-2">
+                            <svg class="w-5 h-5 text-brand-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                            Lista de Contactos para Notificação
+                        </h2>
+                        <p class="text-sm text-gray-500 mt-1">Guarda emails de delegados de turma para enviar notificações em massa.</p>
+                    </div>
+                    <button onclick="abrirModal('modal-adicionar-email')" class="bg-brand-orange text-white font-bold px-4 py-2 rounded-lg hover:bg-orange-700 transition-all text-sm flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+                        Adicionar Email
+                    </button>
+                </div>
+                
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left">
+                        <thead class="bg-gray-50 text-xs font-bold text-gray-500 uppercase">
+                            <tr>
+                                <th class="p-4">Nome</th>
+                                <th class="p-4">Email</th>
+                                <th class="p-4">Turma</th>
+                                <th class="p-4 text-center">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabela-contactos" class="divide-y divide-gray-100 text-sm"></tbody>
+                    </table>
+                </div>
+
+                <div class="p-4 bg-gray-50 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-3">
+                    <p id="total-contactos" class="text-sm text-gray-600 font-medium">Total: 0 contactos</p>
+                    <button onclick="abrirModalEnvioMassa()" class="bg-brand-blue text-white font-bold px-4 py-2 rounded-lg hover:bg-blue-900 transition-all text-sm flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
+                        Enviar Email a Todos
+                    </button>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- MODAL: ADICIONAR EMAIL -->
+    <div id="modal-adicionar-email" class="fixed inset-0 bg-navy/80 backdrop-blur-sm hidden items-center justify-center z-[100] p-4">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-8 relative">
+            <button onclick="fecharModal('modal-adicionar-email')" class="absolute top-4 right-4 text-gray-400 hover:text-gray-700 w-8 h-8 rounded-full flex items-center justify-center hover:bg-gray-100">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+            <h2 class="text-xl font-extrabold text-navy mb-2">Adicionar Contacto</h2>
+            <p class="text-sm text-gray-500 mb-6">Este email irá receber notificações da secretaria.</p>
+            <form id="form-adicionar-contacto" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-1.5">Nome Completo</label>
+                    <input type="text" id="contacto-nome" required class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:bg-white focus:ring-2 focus:ring-brand-blue/20 focus:border-brand-blue outline-none" placeholder="Ex: João Silva">
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-1.5">Email</label>
+                    <input type="email" id="contacto-email" required class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:bg-white focus:ring-2 focus:ring-brand-blue/20 focus:border-brand-blue outline-none" placeholder="Ex: aluno@etpc.pt">
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-1.5">Turma (opcional)</label>
+                    <input type="text" id="contacto-turma" class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:bg-white focus:ring-2 focus:ring-brand-blue/20 focus:border-brand-blue outline-none" placeholder="Ex: 12º TGPSI">
+                </div>
+                <button type="submit" class="w-full bg-brand-blue text-white font-bold py-2.5 rounded-lg hover:bg-blue-900 transition-all">
+                    Guardar Contacto
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: ENVIAR EMAIL EM MASSA -->
+    <div id="modal-envio-massa" class="fixed inset-0 bg-navy/80 backdrop-blur-sm hidden items-center justify-center z-[100] p-4">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-8 relative">
+            <button onclick="fecharModal('modal-envio-massa')" class="absolute top-4 right-4 text-gray-400 hover:text-gray-700 w-8 h-8 rounded-full flex items-center justify-center hover:bg-gray-100">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+            <div class="flex items-center gap-3 mb-6">
+                <div class="w-12 h-12 bg-brand-orange/10 rounded-xl flex items-center justify-center">
+                    <svg class="w-6 h-6 text-brand-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                </div>
+                <div>
+                    <h2 class="text-xl font-extrabold text-navy">Enviar Notificação</h2>
+                    <p id="contador-destinatarios" class="text-sm text-gray-500">0 destinatários</p>
+                </div>
             </div>
+            <form id="form-envio-massa" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-1.5">Assunto</label>
+                    <input type="text" id="massa-assunto" required class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:bg-white focus:ring-2 focus:ring-brand-blue/20 focus:border-brand-blue outline-none" placeholder="Ex: Novo objeto encontrado">
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-1.5">Mensagem</label>
+                    <textarea id="massa-mensagem" rows="5" required class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:bg-white focus:ring-2 focus:ring-brand-blue/20 focus:border-brand-blue outline-none resize-none" placeholder="Escreve a mensagem..."></textarea>
+                </div>
+                <button type="submit" id="btn-enviar-massa" class="w-full bg-brand-orange text-white font-bold py-2.5 rounded-lg hover:bg-orange-700 transition-all flex items-center justify-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
+                    Enviar Agora
+                </button>
+            </form>
         </div>
+    </div>
 
-    <!-- SECÇÃO DE GESTÃO DE EMAILS -->
-<div class="mt-10 bg-white rounded-2xl border border-gray-200 shadow-card overflow-hidden">
-    <div class="p-6 border-b border-gray-100 flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <!-- TOAST -->
+    <div id="toast" class="fixed bottom-6 right-6 transform translate-y-20 opacity-0 transition-all duration-300 z-50 bg-white border-l-4 border-brand-blue shadow-2xl rounded-lg p-4 flex items-center gap-3 max-w-sm">
+        <div id="toast-icon"></div>
         <div>
-            <h2 class="text-lg font-bold text-gray-900 flex items-center gap-2">
-                <svg class="w-5 h-5 text-brand-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
-                Lista de Contactos para Notificação
-            </h2>
-            <p class="text-sm text-gray-500 mt-1">Guarda emails de delegados de turma para enviar notificações em massa.</p>
+            <h4 id="toast-title" class="font-bold text-gray-900 text-sm">Sucesso</h4>
+            <p id="toast-message" class="text-gray-600 text-xs mt-0.5">Operação realizada.</p>
         </div>
-        <button onclick="abrirModal('modal-adicionar-email')" class="bg-brand-orange text-white font-bold px-5 py-2.5 rounded-xl hover:bg-orange-700 transition-all shadow-md flex items-center gap-2 text-sm">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
-            Adicionar Email
-        </button>
     </div>
-
-    <div class="overflow-x-auto">
-        <table class="w-full text-left border-collapse">
-            <thead class="bg-gray-50 text-xs font-bold text-gray-500 uppercase tracking-wider">
-                <tr>
-                    <th class="p-4">Nome</th>
-                    <th class="p-4">Email</th>
-                    <th class="p-4">Turma</th>
-                    <th class="p-4 text-center">Ações</th>
-                </tr>
-            </thead>
-            <tbody id="tabela-contactos" class="divide-y divide-gray-100 text-sm"></tbody>
-        </table>
-    </div>
-
-    <div class="p-4 bg-gray-50 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-3">
-        <p id="total-contactos" class="text-sm text-gray-600 font-medium">Total: 0 contactos</p>
-        <button onclick="abrirModalEnvioMassa()" class="bg-brand-blue text-white font-bold px-5 py-2.5 rounded-xl hover:bg-blue-900 transition-all shadow-md flex items-center gap-2 text-sm">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
-            Enviar Email a Todos
-        </button>
-    </div>
-</div>
-    </main>
 
     <script src="dashboard.js"></script>
-    <!-- MODAL: ADICIONAR EMAIL -->
-<div id="modal-adicionar-email" class="fixed inset-0 bg-navy/80 backdrop-blur-sm hidden items-center justify-center z-[100] p-4">
-    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-8 relative">
-        <button onclick="fecharModal('modal-adicionar-email')" class="absolute top-4 right-4 text-gray-400 hover:text-gray-700 w-8 h-8 rounded-full flex items-center justify-center hover:bg-gray-100 transition-colors">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-        </button>
-        <h2 class="text-xl font-extrabold text-navy mb-2">Adicionar Contacto</h2>
-        <p class="text-sm text-gray-500 mb-6">Este email irá receber notificações da secretaria.</p>
-        <form id="form-adicionar-contacto" class="space-y-4">
-            <div>
-                <label class="block text-sm font-bold text-gray-700 mb-1.5">Nome Completo</label>
-                <input type="text" id="contacto-nome" required class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-brand-blue/20 focus:border-brand-blue outline-none transition-all" placeholder="Ex: João Silva">
-            </div>
-            <div>
-                <label class="block text-sm font-bold text-gray-700 mb-1.5">Email</label>
-                <input type="email" id="contacto-email" required class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-brand-blue/20 focus:border-brand-blue outline-none transition-all" placeholder="Ex: aluno@etpc.pt">
-            </div>
-            <div>
-                <label class="block text-sm font-bold text-gray-700 mb-1.5">Turma (opcional)</label>
-                <input type="text" id="contacto-turma" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-brand-blue/20 focus:border-brand-blue outline-none transition-all" placeholder="Ex: 12º TGPSI">
-            </div>
-            <button type="submit" class="w-full bg-brand-blue text-white font-bold py-3 rounded-xl hover:bg-blue-900 transition-all shadow-lg">
-                Guardar Contacto
-            </button>
-        </form>
-    </div>
-</div>
+    <script>
+        // Toggle sidebar mobile
+        function toggleSidebar() {
+            document.getElementById('sidebar-overlay').classList.toggle('active');
+            document.querySelector('.sidebar').classList.toggle('open');
+        }
 
-<!-- MODAL: ENVIAR EMAIL EM MASSA -->
-<div id="modal-envio-massa" class="fixed inset-0 bg-navy/80 backdrop-blur-sm hidden items-center justify-center z-[100] p-4">
-    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-8 relative">
-        <button onclick="fecharModal('modal-envio-massa')" class="absolute top-4 right-4 text-gray-400 hover:text-gray-700 w-8 h-8 rounded-full flex items-center justify-center hover:bg-gray-100 transition-colors">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-        </button>
-        <div class="flex items-center gap-3 mb-6">
-            <div class="w-12 h-12 bg-brand-orange/10 rounded-xl flex items-center justify-center">
-                <svg class="w-6 h-6 text-brand-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
-            </div>
-            <div>
-                <h2 class="text-xl font-extrabold text-navy">Enviar Notificação</h2>
-                <p id="contador-destinatarios" class="text-sm text-gray-500">0 destinatários</p>
-            </div>
-        </div>
-        <form id="form-envio-massa" class="space-y-4">
-            <div>
-                <label class="block text-sm font-bold text-gray-700 mb-1.5">Assunto</label>
-                <input type="text" id="massa-assunto" required class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-brand-blue/20 focus:border-brand-blue outline-none transition-all" placeholder="Ex: Novo objeto encontrado">
-            </div>
-            <div>
-                <label class="block text-sm font-bold text-gray-700 mb-1.5">Mensagem</label>
-                <textarea id="massa-mensagem" rows="5" required class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-brand-blue/20 focus:border-brand-blue outline-none transition-all resize-none" placeholder="Escreve a mensagem que será enviada a todos os contactos..."></textarea>
-            </div>
-            <div class="bg-blue-50 border border-blue-100 p-3 rounded-xl">
-                <p class="text-xs text-blue-800 flex items-start gap-2">
-                    <svg class="w-4 h-4 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                    <span>Cada destinatário receberá um email individual no teu Gmail (modo teste).</span>
-                </p>
-            </div>
-            <button type="submit" id="btn-enviar-massa" class="w-full bg-brand-orange text-white font-bold py-3 rounded-xl hover:bg-orange-700 transition-all shadow-lg flex items-center justify-center gap-2">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
-                Enviar Agora
-            </button>
-        </form>
-    </div>
-</div>
-    <script src="dashboard-contactos.js"></script>
+        // Modais
+        function abrirModal(id) {
+            const modal = document.getElementById(id);
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+        function fecharModal(id) {
+            const modal = document.getElementById(id);
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+    </script>
 </body>
 </html>
