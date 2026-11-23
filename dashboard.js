@@ -368,25 +368,22 @@ async function enviarNotificacaoObjeto(objetoId) {
             const nomeFinal = MODO_TESTE ? `[TESTE] ${contacto.nome}` : contacto.nome;
 
             // Parâmetros para o Template do EmailJS
-            // IMPORTANTE: Os nomes aqui (to_email, name, etc) têm de bater certo com o Template no site do EmailJS
-            const templateParams = {
-                to_email: emailFinal,       // No template usa {{to_email}}
-                name: nomeFinal,            // No template usa {{name}}
-                email: contacto.email,      // No template usa {{email}} (para Reply-To)
-                assunto: `Objeto Encontrado: ${obj.titulo}`, // No template usa {{assunto}}
-                
-                // Dados do objeto para o corpo do email
-                titulo_objeto: obj.titulo,
-                categoria: obj.categoria,
-                localizacao: obj.sala,
-                estado: obj.estado,
-                
-                from_name: "Secretaria ETPC"
-            };
+// ESTES NOMES TÊM DE SER IGUAIS AOS DO TEMPLATE!
+const templateParams = {
+    to_email: emailFinal,          // Vai para o campo "To Email"
+    name: nomeFinal,               // Vai para {{name}}
+    assunto: `Objeto Encontrado: ${obj.titulo}`, // Vai para {{assunto}}
+    mensagem: `Informamos que foi encontrado um objeto na escola.`, // Vai para {{mensagem}}
+    
+    // Dados do objeto
+    titulo_objeto: obj.titulo,     // Vai para {{titulo_objeto}}
+    categoria: obj.categoria,      // Vai para {{categoria}}
+    localizacao: obj.sala,         // Vai para {{localizacao}}
+    estado: obj.estado             // Vai para {{estado}}
+};
 
-            // Enviar via EmailJS
-            await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, templateParams);
-            sucessos++;
+// Enviar via EmailJS
+await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, templateParams);
             
             // Pequena pausa para não sobrecarregar a API
             await new Promise(r => setTimeout(r, 500));
