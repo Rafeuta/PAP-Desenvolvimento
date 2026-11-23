@@ -233,38 +233,65 @@ async function apagarObjeto(id) {
     }
 }
 
-// ==========================================
-// NOTIFICAR (ENVIAR EMAIL EM MASSA VIA EMAILJS)
-// ==========================================
 async function notificarSobreObjeto(objetoId) {
-    const { data: obj } = await supabaseClient.from('objetos').select('*').eq('id', objetoId).single();
-    if(!obj) return;
-
-    if(listaContactos.length === 0) {
-        mostrarNotificacao('Atenção', 'Adiciona emails na lista de contactos primeiro.', 'erro');
+    // 1. Verificar se há contactos
+    if (listaContactos.length === 0) {
+        mostrarNotificacao('Erro', 'A lista de contactos está vazia! Adiciona um email primeiro.', 'erro');
+        console.error("DEBUG: listaContactos está vazia:", listaContactos);
         return;
     }
 
-    if(!confirm(`Enviar email para ${listaContactos.length} contactos sobre "${obj.titulo}"?`)) return;
+    // 2. Buscar dados do objeto
+    const { data: obj } = await supabaseClient.from('objetos').select('*').eq('id', objetoId).single();
+    if (!obj) {
+        mostrarNotificacao('Erro', 'Objeto não encontrado.', 'erro');
+        return;
+    }
+
+    // 3. Confirmar envio
+    if (!confirm(`Enviar email para ${listaContactos.length} contacto(s) sobre "${obj.titulo}"?`)) return;
 
     mostrarNotificacao('A enviar...', `A processar ${listaContactos.length} emails.`);
 
     let sucessos = 0;
+    let erros = 0;
+
+    // 4. Loop de envio
     for (const contacto of listaContactos) {
-        const sucesso = await enviarEmail(
-            contacto.email, 
-            contacto.nome, 
-            obj, 
-            `Objeto Encontrado: ${obj.titulo}`,
-            `Informamos que foi encontrado o seguinte objeto na escola.`,
-            `Se reconhecer este objeto como seu, por favor dirija-se à secretaria.`
-        );
-        if(sucesso) sucessos++;
+        try {
+            console.log(`DEBUG: A tentar enviar para ${contacto.email}...`);
+            
+            // Verificar se as chaves estão preenchidas
+            if (EMAILJS_SERVICE_ID.includes('COLOCA_AQUI') || EMAILJS_PUBLIC_KEY.includes('COLOCA_AQUI')) {
+                throw new Error("As chaves do EmailJS não estão configuradas no código!");
+            }
+
+            await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+                to_email: contacto.email, // Ex: vigixoh963@dvdee.com
+                nome_destinatario: contacto.nome,
+                assunto_email: `Objeto Encontrado: ${obj.titulo}`,
+                titulo_objeto: obj.titulo,
+                categoria: obj.categoria,
+                localizacao: obj.sala,
+                estado: obj.estado,
+                mensagem_introducao: `Informamos que foi encontrado o seguinte objeto na escola.`,
+                mensagem_final: `Se reconhecer este objeto como seu, por favor dirija-se à secretaria.`
+            });
+
+            console.log(`DEBUG: Sucesso para ${contacto.email}`);
+            sucessos++;
+        } catch (error) {
+            console.error(`DEBUG: Erro ao enviar para ${contacto.email}:`, error);
+            erros++;
+        }
     }
 
-    mostrarNotificacao('Concluído', `${sucessos} emails enviados com sucesso!`);
-}
-
+    // 5. Resultado Final
+    if (sucessos > 0) {
+        mostrarNotificacao('Sucesso', `${sucessos} email(s) enviado(s)! Verifica o Temp Mail.`);
+    } else {
+        mostrarNotificacao('Erro', `Falha ao enviar. Verifica a consola (F12).`, 'erro');
+    }
 // ==========================================
 // GESTÃO DE CONTACTOS (LISTA)
 // ==========================================
