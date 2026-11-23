@@ -1,3 +1,38 @@
+for (const contacto of listaContactos) {
+    try {
+        // Definir destinatário final (Teste vs Real)
+        const emailFinal = MODO_TESTE ? EMAIL_TESTE : contacto.email;
+        const nomeFinal = MODO_TESTE ? `[TESTE] ${contacto.nome}` : contacto.nome;
+
+        // Parâmetros para o Template do EmailJS
+        const templateParams = {
+            to_email: emailFinal,          // Para quem vai
+            name: nomeFinal,               // Nome no Olá
+            assunto: `Objeto Encontrado: ${obj.titulo}`,
+            mensagem: `Informamos que foi encontrado um objeto nas instalações da escola.`,
+            
+            // DADOS DO OBJETO
+            titulo_objeto: obj.titulo,
+            categoria: obj.categoria,
+            localizacao: obj.sala,
+            estado: obj.estado,
+            
+            // 🔥 A NOVA LINHA DA FOTO 🔥
+            foto_url: obj.foto_url || 'https://via.placeholder.com/400x300?text=Sem+Foto'
+        };
+
+        // Enviar via EmailJS
+        await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, templateParams);
+        sucessos++;
+        
+        // Pausa curta
+        await new Promise(r => setTimeout(r, 500));
+
+    } catch (error) {
+        console.error(`Erro ao enviar para ${contacto.email}:`, error);
+        falhas++;
+    }
+}
 // ==========================================
 // 1. CONFIGURAÇÃO DO SUPABASE
 // ==========================================
@@ -380,6 +415,11 @@ const templateParams = {
     categoria: obj.categoria,      // Vai para {{categoria}}
     localizacao: obj.sala,         // Vai para {{localizacao}}
     estado: obj.estado             // Vai para {{estado}}
+
+    
+            // 🔥 A NOVA LINHA DA FOTO 🔥
+            foto_url: obj.foto_url || 'https://via.placeholder.com/400x300?text=Sem+Foto'
+        };
 };
 
 // Enviar via EmailJS
