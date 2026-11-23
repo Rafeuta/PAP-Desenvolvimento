@@ -330,5 +330,43 @@
             modal.classList.remove('flex');
         }
     </script>
+    <!-- MODAL DE SELEÇÃO DE DESTINATÁRIOS -->
+<div id="modal-selecao-emails" class="fixed inset-0 bg-navy/80 backdrop-blur-sm hidden items-center justify-center z-[100] p-4">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg p-6 relative flex flex-col max-h-[90vh]">
+        
+        <!-- Cabeçalho -->
+        <div class="flex items-center justify-between mb-4 border-b pb-4">
+            <div>
+                <h2 class="text-xl font-extrabold text-navy">Selecionar Destinatários</h2>
+                <p class="text-sm text-gray-500">Escolhe para quem enviar a notificação.</p>
+            </div>
+            <button onclick="fecharModal('modal-selecao-emails')" class="text-gray-400 hover:text-gray-600">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+        </div>
+
+        <!-- Lista de Checkboxes (Scrollável) -->
+        <div class="overflow-y-auto flex-grow mb-4 pr-2 space-y-2" id="lista-checkboxes-container">
+            <!-- Os checkboxes serão injetados aqui pelo JS -->
+            <p class="text-center text-gray-500 py-4">A carregar contactos...</p>
+        </div>
+
+        <!-- Ações do Rodapé -->
+        <div class="border-t pt-4 flex items-center justify-between bg-gray-50 -mx-6 -mb-6 px-6 py-4 rounded-b-2xl">
+            <label class="flex items-center gap-2 cursor-pointer select-none">
+                <input type="checkbox" id="check-todos" class="w-4 h-4 text-brand-blue rounded focus:ring-brand-blue" onchange="toggleTodosCheckboxes(this.checked)">
+                <span class="text-sm font-bold text-gray-700">Selecionar Todos</span>
+            </label>
+            
+            <div class="flex gap-3">
+                <button onclick="fecharModal('modal-selecao-emails')" class="px-4 py-2 text-sm font-bold text-gray-600 hover:bg-gray-200 rounded-lg transition-colors">Cancelar</button>
+                <button onclick="confirmarEnvioEmails()" class="px-6 py-2 bg-brand-orange text-white font-bold rounded-lg hover:bg-orange-700 transition-colors shadow-md flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
+                    Enviar Selecionados
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 </body>
 </html>
