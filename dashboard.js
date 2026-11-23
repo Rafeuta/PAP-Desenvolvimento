@@ -1,28 +1,38 @@
 // ==========================================
-// CONFIGURAÇÃO SUPABASE
+// 1. CONFIGURAÇÃO DO SUPABASE
 // ==========================================
 const SUPABASE_URL = 'https://kswqakffuudugnfudizg.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_XM9rWUkcESRXVrKFFlgNDA_VZ8XgXJl';
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // ==========================================
-// CONFIGURAÇÃO EMAILJS (COLOCA AS TUAS CHAVES AQUI!)
+// 2. CONFIGURAÇÃO DO EMAILJS (JÁ PREENCHIDA)
 // ==========================================
-const EMAILJS_PUBLIC_KEY = 'COLOCA_AQUI_A_TUA_PUBLIC_KEY';
-const EMAILJS_SERVICE_ID = 'COLOCA_AQUI_O_TEU_SERVICE_ID'; // Ex: service_gmail_findit
-const EMAILJS_TEMPLATE_ID = 'COLOCA_AQUI_O_TEU_TEMPLATE_ID'; // Ex: template_notificacao
+// Estas são as chaves que me deste. 
+// NOTA: Verifica se a Public Key está completa no site do EmailJS (geralmente é maior).
+const EMAILJS_SERVICE_ID = 'service_vr8m9ms';
+const EMAILJS_TEMPLATE_ID = 'template_sfue4jf';
+const EMAILJS_PUBLIC_KEY = '2DOZgWNakRCfg9ZNd'; 
 
 // Inicializar EmailJS
 if (typeof emailjs !== 'undefined') {
     emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
 }
 
+// ==========================================
+// 3. MODO DE TESTE (TEMP MAIL)
+// ==========================================
+// Se true, TODOS os emails vão para o EMAIL_TESTE (para não spamar ninguém)
+// Se false, envia para os emails reais da lista de contactos
+const MODO_TESTE = true; 
+const EMAIL_TESTE = 'vigixoh963@dvdee.com'; // O teu Temp Mail atual
+
 let currentUser = null;
 let listaContactos = [];
-let objetoEditando = null; // Para saber se estamos a editar ou criar
+let objetoEditando = null; // Guarda o objeto que está a ser editado
 
 // ==========================================
-// SISTEMA TOAST (NOTIFICAÇÕES BONITAS)
+// 4. SISTEMA DE NOTIFICAÇÃO (TOAST)
 // ==========================================
 function mostrarNotificacao(titulo, mensagem, tipo = 'sucesso') {
     // Remove toast anterior se existir
@@ -31,16 +41,25 @@ function mostrarNotificacao(titulo, mensagem, tipo = 'sucesso') {
 
     const toast = document.createElement('div');
     toast.id = 'toast-notification';
-    const bgClass = tipo === 'sucesso' ? 'bg-green-500' : 'bg-red-500';
     
-    toast.className = `fixed bottom-6 right-6 ${bgClass} text-white px-6 py-4 rounded-lg shadow-2xl z-[100] flex items-center gap-3 transform transition-all duration-300 translate-y-0 opacity-100 max-w-sm`;
+    // Cores baseadas no tipo
+    const bgClass = tipo === 'sucesso' ? 'bg-green-600' : 'bg-red-600';
+    const icon = tipo === 'sucesso' 
+        ? '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>'
+        : '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>';
+
+    toast.className = `fixed bottom-6 right-6 ${bgClass} text-white px-6 py-4 rounded-lg shadow-2xl z-[100] flex items-center gap-3 transform transition-all duration-300 translate-y-0 opacity-100 max-w-md border-l-4 border-white/20`;
     toast.innerHTML = `
-        <div class="font-bold">${titulo}</div>
-        <div class="text-sm opacity-90">${mensagem}</div>
+        <svg class="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">${icon}</svg>
+        <div>
+            <h4 class="font-bold text-sm uppercase tracking-wide">${titulo}</h4>
+            <p class="text-xs opacity-90 mt-0.5">${mensagem}</p>
+        </div>
     `;
     
     document.body.appendChild(toast);
     
+    // Animação de saída
     setTimeout(() => {
         toast.classList.add('translate-y-20', 'opacity-0');
         setTimeout(() => toast.remove(), 300);
@@ -48,60 +67,45 @@ function mostrarNotificacao(titulo, mensagem, tipo = 'sucesso') {
 }
 
 // ==========================================
-// FUNÇÃO GENÉRICA DE ENVIO DE EMAIL (EMAILJS)
-// ==========================================
-async function enviarEmail(destinatarioEmail, nomeDestinatario, dadosObjeto, assuntoPersonalizado, msgIntro, msgFinal) {
-    try {
-        await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
-            to_email: destinatarioEmail,
-            nome_destinatario: nomeDestinatario,
-            assunto_email: assuntoPersonalizado,
-            titulo_objeto: dadosObjeto.titulo,
-            categoria: dadosObjeto.categoria,
-            localizacao: dadosObjeto.sala,
-            estado: dadosObjeto.estado,
-            justificacao: dadosObjeto.justificacao || '', // Pode vir vazio
-            mensagem_introducao: msgIntro,
-            mensagem_final: msgFinal
-        });
-        return true;
-    } catch (error) {
-        console.error("Erro EmailJS:", error);
-        return false;
-    }
-}
-
-// ==========================================
-// VERIFICAÇÃO DE SESSÃO
+// 5. VERIFICAÇÃO DE SESSÃO E INICIALIZAÇÃO
 // ==========================================
 async function verificarSessao() {
     const { data: { session } } = await supabaseClient.auth.getSession();
-    if (!session) { window.location.href = 'index.html'; return; }
+    if (!session) {
+        window.location.href = 'index.html';
+        return;
+    }
     currentUser = session.user;
     
     const userEmailEl = document.getElementById('user-email');
     if (userEmailEl) userEmailEl.textContent = currentUser.email;
     
+    // Carregar dados iniciais
     carregarTabelaObjetos();
     carregarContactos();
 }
 
-document.getElementById('btn-logout')?.addEventListener('click', async () => {
-    await supabaseClient.auth.signOut();
-    window.location.href = 'index.html';
-});
+// Logout
+const btnLogout = document.getElementById('btn-logout');
+if (btnLogout) {
+    btnLogout.addEventListener('click', async () => {
+        await supabaseClient.auth.signOut();
+        window.location.href = 'index.html';
+    });
+}
 
 // ==========================================
-// GESTÃO DE OBJETOS (CRIAR / EDITAR)
+// 6. GESTÃO DE OBJETOS (CRIAR / EDITAR)
 // ==========================================
 const formObjeto = document.getElementById('form-objeto');
 if (formObjeto) {
     formObjeto.addEventListener('submit', async (e) => {
         e.preventDefault();
+        
         const btnSubmit = document.getElementById('btn-submit');
         const originalText = btnSubmit.innerHTML;
         btnSubmit.disabled = true;
-        btnSubmit.innerHTML = 'A processar...';
+        btnSubmit.innerHTML = `<svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> A processar...`;
 
         const titulo = document.getElementById('titulo').value;
         const categoria = document.getElementById('categoria').value;
@@ -116,39 +120,50 @@ if (formObjeto) {
             if (fotoFile) {
                 const fileExt = fotoFile.name.split('.').pop();
                 const fileName = `${Date.now()}.${fileExt}`;
+                
                 const { error: uploadError } = await supabaseClient.storage.from('objetos').upload(fileName, fotoFile);
                 if (uploadError) throw uploadError;
+                
                 const { data: { publicUrl } } = supabaseClient.storage.from('objetos').getPublicUrl(fileName);
                 foto_url = publicUrl;
+            } else if (!objetoEditando) {
+                throw new Error("A fotografia é obrigatória para novos objetos.");
             }
 
             if (objetoEditando) {
-                // ATUALIZAR
+                // --- MODO EDIÇÃO ---
                 const { error } = await supabaseClient.from('objetos').update({
                     titulo, categoria, sala, foto_url
                 }).eq('id', objetoEditando.id);
+                
                 if (error) throw error;
-                mostrarNotificacao('Sucesso', 'Objeto atualizado!');
-                objetoEditando = null; // Reset modo edição
+                mostrarNotificacao('Sucesso', 'Objeto atualizado com sucesso!');
+                
+                // Reset modo edição
+                objetoEditando = null;
                 btnSubmit.textContent = 'Guardar Objeto';
+                btnSubmit.classList.remove('bg-orange-600', 'hover:bg-orange-700');
+                btnSubmit.classList.add('bg-brand-blue', 'hover:bg-blue-900');
+
             } else {
-                // INSERIR NOVO
+                // --- MODO CRIAÇÃO ---
                 const { error } = await supabaseClient.from('objetos').insert([{
-                    titulo, categoria, sala, foto_url, estado: 'Achado', registado_por: currentUser.id
+                    titulo, categoria, sala, foto_url, 
+                    estado: 'Achado', 
+                    registado_por: currentUser.id
                 }]);
+                
                 if (error) throw error;
-                mostrarNotificacao('Sucesso', 'Objeto registado!');
+                mostrarNotificacao('Sucesso', 'Objeto registado no sistema!');
             }
 
+            // Limpar formulário
             formObjeto.reset();
-            // Reset visual preview
-            const previewDiv = document.getElementById('image-preview');
-            const placeholderDiv = document.getElementById('upload-placeholder');
-            if(previewDiv) previewDiv.classList.add('hidden');
-            if(placeholderDiv) placeholderDiv.classList.remove('hidden');
-            
+            resetImagePreview();
             carregarTabelaObjetos();
+
         } catch (error) {
+            console.error(error);
             mostrarNotificacao('Erro', error.message, 'erro');
         } finally {
             btnSubmit.innerHTML = originalText;
@@ -157,197 +172,338 @@ if (formObjeto) {
     });
 }
 
-// Função para carregar dados no formulário (Editar)
-async function editarObjeto(id) {
-    const { data: obj } = await supabaseClient.from('objetos').select('*').eq('id', id).single();
-    if (!obj) return;
-
-    objetoEditando = obj;
-    document.getElementById('titulo').value = obj.titulo;
-    document.getElementById('categoria').value = obj.categoria;
-    document.getElementById('sala').value = obj.sala;
-    
-    // Mostrar imagem atual
-    const previewImg = document.getElementById('preview-img');
+// Função auxiliar para limpar preview da imagem
+function resetImagePreview() {
     const previewDiv = document.getElementById('image-preview');
     const placeholderDiv = document.getElementById('upload-placeholder');
+    const fileInfo = document.getElementById('file-size-info');
     
-    if (previewImg && obj.foto_url) {
-        previewImg.src = obj.foto_url;
-        if(previewDiv) previewDiv.classList.remove('hidden');
-        if(placeholderDiv) placeholderDiv.classList.add('hidden');
-    }
+    if (previewDiv) previewDiv.classList.add('hidden');
+    if (placeholderDiv) placeholderDiv.classList.remove('hidden');
+    if (fileInfo) fileInfo.classList.add('hidden');
+}
 
-    const btnSubmit = document.getElementById('btn-submit');
-    if(btnSubmit) btnSubmit.textContent = 'Atualizar Objeto';
+// Pré-visualização da imagem ao selecionar
+const inputFoto = document.getElementById('foto');
+if (inputFoto) {
+    inputFoto.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const previewImg = document.getElementById('preview-img');
+                const previewDiv = document.getElementById('image-preview');
+                const placeholderDiv = document.getElementById('upload-placeholder');
+                const fileInfo = document.getElementById('file-size-info');
+                const fileSizeText = document.getElementById('file-size-text');
 
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-    mostrarNotificacao('Modo Edição', 'Altera os campos e clica em Atualizar.');
+                if (previewImg) previewImg.src = e.target.result;
+                if (previewDiv) previewDiv.classList.remove('hidden');
+                if (placeholderDiv) placeholderDiv.classList.add('hidden');
+                
+                if (fileSizeText) fileSizeText.textContent = (file.size / (1024 * 1024)).toFixed(2);
+                if (fileInfo) fileInfo.classList.remove('hidden');
+            }
+            reader.readAsDataURL(file);
+        }
+    });
 }
 
 // ==========================================
-// TABELA DE OBJETOS
+// 7. TABELA DE OBJETOS (LER / APAGAR / EDITAR)
 // ==========================================
 async function carregarTabelaObjetos() {
     const tbody = document.getElementById('tabela-corpo');
     if (!tbody) return;
 
-    const { data: objetos } = await supabaseClient.from('objetos').select('*').order('criado_em', { ascending: false });
+    // Loading state
+    tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center"><svg class="animate-spin h-8 w-8 text-brand-blue mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg></td></tr>`;
+
+    const { data: objetos, error } = await supabaseClient.from('objetos').select('*').order('criado_em', { ascending: false });
     
-    if (!objetos || objetos.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="6" class="p-8 text-center text-gray-500">Sem objetos.</td></tr>';
+    if (error) {
+        tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-red-500">Erro ao carregar: ${error.message}</td></tr>`;
         return;
     }
 
-    tbody.innerHTML = objetos.map(obj => {
-        const isDevolvido = obj.estado === 'Devolvido';
-        const badge = isDevolvido 
-            ? '<span class="px-2 py-1 rounded-full text-xs font-bold bg-green-100 text-green-700">Devolvido</span>'
-            : '<span class="px-2 py-1 rounded-full text-xs font-bold bg-orange-100 text-orange-700">Achado</span>';
+    if (!objetos || objetos.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="p-12 text-center text-gray-500">Nenhum objeto encontrado.</td></tr>`;
+        return;
+    }
 
-        return `
-        <tr class="border-b hover:bg-gray-50">
-            <td class="p-4"><img src="${obj.foto_url}" class="w-12 h-12 object-cover rounded-lg"></td>
-            <td class="p-4 font-bold text-gray-800">${obj.titulo}<br><span class="text-xs font-normal text-gray-500">${obj.categoria}</span></td>
-            <td class="p-4 text-gray-600">${obj.sala}</td>
-            <td class="p-4">${badge}</td>
-            <td class="p-4 text-right space-x-2">
-                <button onclick="editarObjeto(${obj.id})" class="text-blue-600 hover:text-blue-800 font-semibold text-sm">Editar</button>
-                <button onclick="notificarSobreObjeto(${obj.id})" class="text-orange-600 hover:text-orange-800 font-semibold text-sm" title="Enviar Email">✉️</button>
-                <button onclick="apagarObjeto(${obj.id})" class="text-red-500 hover:text-red-700 font-semibold text-sm">Apagar</button>
-            </td>
-        </tr>`;
-    }).join('');
+    tbody.innerHTML = '';
+    objetos.forEach(obj => {
+        const isDevolvido = obj.estado === 'Devolvido';
+        const badgeClass = isDevolvido ? 'bg-green-100 text-green-700 border-green-200' : 'bg-orange-100 text-orange-700 border-orange-200';
+        const badgeText = isDevolvido ? 'Devolvido' : 'Achado';
+
+        const row = `
+            <tr class="border-b border-gray-100 hover:bg-gray-50 transition-colors">
+                <td class="p-4">
+                    <img src="${obj.foto_url}" alt="${obj.titulo}" class="w-12 h-12 object-cover rounded-lg border border-gray-200 shadow-sm">
+                </td>
+                <td class="p-4">
+                    <div class="font-bold text-gray-900">${obj.titulo}</div>
+                    <div class="text-xs text-gray-500 uppercase font-semibold mt-1">${obj.categoria}</div>
+                </td>
+                <td class="p-4 text-sm text-gray-600 font-medium">${obj.sala}</td>
+                <td class="p-4">
+                    <button onclick="alterarEstado(${obj.id}, '${obj.estado}')" class="px-3 py-1 rounded-full text-xs font-bold border ${badgeClass} hover:opacity-80 transition-opacity cursor-pointer" title="Clica para alterar o estado">
+                        ${badgeText}
+                    </button>
+                </td>
+                <td class="p-4 text-right">
+                    <div class="flex items-center justify-end gap-2">
+                        <button onclick="prepararEdicao(${obj.id})" class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" title="Editar Objeto">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                        </button>
+                        <button onclick="enviarNotificacaoObjeto(${obj.id})" class="p-2 text-orange-600 hover:bg-orange-50 rounded-lg transition-colors" title="Notificar Alunos (Email)">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                        </button>
+                        <button onclick="apagarObjeto(${obj.id})" class="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors" title="Eliminar Objeto">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        `;
+        tbody.innerHTML += row;
+    });
+}
+
+// --- Ações da Tabela ---
+
+async function prepararEdicao(id) {
+    const { data: obj } = await supabaseClient.from('objetos').select('*').eq('id', id).single();
+    if (!obj) return;
+
+    objetoEditando = obj;
+
+    // Preencher formulário
+    document.getElementById('titulo').value = obj.titulo;
+    document.getElementById('categoria').value = obj.categoria;
+    document.getElementById('sala').value = obj.sala;
+
+    // Mostrar imagem atual
+    const previewImg = document.getElementById('preview-img');
+    const previewDiv = document.getElementById('image-preview');
+    const placeholderDiv = document.getElementById('upload-placeholder');
+
+    if (previewImg && obj.foto_url) {
+        previewImg.src = obj.foto_url;
+        if (previewDiv) previewDiv.classList.remove('hidden');
+        if (placeholderDiv) placeholderDiv.classList.add('hidden');
+    }
+
+    // Mudar botão para "Atualizar"
+    const btnSubmit = document.getElementById('btn-submit');
+    if (btnSubmit) {
+        btnSubmit.textContent = 'Atualizar Objeto';
+        btnSubmit.classList.remove('bg-brand-blue', 'hover:bg-blue-900');
+        btnSubmit.classList.add('bg-orange-600', 'hover:bg-orange-700');
+    }
+
+    // Scroll para o topo
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    mostrarNotificacao('Modo Edição', `A editar: ${obj.titulo}. Faz as alterações e clica em Atualizar.`);
 }
 
 async function alterarEstado(id, estadoAtual) {
-    const novo = estadoAtual === 'Achado' ? 'Devolvido' : 'Achado';
-    await supabaseClient.from('objetos').update({ estado: novo }).eq('id', id);
-    carregarTabelaObjetos();
-}
-
-async function apagarObjeto(id) {
-    if(confirm('Eliminar objeto?')) {
-        await supabaseClient.from('objetos').delete().eq('id', id);
+    const novoEstado = estadoAtual === 'Achado' ? 'Devolvido' : 'Achado';
+    const { error } = await supabaseClient.from('objetos').update({ estado: novoEstado }).eq('id', id);
+    
+    if (error) {
+        mostrarNotificacao('Erro', 'Falha ao atualizar estado.', 'erro');
+    } else {
+        mostrarNotificacao('Estado Atualizado', `Objeto marcado como ${novoEstado}.`);
         carregarTabelaObjetos();
     }
 }
 
-async function notificarSobreObjeto(objetoId) {
-    // 1. Verificar se há contactos
+async function apagarObjeto(id) {
+    if (!confirm("Tem a certeza que deseja eliminar este objeto permanentemente?")) return;
+    
+    const { error } = await supabaseClient.from('objetos').delete().eq('id', id);
+    if (error) {
+        mostrarNotificacao('Erro', 'Falha ao eliminar.', 'erro');
+    } else {
+        mostrarNotificacao('Eliminado', 'Objeto removido do sistema.');
+        carregarTabelaObjetos();
+    }
+}
+
+// ==========================================
+// 8. ENVIO DE EMAILS (EMAILJS + MODO TESTE)
+// ==========================================
+async function enviarNotificacaoObjeto(objetoId) {
+    // 1. Verificar contactos
     if (listaContactos.length === 0) {
-        mostrarNotificacao('Erro', 'A lista de contactos está vazia! Adiciona um email primeiro.', 'erro');
-        console.error("DEBUG: listaContactos está vazia:", listaContactos);
+        mostrarNotificacao('Lista Vazia', 'Adiciona emails na lista de contactos primeiro.', 'erro');
         return;
     }
 
     // 2. Buscar dados do objeto
     const { data: obj } = await supabaseClient.from('objetos').select('*').eq('id', objetoId).single();
-    if (!obj) {
-        mostrarNotificacao('Erro', 'Objeto não encontrado.', 'erro');
-        return;
-    }
+    if (!obj) return;
 
-    // 3. Confirmar envio
-    if (!confirm(`Enviar email para ${listaContactos.length} contacto(s) sobre "${obj.titulo}"?`)) return;
+    // 3. Confirmar
+    const destinoReal = listaContactos.length === 1 ? listaContactos[0].email : `${listaContactos.length} contactos`;
+    const destinoTeste = EMAIL_TESTE;
+    const msgConfirm = MODO_TESTE 
+        ? `MODO DE TESTE ATIVO!\n\nO email será enviado para: ${destinoTeste}\n(em vez de ir para ${destinoReal})\n\nDeseja continuar?`
+        : `Enviar email para ${destinoReal} sobre "${obj.titulo}"?`;
 
-    mostrarNotificacao('A enviar...', `A processar ${listaContactos.length} emails.`);
+    if (!confirm(msgConfirm)) return;
+
+    mostrarNotificacao('A Enviar...', `A processar ${listaContactos.length} emails...`);
 
     let sucessos = 0;
-    let erros = 0;
+    let falhas = 0;
 
-    // 4. Loop de envio
+    // 4. Loop de Envio
     for (const contacto of listaContactos) {
         try {
-            console.log(`DEBUG: A tentar enviar para ${contacto.email}...`);
-            
-            // Verificar se as chaves estão preenchidas
-            if (EMAILJS_SERVICE_ID.includes('COLOCA_AQUI') || EMAILJS_PUBLIC_KEY.includes('COLOCA_AQUI')) {
-                throw new Error("As chaves do EmailJS não estão configuradas no código!");
-            }
+            // Definir destinatário final (Teste vs Real)
+            const emailFinal = MODO_TESTE ? EMAIL_TESTE : contacto.email;
+            const nomeFinal = MODO_TESTE ? `[TESTE] ${contacto.nome}` : contacto.nome;
 
-            await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
-                to_email: contacto.email, // Ex: vigixoh963@dvdee.com
-                nome_destinatario: contacto.nome,
-                assunto_email: `Objeto Encontrado: ${obj.titulo}`,
+            // Parâmetros para o Template do EmailJS
+            // IMPORTANTE: Os nomes aqui (to_email, name, etc) têm de bater certo com o Template no site do EmailJS
+            const templateParams = {
+                to_email: emailFinal,       // No template usa {{to_email}}
+                name: nomeFinal,            // No template usa {{name}}
+                email: contacto.email,      // No template usa {{email}} (para Reply-To)
+                assunto: `Objeto Encontrado: ${obj.titulo}`, // No template usa {{assunto}}
+                
+                // Dados do objeto para o corpo do email
                 titulo_objeto: obj.titulo,
                 categoria: obj.categoria,
                 localizacao: obj.sala,
                 estado: obj.estado,
-                mensagem_introducao: `Informamos que foi encontrado o seguinte objeto na escola.`,
-                mensagem_final: `Se reconhecer este objeto como seu, por favor dirija-se à secretaria.`
-            });
+                
+                from_name: "Secretaria ETPC"
+            };
 
-            console.log(`DEBUG: Sucesso para ${contacto.email}`);
+            // Enviar via EmailJS
+            await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, templateParams);
             sucessos++;
+            
+            // Pequena pausa para não sobrecarregar a API
+            await new Promise(r => setTimeout(r, 500));
+
         } catch (error) {
-            console.error(`DEBUG: Erro ao enviar para ${contacto.email}:`, error);
-            erros++;
+            console.error(`Erro ao enviar para ${contacto.email}:`, error);
+            falhas++;
         }
     }
 
-    // 5. Resultado Final
+    // 5. Resultado
     if (sucessos > 0) {
-        mostrarNotificacao('Sucesso', `${sucessos} email(s) enviado(s)! Verifica o Temp Mail.`);
-    } else {
-        mostrarNotificacao('Erro', `Falha ao enviar. Verifica a consola (F12).`, 'erro');
+        const msg = MODO_TESTE 
+            ? `${sucessos} email(s) de teste enviado(s) para ${EMAIL_TESTE}!`
+            : `${sucessos} email(s) enviado(s) com sucesso!`;
+        mostrarNotificacao('Sucesso', msg);
     }
+    
+    if (falhas > 0) {
+        mostrarNotificacao('Atenção', `${falhas} email(s) falharam. Verifica a consola (F12).`, 'erro');
+    }
+}
+
 // ==========================================
-// GESTÃO DE CONTACTOS (LISTA)
+// 9. GESTÃO DE CONTACTOS (LISTA)
 // ==========================================
 async function carregarContactos() {
     const tbody = document.getElementById('tabela-contactos');
-    if(!tbody) return;
-    const { data } = await supabaseClient.from('contactos_email').select('*');
-    listaContactos = data || [];
+    if (!tbody) return;
+
+    const { data, error } = await supabaseClient.from('contactos_email').select('*').order('nome');
     
-    if(listaContactos.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-gray-500">Sem contactos.</td></tr>';
+    if (error) {
+        console.error("Erro contactos:", error);
         return;
     }
 
-    tbody.innerHTML = listaContactos.map(c => `
-        <tr class="border-b">
-            <td class="p-3 font-semibold">${c.nome}</td>
-            <td class="p-3 text-gray-600">${c.email}</td>
-            <td class="p-3 text-gray-500">${c.turma || '-'}</td>
-            <td class="p-3 text-right">
-                <button onclick="apagarContacto(${c.id})" class="text-red-500 text-sm">Remover</button>
-            </td>
-        </tr>
-    `).join('');
-    
-    const totalEl = document.getElementById('total-contactos');
-    if(totalEl) totalEl.textContent = `Total: ${listaContactos.length} contactos`;
+    listaContactos = data || [];
+
+    if (listaContactos.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="4" class="p-8 text-center text-gray-500 italic">Nenhum contacto guardado.</td></tr>`;
+    } else {
+        tbody.innerHTML = listaContactos.map(c => `
+            <tr class="border-b border-gray-50 hover:bg-gray-50">
+                <td class="p-3 font-semibold text-gray-800">${c.nome}</td>
+                <td class="p-3 text-gray-600 text-sm">${c.email}</td>
+                <td class="p-3 text-gray-500 text-sm">${c.turma || '-'}</td>
+                <td class="p-3 text-right">
+                    <button onclick="removerContacto(${c.id})" class="text-red-400 hover:text-red-600 text-xs font-bold uppercase">Remover</button>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    // Atualizar contador se existir
+    const counter = document.getElementById('total-contactos');
+    if (counter) counter.textContent = `Total: ${listaContactos.length} contactos`;
 }
 
-// Adicionar Contacto
-document.getElementById('form-adicionar-contacto')?.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const nome = document.getElementById('contacto-nome').value;
-    const email = document.getElementById('contacto-email').value;
-    const turma = document.getElementById('contacto-turma').value;
+// Adicionar Contacto (Modal)
+const formContacto = document.getElementById('form-adicionar-contacto');
+if (formContacto) {
+    formContacto.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const nome = document.getElementById('contacto-nome').value;
+        const email = document.getElementById('contacto-email').value;
+        const turma = document.getElementById('contacto-turma').value;
 
-    const { error } = await supabaseClient.from('contactos_email').insert([{nome, email, turma}]);
-    if(error) {
-        mostrarNotificacao('Erro', 'Email já existe ou erro na base de dados.', 'erro');
-    } else {
-        mostrarNotificacao('Sucesso', 'Contacto adicionado!');
-        e.target.reset();
-        // Fechar modal se existir
-        const modal = document.getElementById('modal-adicionar-email');
-        if(modal) modal.classList.add('hidden');
-        carregarContactos();
-    }
-});
+        const { error } = await supabaseClient.from('contactos_email').insert([{ nome, email, turma }]);
 
-async function apagarContacto(id) {
+        if (error) {
+            mostrarNotificacao('Erro', 'Falha ao guardar. O email já existe?', 'erro');
+        } else {
+            mostrarNotificacao('Sucesso', 'Contacto adicionado à lista!');
+            formContacto.reset();
+            fecharModal('modal-adicionar-email');
+            carregarContactos();
+        }
+    });
+}
+
+async function removerContacto(id) {
+    if(!confirm('Remover este contacto?')) return;
     await supabaseClient.from('contactos_email').delete().eq('id', id);
     carregarContactos();
 }
 
-// Modal Logic
-function abrirModal(id) { document.getElementById(id)?.classList.remove('hidden'); }
-function fecharModal(id) { document.getElementById(id)?.classList.add('hidden'); }
+// ==========================================
+// 10. FUNÇÕES AUXILIARES (MODAIS)
+// ==========================================
+function abrirModal(id) {
+    const el = document.getElementById(id);
+    if (el) {
+        el.classList.remove('hidden');
+        el.classList.add('flex');
+    }
+}
 
-window.onload = verificarSessao;
+function fecharModal(id) {
+    const el = document.getElementById(id);
+    if (el) {
+        el.classList.add('hidden');
+        el.classList.remove('flex');
+    }
+}
+
+// Fechar modal ao clicar fora
+window.onclick = function(event) {
+    if (event.target.classList.contains('fixed') && event.target.classList.contains('inset-0')) {
+        event.target.classList.add('hidden');
+        event.target.classList.remove('flex');
+    }
+}
+
+// ==========================================
+// INICIAR TUDO
+// ==========================================
+window.onload = () => {
+    verificarSessao();
+};
