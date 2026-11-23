@@ -31,6 +31,9 @@ let currentUser = null;
 let listaContactos = [];
 let objetoEditando = null; // Guarda o ID do objeto em edição
 
+// Variável global para guardar o objeto atual que está a ser enviado
+let objetoParaEnviar = null;
+
 // ==========================================
 // 4. SISTEMA DE NOTIFICAÇÃO (TOAST)
 // ==========================================
@@ -299,34 +302,97 @@ async function apagarObjeto(id) {
 }
 
 // ==========================================
-// 8. ENVIO DE EMAILS (COM FOTO E DESIGN)
+// 8. ENVIO DE EMAILS (COM MODAL DE SELEÇÃO)
 // ==========================================
+
+// Função chamada pelo botão na tabela
 async function enviarNotificacaoObjeto(objetoId) {
+    // 1. Buscar dados do objeto
+    const { data: obj } = await supabaseClient.from('objetos').select('*').eq('id', objetoId).single();
+    if (!obj) return;
+
+    // 2. Verificar se há contactos
     if (listaContactos.length === 0) {
         mostrarNotificacao('Lista Vazia', 'Adiciona emails na lista primeiro.', 'erro');
         return;
     }
 
-    const { data: obj } = await supabaseClient.from('objetos').select('*').eq('id', objetoId).single();
-    if (!obj) return;
+    // 3. Guardar objeto e abrir modal
+    objetoParaEnviar = obj;
+    gerarListaCheckboxes();
+    abrirModal('modal-selecao-emails');
+}
 
-    const destinoReal = listaContactos.length === 1 ? listaContactos[0].email : `${listaContactos.length} contactos`;
-    const msgConfirm = MODO_TESTE 
-        ? `MODO TESTE: Enviar para ${EMAIL_TESTE}?`
-        : `Enviar email para ${destinoReal}?`;
+// Gera os checkboxes dinamicamente
+function gerarListaCheckboxes() {
+    const container = document.getElementById('lista-checkboxes-container');
+    if (!container) return;
 
-    if (!confirm(msgConfirm)) return;
+    container.innerHTML = '';
 
-    mostrarNotificacao('A Enviar...', `A processar ${listaContactos.length} emails...`);
+    listaContactos.forEach((c, index) => {
+        // Se MODO_TESTE estiver ativo, mostramos um aviso visual mas mantemos o email real na label
+        const isTestMode = MODO_TESTE;
+        const badgeTeste = isTestMode ? '<span class="ml-2 text-xs bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded-full border border-yellow-200">TESTE → Temp Mail</span>' : '';
+
+        const div = document.createElement('div');
+        div.className = "flex items-center p-3 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors";
+        div.innerHTML = `
+            <input type="checkbox" id="chk-${index}" value="${c.email}" class="email-checkbox w-5 h-5 text-brand-blue rounded focus:ring-brand-blue cursor-pointer" checked>
+            <label for="chk-${index}" class="ml-3 flex-grow cursor-pointer flex flex-col">
+                <span class="font-bold text-gray-900 text-sm">${c.nome} ${badgeTeste}</span>
+                <span class="text-xs text-gray-500">${c.email} • ${c.turma || 'Sem Turma'}</span>
+            </label>
+        `;
+        container.appendChild(div);
+    });
+
+    // Marcar "Selecionar Todos" como true por defeito
+    const checkTodos = document.getElementById('check-todos');
+    if (checkTodos) checkTodos.checked = true;
+}
+
+// Função para o checkbox "Selecionar Todos"
+function toggleTodosCheckboxes(estado) {
+    const checkboxes = document.querySelectorAll('.email-checkbox');
+    checkboxes.forEach(chk => chk.checked = estado);
+}
+
+// Função final que envia os emails
+async function confirmarEnvioEmails() {
+    if (!objetoParaEnviar) return;
+
+    // 1. Apanhar todos os emails marcados
+    const checkboxes = document.querySelectorAll('.email-checkbox:checked');
+    const emailsSelecionados = Array.from(checkboxes).map(chk => {
+        // Encontrar o contacto correspondente para saber o nome
+        const email = chk.value;
+        const contacto = listaContactos.find(c => c.email === email);
+        return {
+            email: email,
+            nome: contacto ? contacto.nome : 'Aluno'
+        };
+    });
+
+    if (emailsSelecionados.length === 0) {
+        mostrarNotificacao('Atenção', 'Seleciona pelo menos um destinatário.', 'erro');
+        return;
+    }
+
+    // 2. Fechar modal e mostrar loading
+    fecharModal('modal-selecao-emails');
+    mostrarNotificacao('A Enviar...', `A processar ${emailsSelecionados.length} emails...`);
 
     let sucessos = 0;
+    const obj = objetoParaEnviar;
 
-    for (const contacto of listaContactos) {
+    // 3. Loop de envio
+    for (const dest of emailsSelecionados) {
         try {
-            const emailFinal = MODO_TESTE ? EMAIL_TESTE : contacto.email;
-            const nomeFinal = MODO_TESTE ? `[TESTE] ${contacto.nome}` : contacto.nome;
+            // Lógica do Modo Teste vs Real
+            const emailFinal = MODO_TESTE ? EMAIL_TESTE : dest.email;
+            const nomeFinal = MODO_TESTE ? `[TESTE] ${dest.nome}` : dest.nome;
 
-            // Parâmetros exatos para o Template HTML que te dei
             const templateParams = {
                 to_email: emailFinal,
                 name: nomeFinal,
@@ -344,15 +410,20 @@ async function enviarNotificacaoObjeto(objetoId) {
             await new Promise(r => setTimeout(r, 500)); // Pausa anti-spam
 
         } catch (error) {
-            console.error(`Erro email ${contacto.email}:`, error);
+            console.error(`Erro ao enviar para ${dest.email}:`, error);
         }
     }
 
+    // 4. Resultado
     if (sucessos > 0) {
-        mostrarNotificacao('Sucesso', `${sucessos} email(s) enviado(s)!`);
+        const msgDestino = MODO_TESTE ? `para o Temp Mail (${EMAIL_TESTE})` : 'para os destinatários';
+        mostrarNotificacao('Sucesso', `${sucessos} email(s) enviado(s) ${msgDestino}!`);
     } else {
-        mostrarNotificacao('Erro', 'Falha ao enviar. Verifica a consola.', 'erro');
+        mostrarNotificacao('Erro', 'Falha ao enviar emails.', 'erro');
     }
+    
+    // Limpar objeto temporário
+    objetoParaEnviar = null;
 }
 
 // ==========================================
