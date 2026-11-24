@@ -127,7 +127,13 @@ grant insert on table public.reclamacoes to anon, authenticated;
 grant select on table public.reclamacoes to authenticated;
 grant usage, select on sequence public.reclamacoes_id_seq to anon, authenticated;
 
--- 5) Fotografias: leitura pública (catálogo), upload apenas por staff.
+-- 5) Índices nas chaves estrangeiras identificadas pelo advisor de performance.
+create index if not exists idx_objetos_registado_por
+on public.objetos (registado_por);
+create index if not exists idx_reclamacoes_objeto_id
+on public.reclamacoes (objeto_id);
+
+-- 6) Fotografias: leitura pública (catálogo), upload apenas por staff.
 drop policy if exists "Permitir leitura dos próprios ficheiros" on storage.objects;
 drop policy if exists "Permitir upload de objetos" on storage.objects;
 create policy "Staff envia fotografias de objetos"
