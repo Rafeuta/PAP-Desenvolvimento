@@ -125,7 +125,8 @@ if (formObjeto) {
                 const extensions = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp' };
                 if (!extensions[fotoFile.type]) throw new Error('Formato inválido. Utiliza JPG, PNG ou WebP.');
                 if (fotoFile.size > 5 * 1024 * 1024) throw new Error('A fotografia não pode ultrapassar 5 MB.');
-                const fileName = `${crypto.randomUUID ? crypto.randomUUID() : Date.now()}.${extensions[fotoFile.type]}`;
+                const uniqueId = window.crypto && typeof window.crypto.randomUUID === 'function' ? window.crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+                const fileName = `${uniqueId}.${extensions[fotoFile.type]}`;
                 uploadedPath = fileName;
 
                 const { error: uploadError } = await supabaseClient.storage.from('objetos').upload(fileName, fotoFile, {
@@ -228,7 +229,9 @@ async function carregarTabelaObjetos() {
     const { data: objetos, error } = await supabaseClient.from('objetos').select('*').order('criado_em', { ascending: false });
     
     if (error) {
-        tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-red-500">Erro: ${error.message}</td></tr>`;
+        tbody.innerHTML = '<tr><td colspan="6" class="p-8 text-center text-red-500">Não foi possível carregar os objetos.</td></tr>';
+        mostrarNotificacao('Erro', 'Não foi possível carregar os objetos. Verifica as permissões e a ligação à base de dados.', 'erro');
+        console.error(error);
         return;
     }
 
