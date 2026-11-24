@@ -359,71 +359,77 @@ function toggleTodosCheckboxes(estado) {
 }
 
 // Função final que envia os emails
-async function confirmarEnvioEmails() {
-    if (!objetoParaEnviar) return;
+let envioEmailsEmCurso = false;
 
-    // 1. Apanhar todos os emails marcados
-    const checkboxes = document.querySelectorAll('.email-checkbox:checked');
-    const emailsSelecionados = Array.from(checkboxes).map(chk => {
-        // Encontrar o contacto correspondente para saber o nome
-        const email = chk.value;
-        const contacto = listaContactos.find(c => c.email === email);
-        return {
-            email: email,
-            nome: contacto ? contacto.nome : 'Aluno'
-        };
-    });
+async function confirmarEnvioEmails() {
+    if (!objetoParaEnviar || envioEmailsEmCurso) return;
+
+    const emailsSelecionados = Array.from(document.querySelectorAll('.email-checkbox:checked'))
+        .map(chk => listaContactos.find(c => c.email === chk.value))
+        .filter(Boolean);
 
     if (emailsSelecionados.length === 0) {
         mostrarNotificacao('Atenção', 'Seleciona pelo menos um destinatário.', 'erro');
         return;
     }
+    if (typeof emailjs === 'undefined' || typeof emailjs.send !== 'function') {
+        mostrarNotificacao('Erro', 'O serviço de email não está disponível. Atualiza a página e tenta novamente.', 'erro');
+        return;
+    }
 
-    // 2. Fechar modal e mostrar loading
-    fecharModal('modal-selecao-emails');
-    mostrarNotificacao('A Enviar...', `A processar ${emailsSelecionados.length} emails...`);
-
-    let sucessos = 0;
+    const btnEnviar = document.querySelector('#modal-selecao-emails button[onclick="confirmarEnvioEmails()"]');
+    const textoOriginal = btnEnviar ? btnEnviar.textContent : '';
     const obj = objetoParaEnviar;
 
-    // 3. Loop de envio
-    for (const dest of emailsSelecionados) {
-        try {
-            // Lógica do Modo Teste vs Real
-            const emailFinal = MODO_TESTE ? EMAIL_TESTE : dest.email;
-            const nomeFinal = MODO_TESTE ? `[TESTE] ${dest.nome}` : dest.nome;
+    if (!MODO_TESTE && !confirm('Confirmas o envio de ' + emailsSelecionados.length + ' notificações para os endereços selecionados?')) return;
 
-            const templateParams = {
-                to_email: emailFinal,
-                name: nomeFinal,
-                assunto: `Objeto Encontrado: ${obj.titulo}`,
-                mensagem: `Informamos que foi encontrado um objeto nas instalações da escola.`,
-                titulo_objeto: obj.titulo,
-                categoria: obj.categoria,
-                localizacao: obj.sala,
-                estado: obj.estado,
-                foto_url: obj.foto_url || 'https://via.placeholder.com/400x300?text=Sem+Foto'
-            };
+    envioEmailsEmCurso = true;
+    if (btnEnviar) {
+        btnEnviar.disabled = true;
+        btnEnviar.textContent = 'A enviar…';
+    }
 
-            await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, templateParams);
-            sucessos++;
-            await new Promise(r => setTimeout(r, 500)); // Pausa anti-spam
+    let sucessos = 0;
+    let falhas = 0;
 
-        } catch (error) {
-            console.error(`Erro ao enviar para ${dest.email}:`, error);
+    try {
+        fecharModal('modal-selecao-emails');
+        for (const dest of emailsSelecionados) {
+            try {
+                const templateParams = {
+                    to_email: MODO_TESTE ? EMAIL_TESTE : dest.email,
+                    name: MODO_TESTE ? '[TESTE] ' + dest.nome : dest.nome,
+                    assunto: 'Objeto Encontrado: ' + obj.titulo,
+                    mensagem: 'Informamos que foi encontrado um objeto nas instalações da escola.',
+                    titulo_objeto: obj.titulo,
+                    categoria: obj.categoria,
+                    localizacao: obj.sala,
+                    estado: obj.estado,
+                    foto_url: obj.foto_url || ''
+                };
+                await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, templateParams);
+                sucessos++;
+                await new Promise(resolve => setTimeout(resolve, 500));
+            } catch (error) {
+                falhas++;
+                console.error('Falha no envio para ' + dest.email, error);
+            }
         }
-    }
 
-    // 4. Resultado
-    if (sucessos > 0) {
-        const msgDestino = MODO_TESTE ? `para o Temp Mail (${EMAIL_TESTE})` : 'para os destinatários';
-        mostrarNotificacao('Sucesso', `${sucessos} email(s) enviado(s) ${msgDestino}!`);
-    } else {
-        mostrarNotificacao('Erro', 'Falha ao enviar emails.', 'erro');
+        if (falhas === 0) {
+            const destino = MODO_TESTE ? 'para o endereço de teste (' + EMAIL_TESTE + ')' : 'para os destinatários selecionados';
+            mostrarNotificacao('Envio concluído', sucessos + ' email(s) enviado(s) ' + destino + '.');
+        } else {
+            mostrarNotificacao('Envio parcial', sucessos + ' enviado(s); ' + falhas + ' falharam. Consulta a consola para detalhes.', 'erro');
+        }
+    } finally {
+        envioEmailsEmCurso = false;
+        if (btnEnviar) {
+            btnEnviar.disabled = false;
+            btnEnviar.textContent = textoOriginal || 'Enviar';
+        }
+        objetoParaEnviar = null;
     }
-    
-    // Limpar objeto temporário
-    objetoParaEnviar = null;
 }
 
 // ==========================================
