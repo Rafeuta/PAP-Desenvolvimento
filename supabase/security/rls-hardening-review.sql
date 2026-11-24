@@ -104,7 +104,7 @@ with check (
 );
 
 revoke all on table public.contactos_email from public, anon;
-grant select, insert, update, delete on table public.contactos_email to authenticated;
+grant select, insert, update, delete on public.contactos_email to authenticated;
 grant usage, select on sequence public.contactos_email_id_seq to authenticated;
 
 -- 4) Reclamações: submissão pública; consulta apenas por staff.
@@ -123,8 +123,8 @@ using (
 );
 
 revoke all on table public.reclamacoes from public, anon;
-grant insert on table public.reclamacoes to anon, authenticated;
-grant select on table public.reclamacoes to authenticated;
+grant insert on public.reclamacoes to anon, authenticated;
+grant select on public.reclamacoes to authenticated;
 grant usage, select on sequence public.reclamacoes_id_seq to anon, authenticated;
 
 -- 5) Índices nas chaves estrangeiras identificadas pelo advisor de performance.
@@ -133,14 +133,30 @@ on public.objetos (registado_por);
 create index if not exists idx_reclamacoes_objeto_id
 on public.reclamacoes (objeto_id);
 
--- 6) Fotografias: leitura pública (catálogo), upload apenas por staff.
+-- 6) Fotografias: leitura pública; upload e eliminação apenas por staff.
 drop policy if exists "Permitir leitura dos próprios ficheiros" on storage.objects;
 drop policy if exists "Permitir upload de objetos" on storage.objects;
+drop policy if exists "Staff envia fotografias de objetos" on storage.objects;
+drop policy if exists "Staff elimina fotografias de objetos" on storage.objects;
+
 create policy "Staff envia fotografias de objetos"
 on storage.objects
 for insert
 to authenticated
 with check (
+  bucket_id = 'objetos'
+  and exists (
+    select 1 from public.utilizadores u
+    where u.id = (select auth.uid())
+      and u.cargo in ('admin', 'funcionario')
+  )
+);
+
+create policy "Staff elimina fotografias de objetos"
+on storage.objects
+for delete
+to authenticated
+using (
   bucket_id = 'objetos'
   and exists (
     select 1 from public.utilizadores u
