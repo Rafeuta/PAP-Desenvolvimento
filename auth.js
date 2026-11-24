@@ -8,11 +8,13 @@ const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 let categoriaAtiva = 'Todos';
 
 function esc(value) {
-    return String(value ?? '')
-        .replace(/&/g, '&')
-        .replace(/</g, '<')
-        .replace(/>/g, '>')
-        .replace(/"/g, '"');
+    return String(value ?? '').replace(/[&<>"']/g, character => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
+    })[character]);
 }
 
 const modal = document.getElementById('modal-login');
@@ -82,19 +84,25 @@ async function fazerLogin() {
         if (msgTexto) msgTexto.textContent = "Erro: Credenciais inválidas. Tenta novamente.";
         else if (msgErro) msgErro.textContent = "Erro: Credenciais inválidas. Tenta novamente.";
         msgErro?.classList.remove('hidden');
-    } else {
-        const { data: perfil } = await supabaseClient
-            .from('utilizadores')
-            .select('cargo')
-            .eq('id', data.user.id)
-            .single();
-
-        if (perfil && perfil.cargo === 'admin') {
-            window.location.href = 'admin.html';
-        } else {
-            window.location.href = 'dashboard.html';
-        }
+        return;
     }
+
+    const { data: perfil, error: perfilError } = await supabaseClient
+        .from('utilizadores')
+        .select('cargo')
+        .eq('id', data.user.id)
+        .maybeSingle();
+
+    if (perfilError || !perfil || !['admin', 'funcionario'].includes(perfil.cargo)) {
+        await supabaseClient.auth.signOut();
+        const aviso = 'A conta ainda não tem um perfil de acesso válido. Contacta o responsável pelo FindIT School.';
+        if (msgTexto) msgTexto.textContent = aviso;
+        else if (msgErro) msgErro.textContent = aviso;
+        msgErro?.classList.remove('hidden');
+        return;
+    }
+
+    window.location.href = perfil.cargo === 'admin' ? 'admin.html' : 'dashboard.html';
 }
 
 async function fazerLogout() {
@@ -156,8 +164,8 @@ function atualizarContagem(n, total) {
 function estadoVazio(grid, titulo, texto) {
     grid.innerHTML = `
         <div class="col-span-full flex flex-col items-center justify-center py-20 bg-white rounded-2xl border border-dashed border-gray-300">
-            <h3 class="text-lg font-bold text-gray-700">${titulo}</h3>
-            <p class="text-gray-500 mt-1 text-sm">${texto}</p>
+            <h3 class="text-lg font-bold text-gray-700">${esc(titulo)}</h3>
+            <p class="text-gray-500 mt-1 text-sm">${esc(texto)}</p>
         </div>
     `;
 }
@@ -228,8 +236,8 @@ async function carregarObjetos() {
 
         return `
             <article class="card-objeto animate-fade-in flex flex-col bg-white rounded-2xl border border-gray-200 overflow-hidden h-full">
-                <a href="reclamar.html?id=${obj.id}" class="relative aspect-[4/3] bg-gray-100 overflow-hidden block">
-                    <img src="${foto}" alt="${esc(obj.titulo || "Objeto")}" class="w-full h-full object-cover transition-transform duration-500 hover:scale-105">
+                <a href="reclamar.html?id=${encodeURIComponent(String(obj.id))}" class="relative aspect-[4/3] bg-gray-100 overflow-hidden block">
+                    <img src="${esc(foto)}" alt="${esc(obj.titulo || "Objeto")}" class="w-full h-full object-cover transition-transform duration-500 hover:scale-105">
                     <span class="absolute top-3 left-3 bg-white/95 text-brand-blue text-[11px] font-extrabold px-2.5 py-1 rounded-full shadow-sm uppercase tracking-wide">${esc(obj.categoria || "Outro")}</span>
                     <span class="absolute top-3 right-3 ${badgeClass} text-[11px] font-extrabold px-2.5 py-1 rounded-full shadow-sm uppercase tracking-wide">${esc(obj.estado || "Achado")}</span>
                 </a>
@@ -242,7 +250,7 @@ async function carregarObjetos() {
                         </p>
                         ${dataTxt ? `<p class="flex items-center gap-2"><svg class="w-4 h-4 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg><span>${dataTxt}</span></p>` : ''}
                     </div>
-                    <a href="reclamar.html?id=${obj.id}" class="mt-auto block text-center bg-brand-blue text-white font-bold py-2.5 rounded-xl hover:bg-blue-900 transition-colors text-sm">
+                    <a href="reclamar.html?id=${encodeURIComponent(String(obj.id))}" class="mt-auto block text-center bg-brand-blue text-white font-bold py-2.5 rounded-xl hover:bg-blue-900 transition-colors text-sm">
                         Ver objeto
                     </a>
                 </div>
