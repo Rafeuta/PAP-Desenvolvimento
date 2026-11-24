@@ -1,0 +1,36 @@
+/* FindIT School — camada visual profissional do painel */
+:root{--fit-navy:#0b1b3d;--fit-blue:#0f3b7a;--fit-orange:#e67e22;--fit-muted:#64748b;--fit-line:#e2e8f0}
+html{scroll-behavior:smooth;scroll-padding-top:5rem}
+body{background:#f4f6fa}
+.sidebar{box-shadow:8px 0 28px rgba(11,27,61,.08)}
+.main-content{background:#f4f6fa}
+.main-content main{max-width:1440px!important;margin-inline:auto}
+.main-content header{backdrop-filter:blur(12px);background:rgba(255,255,255,.94)}
+.main-content section{border-radius:16px!important;box-shadow:0 4px 18px rgba(15,23,42,.035);transition:box-shadow .2s ease,border-color .2s ease}
+.main-content section:focus-within{border-color:#cbd5e1}
+.main-content section>div:first-child{padding:1.25rem 1.5rem}
+.main-content section h2{font-size:1rem;letter-spacing:-.02em}
+.main-content table{border-collapse:separate;border-spacing:0}
+.main-content thead th{font-size:.68rem;letter-spacing:.08em;color:#64748b;background:#f8fafc}
+.main-content tbody td{vertical-align:middle}
+.main-content tbody tr{transition:background .15s ease}
+.main-content input:not([type=checkbox]),.main-content select,.main-content textarea{transition:border-color .15s ease,box-shadow .15s ease}
+.main-content input:focus,.main-content select:focus,.main-content textarea:focus{outline:none;border-color:#0f3b7a;box-shadow:0 0 0 3px rgba(15,59,122,.1)}
+.fit-toolbar{display:flex;gap:.75rem;flex-wrap:wrap;align-items:center;padding:1rem 1.5rem;border-bottom:1px solid #eef2f7;background:#fff}
+.fit-toolbar input,.fit-toolbar select{min-height:40px;border:1px solid #dbe2ea;border-radius:10px;padding:.55rem .8rem;font-size:.875rem;background:#fff;color:#0f172a}
+.fit-toolbar input{flex:1;min-width:190px}
+.fit-toolbar select{min-width:145px}
+.fit-stat-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1rem;margin-bottom:1.5rem}
+.fit-stat{background:#fff;border:1px solid #e8edf4;border-radius:16px;padding:1.15rem 1.25rem;box-shadow:0 4px 18px rgba(15,23,42,.035);min-width:0}
+.fit-stat-label{font-size:.75rem;font-weight:600;color:#64748b}
+.fit-stat-value{font-size:1.8rem;line-height:1.2;font-weight:800;letter-spacing:-.045em;color:#0b1b3d;margin-top:.45rem}
+.fit-stat-note{font-size:.72rem;color:#94a3b8;margin-top:.3rem}
+.fit-stat-mark{width:36px;height:36px;border-radius:11px;display:grid;place-items:center;background:#eff6ff;color:#0f3b7a;font-weight:800}
+.fit-empty-filter{padding:2rem;text-align:center;color:#64748b;font-size:.875rem}
+#modal-selecao-emails>div{box-shadow:0 24px 80px rgba(2,6,23,.25)}
+#lista-checkboxes-container .email-checkbox{accent-color:#0f3b7a}
+#lista-checkboxes-container>div:has(input:checked){border-color:#93b4df;background:#f5f9ff}
+button:disabled{cursor:not-allowed;opacity:.65}
+@media(max-width:900px){.fit-stat-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:520px){.fit-stat-grid{gap:.65rem}.fit-stat{padding:.9rem}.fit-stat-value{font-size:1.5rem}.fit-toolbar{padding:.85rem 1rem}.fit-toolbar input,.fit-toolbar select{width:100%;min-width:0}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition:none!important;animation:none!important}}

@@ -33,6 +33,13 @@ let objetoEditando = null; // Guarda o ID do objeto em edição
 
 // Variável global para guardar o objeto atual que está a ser enviado
 let objetoParaEnviar = null;
+/* Escapa valores provenientes da base de dados antes de os inserir no HTML. */
+function escapeHTML(value) {
+    return String(value ?? '').replace(/[&<>"']/g, character => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    })[character]);
+}
+
 
 // ==========================================
 // 4. SISTEMA DE NOTIFICAÇÃO (TOAST)
@@ -227,13 +234,13 @@ async function carregarTabelaObjetos() {
         tbody.innerHTML += `
             <tr class="border-b border-gray-100 hover:bg-gray-50 transition-colors">
                 <td class="p-4">
-                    <img src="${obj.foto_url}" class="w-12 h-12 object-cover rounded-lg border border-gray-200 shadow-sm">
+                    <img src="${escapeHTML(obj.foto_url)}" class="w-12 h-12 object-cover rounded-lg border border-gray-200 shadow-sm">
                 </td>
                 <td class="p-4">
-                    <div class="font-bold text-gray-900">${obj.titulo}</div>
-                    <div class="text-xs text-gray-500 uppercase font-semibold mt-1">${obj.categoria}</div>
+                    <div class="font-bold text-gray-900">${escapeHTML(obj.titulo)}</div>
+                    <div class="text-xs text-gray-500 uppercase font-semibold mt-1">${escapeHTML(obj.categoria)}</div>
                 </td>
-                <td class="p-4 text-sm text-gray-600 font-medium">${obj.sala}</td>
+                <td class="p-4 text-sm text-gray-600 font-medium">${escapeHTML(obj.sala)}</td>
                 <td class="p-4">
                     <button onclick="alterarEstado(${obj.id}, '${obj.estado}')" class="px-3 py-1 rounded-full text-xs font-bold border ${badgeClass} hover:opacity-80 transition-opacity cursor-pointer">
                         ${badgeText}
@@ -284,7 +291,7 @@ async function prepararEdicao(id) {
     }
 
     window.scrollTo({ top: 0, behavior: 'smooth' });
-    mostrarNotificacao('Modo Edição', `A editar: ${obj.titulo}`);
+    mostrarNotificacao('Modo Edição', `A editar: ${escapeHTML(obj.titulo)}`);
 }
 
 async function alterarEstado(id, estadoAtual) {
@@ -338,10 +345,10 @@ function gerarListaCheckboxes() {
         const div = document.createElement('div');
         div.className = "flex items-center p-3 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors";
         div.innerHTML = `
-            <input type="checkbox" id="chk-${index}" value="${c.email}" class="email-checkbox w-5 h-5 text-brand-blue rounded focus:ring-brand-blue cursor-pointer" checked>
+            <input type="checkbox" id="chk-${index}" value="${escapeHTML(c.email)}" class="email-checkbox w-5 h-5 text-brand-blue rounded focus:ring-brand-blue cursor-pointer" checked>
             <label for="chk-${index}" class="ml-3 flex-grow cursor-pointer flex flex-col">
-                <span class="font-bold text-gray-900 text-sm">${c.nome} ${badgeTeste}</span>
-                <span class="text-xs text-gray-500">${c.email} • ${c.turma || 'Sem Turma'}</span>
+                <span class="font-bold text-gray-900 text-sm">${escapeHTML(c.nome)} ${badgeTeste}</span>
+                <span class="text-xs text-gray-500">${escapeHTML(c.email)} • ${c.turma || 'Sem Turma'}</span>
             </label>
         `;
         container.appendChild(div);
@@ -359,71 +366,77 @@ function toggleTodosCheckboxes(estado) {
 }
 
 // Função final que envia os emails
-async function confirmarEnvioEmails() {
-    if (!objetoParaEnviar) return;
+let envioEmailsEmCurso = false;
 
-    // 1. Apanhar todos os emails marcados
-    const checkboxes = document.querySelectorAll('.email-checkbox:checked');
-    const emailsSelecionados = Array.from(checkboxes).map(chk => {
-        // Encontrar o contacto correspondente para saber o nome
-        const email = chk.value;
-        const contacto = listaContactos.find(c => c.email === email);
-        return {
-            email: email,
-            nome: contacto ? contacto.nome : 'Aluno'
-        };
-    });
+async function confirmarEnvioEmails() {
+    if (!objetoParaEnviar || envioEmailsEmCurso) return;
+
+    const emailsSelecionados = Array.from(document.querySelectorAll('.email-checkbox:checked'))
+        .map(chk => listaContactos.find(c => c.email === chk.value))
+        .filter(Boolean);
 
     if (emailsSelecionados.length === 0) {
         mostrarNotificacao('Atenção', 'Seleciona pelo menos um destinatário.', 'erro');
         return;
     }
+    if (typeof emailjs === 'undefined' || typeof emailjs.send !== 'function') {
+        mostrarNotificacao('Erro', 'O serviço de email não está disponível. Atualiza a página e tenta novamente.', 'erro');
+        return;
+    }
 
-    // 2. Fechar modal e mostrar loading
-    fecharModal('modal-selecao-emails');
-    mostrarNotificacao('A Enviar...', `A processar ${emailsSelecionados.length} emails...`);
-
-    let sucessos = 0;
+    const btnEnviar = document.querySelector('#modal-selecao-emails button[onclick="confirmarEnvioEmails()"]');
+    const textoOriginal = btnEnviar ? btnEnviar.textContent : '';
     const obj = objetoParaEnviar;
 
-    // 3. Loop de envio
-    for (const dest of emailsSelecionados) {
-        try {
-            // Lógica do Modo Teste vs Real
-            const emailFinal = MODO_TESTE ? EMAIL_TESTE : dest.email;
-            const nomeFinal = MODO_TESTE ? `[TESTE] ${dest.nome}` : dest.nome;
+    if (!MODO_TESTE && !confirm('Confirmas o envio de ' + emailsSelecionados.length + ' notificações para os endereços selecionados?')) return;
 
-            const templateParams = {
-                to_email: emailFinal,
-                name: nomeFinal,
-                assunto: `Objeto Encontrado: ${obj.titulo}`,
-                mensagem: `Informamos que foi encontrado um objeto nas instalações da escola.`,
-                titulo_objeto: obj.titulo,
-                categoria: obj.categoria,
-                localizacao: obj.sala,
-                estado: obj.estado,
-                foto_url: obj.foto_url || 'https://via.placeholder.com/400x300?text=Sem+Foto'
-            };
+    envioEmailsEmCurso = true;
+    if (btnEnviar) {
+        btnEnviar.disabled = true;
+        btnEnviar.textContent = 'A enviar…';
+    }
 
-            await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, templateParams);
-            sucessos++;
-            await new Promise(r => setTimeout(r, 500)); // Pausa anti-spam
+    let sucessos = 0;
+    let falhas = 0;
 
-        } catch (error) {
-            console.error(`Erro ao enviar para ${dest.email}:`, error);
+    try {
+        fecharModal('modal-selecao-emails');
+        for (const dest of emailsSelecionados) {
+            try {
+                const templateParams = {
+                    to_email: MODO_TESTE ? EMAIL_TESTE : dest.email,
+                    name: MODO_TESTE ? '[TESTE] ' + dest.nome : dest.nome,
+                    assunto: 'Objeto Encontrado: ' + obj.titulo,
+                    mensagem: 'Informamos que foi encontrado um objeto nas instalações da escola.',
+                    titulo_objeto: obj.titulo,
+                    categoria: obj.categoria,
+                    localizacao: obj.sala,
+                    estado: obj.estado,
+                    foto_url: obj.foto_url || ''
+                };
+                await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, templateParams);
+                sucessos++;
+                await new Promise(resolve => setTimeout(resolve, 500));
+            } catch (error) {
+                falhas++;
+                console.error('Falha no envio para ' + dest.email, error);
+            }
         }
-    }
 
-    // 4. Resultado
-    if (sucessos > 0) {
-        const msgDestino = MODO_TESTE ? `para o Temp Mail (${EMAIL_TESTE})` : 'para os destinatários';
-        mostrarNotificacao('Sucesso', `${sucessos} email(s) enviado(s) ${msgDestino}!`);
-    } else {
-        mostrarNotificacao('Erro', 'Falha ao enviar emails.', 'erro');
+        if (falhas === 0) {
+            const destino = MODO_TESTE ? 'para o endereço de teste (' + EMAIL_TESTE + ')' : 'para os destinatários selecionados';
+            mostrarNotificacao('Envio concluído', sucessos + ' email(s) enviado(s) ' + destino + '.');
+        } else {
+            mostrarNotificacao('Envio parcial', sucessos + ' enviado(s); ' + falhas + ' falharam. Consulta a consola para detalhes.', 'erro');
+        }
+    } finally {
+        envioEmailsEmCurso = false;
+        if (btnEnviar) {
+            btnEnviar.disabled = false;
+            btnEnviar.textContent = textoOriginal || 'Enviar';
+        }
+        objetoParaEnviar = null;
     }
-    
-    // Limpar objeto temporário
-    objetoParaEnviar = null;
 }
 
 // ==========================================
@@ -441,8 +454,8 @@ async function carregarContactos() {
     } else {
         tbody.innerHTML = listaContactos.map(c => `
             <tr class="border-b border-gray-50 hover:bg-gray-50">
-                <td class="p-3 font-semibold text-gray-800">${c.nome}</td>
-                <td class="p-3 text-gray-600 text-sm">${c.email}</td>
+                <td class="p-3 font-semibold text-gray-800">${escapeHTML(c.nome)}</td>
+                <td class="p-3 text-gray-600 text-sm">${escapeHTML(c.email)}</td>
                 <td class="p-3 text-gray-500 text-sm">${c.turma || '-'}</td>
                 <td class="p-3 text-right">
                     <button onclick="removerContacto(${c.id})" class="text-red-400 hover:text-red-600 text-xs font-bold uppercase">Remover</button>
