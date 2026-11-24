@@ -33,6 +33,13 @@ let objetoEditando = null; // Guarda o ID do objeto em edição
 
 // Variável global para guardar o objeto atual que está a ser enviado
 let objetoParaEnviar = null;
+/* Escapa valores provenientes da base de dados antes de os inserir no HTML. */
+function escapeHTML(value) {
+    return String(value ?? '').replace(/[&<>"']/g, character => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    })[character]);
+}
+
 
 // ==========================================
 // 4. SISTEMA DE NOTIFICAÇÃO (TOAST)
@@ -227,13 +234,13 @@ async function carregarTabelaObjetos() {
         tbody.innerHTML += `
             <tr class="border-b border-gray-100 hover:bg-gray-50 transition-colors">
                 <td class="p-4">
-                    <img src="${obj.foto_url}" class="w-12 h-12 object-cover rounded-lg border border-gray-200 shadow-sm">
+                    <img src="${escapeHTML(obj.foto_url)}" class="w-12 h-12 object-cover rounded-lg border border-gray-200 shadow-sm">
                 </td>
                 <td class="p-4">
-                    <div class="font-bold text-gray-900">${obj.titulo}</div>
-                    <div class="text-xs text-gray-500 uppercase font-semibold mt-1">${obj.categoria}</div>
+                    <div class="font-bold text-gray-900">${escapeHTML(obj.titulo)}</div>
+                    <div class="text-xs text-gray-500 uppercase font-semibold mt-1">${escapeHTML(obj.categoria)}</div>
                 </td>
-                <td class="p-4 text-sm text-gray-600 font-medium">${obj.sala}</td>
+                <td class="p-4 text-sm text-gray-600 font-medium">${escapeHTML(obj.sala)}</td>
                 <td class="p-4">
                     <button onclick="alterarEstado(${obj.id}, '${obj.estado}')" class="px-3 py-1 rounded-full text-xs font-bold border ${badgeClass} hover:opacity-80 transition-opacity cursor-pointer">
                         ${badgeText}
@@ -284,7 +291,7 @@ async function prepararEdicao(id) {
     }
 
     window.scrollTo({ top: 0, behavior: 'smooth' });
-    mostrarNotificacao('Modo Edição', `A editar: ${obj.titulo}`);
+    mostrarNotificacao('Modo Edição', `A editar: ${escapeHTML(obj.titulo)}`);
 }
 
 async function alterarEstado(id, estadoAtual) {
@@ -338,10 +345,10 @@ function gerarListaCheckboxes() {
         const div = document.createElement('div');
         div.className = "flex items-center p-3 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors";
         div.innerHTML = `
-            <input type="checkbox" id="chk-${index}" value="${c.email}" class="email-checkbox w-5 h-5 text-brand-blue rounded focus:ring-brand-blue cursor-pointer" checked>
+            <input type="checkbox" id="chk-${index}" value="${escapeHTML(c.email)}" class="email-checkbox w-5 h-5 text-brand-blue rounded focus:ring-brand-blue cursor-pointer" checked>
             <label for="chk-${index}" class="ml-3 flex-grow cursor-pointer flex flex-col">
-                <span class="font-bold text-gray-900 text-sm">${c.nome} ${badgeTeste}</span>
-                <span class="text-xs text-gray-500">${c.email} • ${c.turma || 'Sem Turma'}</span>
+                <span class="font-bold text-gray-900 text-sm">${escapeHTML(c.nome)} ${badgeTeste}</span>
+                <span class="text-xs text-gray-500">${escapeHTML(c.email)} • ${c.turma || 'Sem Turma'}</span>
             </label>
         `;
         container.appendChild(div);
@@ -447,8 +454,8 @@ async function carregarContactos() {
     } else {
         tbody.innerHTML = listaContactos.map(c => `
             <tr class="border-b border-gray-50 hover:bg-gray-50">
-                <td class="p-3 font-semibold text-gray-800">${c.nome}</td>
-                <td class="p-3 text-gray-600 text-sm">${c.email}</td>
+                <td class="p-3 font-semibold text-gray-800">${escapeHTML(c.nome)}</td>
+                <td class="p-3 text-gray-600 text-sm">${escapeHTML(c.email)}</td>
                 <td class="p-3 text-gray-500 text-sm">${c.turma || '-'}</td>
                 <td class="p-3 text-right">
                     <button onclick="removerContacto(${c.id})" class="text-red-400 hover:text-red-600 text-xs font-bold uppercase">Remover</button>
