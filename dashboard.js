@@ -81,16 +81,31 @@ function mostrarNotificacao(titulo, mensagem, tipo = 'sucesso') {
 async function verificarSessao() {
     const { data: { session } } = await supabaseClient.auth.getSession();
     if (!session) {
-        window.location.href = 'index.html';
+        window.location.replace('index.html');
         return;
     }
+
+    const { data: perfil, error: perfilError } = await supabaseClient
+        .from('utilizadores')
+        .select('cargo')
+        .eq('id', session.user.id)
+        .maybeSingle();
+
+    const paginaAdmin = /\/admin\.html$/i.test(window.location.pathname);
+    const cargoValido = perfil && ['admin', 'funcionario'].includes(perfil.cargo);
+    const acessoPermitido = cargoValido && (!paginaAdmin || perfil.cargo === 'admin');
+
+    if (perfilError || !acessoPermitido) {
+        await supabaseClient.auth.signOut();
+        window.location.replace('index.html');
+        return;
+    }
+
     currentUser = session.user;
-    
     const userEmailEl = document.getElementById('user-email');
     if (userEmailEl) userEmailEl.textContent = currentUser.email;
-    
-    carregarTabelaObjetos();
-    carregarContactos();
+
+    await Promise.all([carregarTabelaObjetos(), carregarContactos()]);
 }
 
 document.getElementById('btn-logout')?.addEventListener('click', async () => {
