@@ -60,10 +60,12 @@ function mostrarNotificacao(titulo, mensagem, tipo = 'sucesso') {
     toast.innerHTML = `
         <svg class="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">${icon}</svg>
         <div>
-            <h4 class="font-bold text-sm uppercase tracking-wide">${titulo}</h4>
-            <p class="text-xs opacity-90 mt-0.5">${mensagem}</p>
+            <h4 class="toast-title font-bold text-sm uppercase tracking-wide"></h4>
+            <p class="toast-message text-xs opacity-90 mt-0.5"></p>
         </div>
     `;
+    toast.querySelector('.toast-title').textContent = String(titulo ?? '');
+    toast.querySelector('.toast-message').textContent = String(mensagem ?? '');
     
     document.body.appendChild(toast);
     
@@ -109,22 +111,29 @@ if (formObjeto) {
         btnSubmit.disabled = true;
         btnSubmit.innerHTML = `<svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> A processar...`;
 
-        const titulo = document.getElementById('titulo').value;
+        const titulo = document.getElementById('titulo').value.trim();
         const categoria = document.getElementById('categoria').value;
-        const sala = document.getElementById('sala').value;
+        const sala = document.getElementById('sala').value.trim();
         const fotoFile = document.getElementById('foto').files[0];
+        let uploadedPath = null;
 
         try {
             let foto_url = objetoEditando ? objetoEditando.foto_url : '';
 
-            // Upload de nova foto se existir
+            // Aceitar apenas imagens comuns até 5 MB.
             if (fotoFile) {
-                const fileExt = fotoFile.name.split('.').pop();
-                const fileName = `${Date.now()}.${fileExt}`;
-                
-                const { error: uploadError } = await supabaseClient.storage.from('objetos').upload(fileName, fotoFile);
+                const extensions = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp' };
+                if (!extensions[fotoFile.type]) throw new Error('Formato inválido. Utiliza JPG, PNG ou WebP.');
+                if (fotoFile.size > 5 * 1024 * 1024) throw new Error('A fotografia não pode ultrapassar 5 MB.');
+                const fileName = `${crypto.randomUUID ? crypto.randomUUID() : Date.now()}.${extensions[fotoFile.type]}`;
+                uploadedPath = fileName;
+
+                const { error: uploadError } = await supabaseClient.storage.from('objetos').upload(fileName, fotoFile, {
+                    contentType: fotoFile.type,
+                    upsert: false
+                });
                 if (uploadError) throw uploadError;
-                
+
                 const { data: { publicUrl } } = supabaseClient.storage.from('objetos').getPublicUrl(fileName);
                 foto_url = publicUrl;
             } else if (!objetoEditando) {
@@ -160,8 +169,11 @@ if (formObjeto) {
             carregarTabelaObjetos();
 
         } catch (error) {
+            if (uploadedPath) {
+                await supabaseClient.storage.from('objetos').remove([uploadedPath]).catch(() => {});
+            }
             console.error(error);
-            mostrarNotificacao('Erro', error.message, 'erro');
+            mostrarNotificacao('Erro', error.message || 'Não foi possível guardar o objeto.', 'erro');
         } finally {
             btnSubmit.innerHTML = originalText;
             btnSubmit.disabled = false;
@@ -227,9 +239,10 @@ async function carregarTabelaObjetos() {
 
     tbody.innerHTML = '';
     objetos.forEach(obj => {
-        const isDevolvido = obj.estado === 'Devolvido';
+        const estadoAtual = obj.estado === 'Devolvido' ? 'Devolvido' : 'Achado';
+        const isDevolvido = estadoAtual === 'Devolvido';
         const badgeClass = isDevolvido ? 'bg-green-100 text-green-700 border-green-200' : 'bg-orange-100 text-orange-700 border-orange-200';
-        const badgeText = isDevolvido ? 'Devolvido' : 'Achado';
+        const badgeText = estadoAtual;
 
         tbody.innerHTML += `
             <tr class="border-b border-gray-100 hover:bg-gray-50 transition-colors">
@@ -242,7 +255,7 @@ async function carregarTabelaObjetos() {
                 </td>
                 <td class="p-4 text-sm text-gray-600 font-medium">${escapeHTML(obj.sala)}</td>
                 <td class="p-4">
-                    <button onclick="alterarEstado(${obj.id}, '${obj.estado}')" class="px-3 py-1 rounded-full text-xs font-bold border ${badgeClass} hover:opacity-80 transition-opacity cursor-pointer">
+                    <button onclick="alterarEstado(${Number(obj.id)})" class="px-3 py-1 rounded-full text-xs font-bold border ${badgeClass} hover:opacity-80 transition-opacity cursor-pointer">
                         ${badgeText}
                     </button>
                 </td>
@@ -294,18 +307,33 @@ async function prepararEdicao(id) {
     mostrarNotificacao('Modo Edição', `A editar: ${escapeHTML(obj.titulo)}`);
 }
 
-async function alterarEstado(id, estadoAtual) {
-    const novoEstado = estadoAtual === 'Achado' ? 'Devolvido' : 'Achado';
-    await supabaseClient.from('objetos').update({ estado: novoEstado }).eq('id', id);
-    mostrarNotificacao('Estado Atualizado', `Marcado como ${novoEstado}.`);
-    carregarTabelaObjetos();
+async function alterarEstado(id) {
+    try {
+        const { data: objeto, error: leituraErro } = await supabaseClient
+            .from('objetos').select('estado').eq('id', id).single();
+        if (leituraErro) throw leituraErro;
+        const novoEstado = objeto.estado === 'Achado' ? 'Devolvido' : 'Achado';
+        const { error } = await supabaseClient.from('objetos').update({ estado: novoEstado }).eq('id', id);
+        if (error) throw error;
+        mostrarNotificacao('Estado atualizado', `Marcado como ${novoEstado}.`);
+        await carregarTabelaObjetos();
+    } catch (error) {
+        console.error(error);
+        mostrarNotificacao('Erro', error.message || 'Não foi possível alterar o estado.', 'erro');
+    }
 }
 
 async function apagarObjeto(id) {
-    if (!confirm("Eliminar este objeto?")) return;
-    await supabaseClient.from('objetos').delete().eq('id', id);
-    mostrarNotificacao('Eliminado', 'Objeto removido.');
-    carregarTabelaObjetos();
+    if (!confirm('Eliminar este objeto?')) return;
+    try {
+        const { error } = await supabaseClient.from('objetos').delete().eq('id', id);
+        if (error) throw error;
+        mostrarNotificacao('Eliminado', 'Objeto removido.');
+        await carregarTabelaObjetos();
+    } catch (error) {
+        console.error(error);
+        mostrarNotificacao('Erro', error.message || 'Não foi possível eliminar o objeto.', 'erro');
+    }
 }
 
 // ==========================================
@@ -348,7 +376,7 @@ function gerarListaCheckboxes() {
             <input type="checkbox" id="chk-${index}" value="${escapeHTML(c.email)}" class="email-checkbox w-5 h-5 text-brand-blue rounded focus:ring-brand-blue cursor-pointer" checked>
             <label for="chk-${index}" class="ml-3 flex-grow cursor-pointer flex flex-col">
                 <span class="font-bold text-gray-900 text-sm">${escapeHTML(c.nome)} ${badgeTeste}</span>
-                <span class="text-xs text-gray-500">${escapeHTML(c.email)} • ${c.turma || 'Sem Turma'}</span>
+                <span class="text-xs text-gray-500">${escapeHTML(c.email)} • ${escapeHTML(c.turma || 'Sem Turma')}</span>
             </label>
         `;
         container.appendChild(div);
@@ -446,7 +474,13 @@ async function carregarContactos() {
     const tbody = document.getElementById('tabela-contactos');
     if (!tbody) return;
 
-    const { data } = await supabaseClient.from('contactos_email').select('*').order('nome');
+    const { data, error } = await supabaseClient.from('contactos_email').select('*').order('nome');
+    if (error) {
+        console.error(error);
+        tbody.innerHTML = '<tr><td colspan="4" class="p-8 text-center text-red-500">Não foi possível carregar os contactos.</td></tr>';
+        mostrarNotificacao('Erro', 'Não foi possível carregar os contactos.', 'erro');
+        return;
+    }
     listaContactos = data || [];
 
     if (listaContactos.length === 0) {
@@ -470,9 +504,18 @@ async function carregarContactos() {
 
 document.getElementById('form-adicionar-contacto')?.addEventListener('submit', async (e) => {
     e.preventDefault();
-    const nome = document.getElementById('contacto-nome').value;
-    const email = document.getElementById('contacto-email').value;
-    const turma = document.getElementById('contacto-turma').value;
+    const nome = document.getElementById('contacto-nome').value.trim();
+    const email = document.getElementById('contacto-email').value.trim().toLowerCase();
+    const turma = document.getElementById('contacto-turma').value.trim();
+
+    if (!nome || !email) {
+        mostrarNotificacao('Atenção', 'Preenche o nome e um email válido.', 'erro');
+        return;
+    }
+    if (listaContactos.some(contacto => contacto.email.toLowerCase() === email)) {
+        mostrarNotificacao('Contacto existente', 'Este endereço já está na lista.', 'erro');
+        return;
+    }
 
     const { error } = await supabaseClient.from('contactos_email').insert([{ nome, email, turma }]);
 
@@ -487,9 +530,16 @@ document.getElementById('form-adicionar-contacto')?.addEventListener('submit', a
 });
 
 async function removerContacto(id) {
-    if(!confirm('Remover contacto?')) return;
-    await supabaseClient.from('contactos_email').delete().eq('id', id);
-    carregarContactos();
+    if (!confirm('Remover contacto?')) return;
+    try {
+        const { error } = await supabaseClient.from('contactos_email').delete().eq('id', id);
+        if (error) throw error;
+        mostrarNotificacao('Contacto removido', 'O contacto foi retirado da lista.');
+        await carregarContactos();
+    } catch (error) {
+        console.error(error);
+        mostrarNotificacao('Erro', error.message || 'Não foi possível remover o contacto.', 'erro');
+    }
 }
 
 // ==========================================
