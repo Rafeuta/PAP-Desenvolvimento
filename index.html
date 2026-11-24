@@ -35,11 +35,11 @@
 
     <!-- HEADER (Com Glassmorphism e Menu Mobile) -->
     <header class="fixed w-full top-0 z-50 bg-white/90 backdrop-blur-md border-b border-gray-200 transition-all duration-300">
-        <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+        <div class="max-w-7xl mx-auto px-6 h-24 sm:h-28 flex items-center justify-between">
             <!-- Logo -->
-           <a href="index.html" class="flex items-center group">
-    <img src="logo.png" alt="FindIT School" class="h-14 w-auto transition-transform group-hover:scale-105">
-</a>
+            <a href="index.html" class="flex items-center group shrink-0">
+                <img src="logo.png" alt="FindIT School" class="h-20 sm:h-24 w-auto transition-transform group-hover:scale-105">
+            </a>
             
             <!-- Desktop Nav -->
             <nav class="hidden md:flex items-center gap-8 text-sm font-semibold text-gray-600">
@@ -98,7 +98,7 @@
     </header>
 
     <!-- HERO (Com Gradiente e Padrão Sutil) -->
-    <section id="inicio" class="relative bg-navy pt-32 pb-24 px-6 border-b-4 border-brand-orange overflow-hidden">
+    <section id="inicio" class="relative bg-navy pt-40 pb-24 px-6 border-b-4 border-brand-orange overflow-hidden">
         <!-- Padrão de fundo sutil (opcional, dá um toque premium) -->
         <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(#ffffff 1px, transparent 1px); background-size: 32px 32px;"></div>
         <div class="absolute inset-0 bg-gradient-to-br from-navy via-brand-blue to-navy opacity-90"></div>
@@ -132,7 +132,7 @@
             
             <!-- SIDEBAR (Filtros) -->
             <aside class="w-full lg:w-72 flex-shrink-0">
-                <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-card sticky top-28">
+                <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-card sticky top-32">
                     <div class="flex items-center gap-2 mb-6">
                         <svg class="w-5 h-5 text-brand-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>
                         <h3 class="text-sm font-extrabold text-gray-900 uppercase tracking-wider">Filtrar Resultados</h3>
@@ -151,25 +151,20 @@
                     <div class="mb-8">
                         <label class="block text-xs font-bold text-gray-500 uppercase mb-3">Categorias</label>
                         <div class="flex flex-col gap-1.5">
-                            <button onclick="filtrarPorCategoria('Todos')" class="filter-btn active text-left px-4 py-2.5 rounded-lg text-sm font-semibold w-full flex items-center justify-between group">
+                            <button data-categoria="Todos" onclick="filtrarPorCategoria('Todos')" class="filter-btn active text-left px-4 py-2.5 rounded-lg text-sm font-semibold w-full flex items-center justify-between group">
                                 Todos os Objetos
-                                <span class="w-2 h-2 rounded-full bg-brand-orange opacity-0 group-[.active]:opacity-100 transition-opacity"></span>
                             </button>
-                            <button onclick="filtrarPorCategoria('Eletrónica')" class="filter-btn text-left px-4 py-2.5 rounded-lg text-sm font-semibold w-full text-gray-600 hover:bg-gray-50 flex items-center justify-between group">
+                            <button data-categoria="Eletrónica" onclick="filtrarPorCategoria('Eletrónica')" class="filter-btn text-left px-4 py-2.5 rounded-lg text-sm font-semibold w-full text-gray-600 hover:bg-gray-50">
                                 Eletrónica
-                                <span class="w-2 h-2 rounded-full bg-brand-orange opacity-0 group-[.active]:opacity-100 transition-opacity"></span>
                             </button>
-                            <button onclick="filtrarPorCategoria('Roupa')" class="filter-btn text-left px-4 py-2.5 rounded-lg text-sm font-semibold w-full text-gray-600 hover:bg-gray-50 flex items-center justify-between group">
+                            <button data-categoria="Roupa" onclick="filtrarPorCategoria('Roupa')" class="filter-btn text-left px-4 py-2.5 rounded-lg text-sm font-semibold w-full text-gray-600 hover:bg-gray-50">
                                 Roupa e Acessórios
-                                <span class="w-2 h-2 rounded-full bg-brand-orange opacity-0 group-[.active]:opacity-100 transition-opacity"></span>
                             </button>
-                            <button onclick="filtrarPorCategoria('Material Escolar')" class="filter-btn text-left px-4 py-2.5 rounded-lg text-sm font-semibold w-full text-gray-600 hover:bg-gray-50 flex items-center justify-between group">
+                            <button data-categoria="Material Escolar" onclick="filtrarPorCategoria('Material Escolar')" class="filter-btn text-left px-4 py-2.5 rounded-lg text-sm font-semibold w-full text-gray-600 hover:bg-gray-50">
                                 Material Escolar
-                                <span class="w-2 h-2 rounded-full bg-brand-orange opacity-0 group-[.active]:opacity-100 transition-opacity"></span>
                             </button>
-                            <button onclick="filtrarPorCategoria('Chaves')" class="filter-btn text-left px-4 py-2.5 rounded-lg text-sm font-semibold w-full text-gray-600 hover:bg-gray-50 flex items-center justify-between group">
+                            <button data-categoria="Chaves" onclick="filtrarPorCategoria('Chaves')" class="filter-btn text-left px-4 py-2.5 rounded-lg text-sm font-semibold w-full text-gray-600 hover:bg-gray-50">
                                 Chaves
-                                <span class="w-2 h-2 rounded-full bg-brand-orange opacity-0 group-[.active]:opacity-100 transition-opacity"></span>
                             </button>
                         </div>
                     </div>
@@ -182,19 +177,24 @@
 
             <!-- GRELHA DE OBJETOS -->
             <div class="flex-grow">
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-8 gap-4">
+                <div class="flex flex-col sm:flex-row sm:items-end justify-between mb-6 gap-4">
                     <div>
                         <h2 class="text-2xl font-extrabold text-gray-900">Catálogo de Objetos</h2>
-                        <p class="text-sm text-gray-500 mt-1">Itens encontrados e disponíveis para levantamento.</p>
+                        <p id="total-objetos" class="text-sm text-gray-500 mt-1">A carregar itens...</p>
                     </div>
-                    <div class="flex items-center gap-2 text-sm text-gray-600 bg-white px-4 py-2 rounded-lg border border-gray-200 shadow-sm">
-                        <svg class="w-4 h-4 text-brand-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                        Atualizado agora
-                    </div>
+                    <label class="flex items-center gap-2 text-sm text-gray-600 bg-white px-3 py-2 rounded-xl border border-gray-200 shadow-sm">
+                        <span class="font-semibold text-gray-500">Ordenar</span>
+                        <select id="ordenar" onchange="carregarObjetos()" class="bg-transparent font-bold text-gray-800 outline-none cursor-pointer">
+                            <option value="recentes">Mais recentes</option>
+                            <option value="antigos">Mais antigos</option>
+                            <option value="titulo">Nome (A–Z)</option>
+                            <option value="sala">Sala</option>
+                        </select>
+                    </label>
                 </div>
 
                 <!-- Grid onde o JS injeta os cartões -->
-                <div id="catalogo-grid" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+                <div id="catalogo-grid" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-7">
                     
                     <!-- EXEMPLO DE COMO O TEU JS DEVE GERAR O CARTÃO (Para referência visual) -->
                     <!-- 
@@ -276,7 +276,7 @@
     <!-- FOOTER -->
     <footer class="bg-navy py-16 text-center border-t-4 border-brand-orange mt-auto">
         <div class="max-w-7xl mx-auto px-6">
-            <img src="logo.png" alt="FindIT" class="h-12 mx-auto mb-6 brightness-0 invert opacity-80">
+            <img src="logo.png" alt="FindIT" class="h-16 mx-auto mb-6 brightness-0 invert opacity-90">
             <p class="text-blue-200 text-sm font-medium mb-2">&copy; 2026 FindIT School - Rafael Rodrigues.</p>
             <p class="text-blue-300/60 text-xs mb-8">Projeto de Aptidão Profissional (PAP) - ETPC</p>
             
@@ -355,6 +355,7 @@
             const modal = document.getElementById('modal-login');
             const content = document.getElementById('modal-content');
             modal.classList.remove('hidden');
+            modal.classList.add('flex');
             // Pequeno delay para permitir a transição CSS
             setTimeout(() => {
                 modal.classList.remove('opacity-0');
@@ -371,6 +372,7 @@
             content.classList.add('scale-95');
             setTimeout(() => {
                 modal.classList.add('hidden');
+                modal.classList.remove('flex');
                 document.getElementById('msg-erro').classList.add('hidden');
             }, 300);
         }
