@@ -7,6 +7,14 @@ const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 let categoriaAtiva = 'Todos';
 
+function esc(value) {
+    return String(value ?? '')
+        .replace(/&/g, '&')
+        .replace(/</g, '<')
+        .replace(/>/g, '>')
+        .replace(/"/g, '"');
+}
+
 const modal = document.getElementById('modal-login');
 
 function abrirModal() {
@@ -221,16 +229,16 @@ async function carregarObjetos() {
         return `
             <article class="card-objeto animate-fade-in flex flex-col bg-white rounded-2xl border border-gray-200 overflow-hidden h-full">
                 <a href="reclamar.html?id=${obj.id}" class="relative aspect-[4/3] bg-gray-100 overflow-hidden block">
-                    <img src="${foto}" alt="${obj.titulo || 'Objeto'}" class="w-full h-full object-cover transition-transform duration-500 hover:scale-105">
-                    <span class="absolute top-3 left-3 bg-white/95 text-brand-blue text-[11px] font-extrabold px-2.5 py-1 rounded-full shadow-sm uppercase tracking-wide">${obj.categoria || 'Outro'}</span>
-                    <span class="absolute top-3 right-3 ${badgeClass} text-[11px] font-extrabold px-2.5 py-1 rounded-full shadow-sm uppercase tracking-wide">${obj.estado || 'Achado'}</span>
+                    <img src="${foto}" alt="${esc(obj.titulo || "Objeto")}" class="w-full h-full object-cover transition-transform duration-500 hover:scale-105">
+                    <span class="absolute top-3 left-3 bg-white/95 text-brand-blue text-[11px] font-extrabold px-2.5 py-1 rounded-full shadow-sm uppercase tracking-wide">${esc(obj.categoria || "Outro")}</span>
+                    <span class="absolute top-3 right-3 ${badgeClass} text-[11px] font-extrabold px-2.5 py-1 rounded-full shadow-sm uppercase tracking-wide">${esc(obj.estado || "Achado")}</span>
                 </a>
                 <div class="p-5 flex flex-col flex-grow">
-                    <h3 class="text-lg font-extrabold text-gray-900 leading-snug mb-3 line-clamp-2">${obj.titulo || 'Sem título'}</h3>
+                    <h3 class="text-lg font-extrabold text-gray-900 leading-snug mb-3 line-clamp-2">${esc(obj.titulo || "Sem título")}</h3>
                     <div class="space-y-1.5 text-sm text-gray-600 mb-4">
                         <p class="flex items-center gap-2">
                             <svg class="w-4 h-4 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                            <span>Sala ${obj.sala || '\u2014'}</span>
+                            <span>Sala ${esc(obj.sala || '—')}</span>
                         </p>
                         ${dataTxt ? `<p class="flex items-center gap-2"><svg class="w-4 h-4 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg><span>${dataTxt}</span></p>` : ''}
                     </div>
