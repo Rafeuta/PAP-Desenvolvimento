@@ -1,16 +1,16 @@
 <!DOCTYPE html>
-<html lang="pt-PT" class="scroll-smooth">
+<html lang="pt-PT">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - FindIT School</title>
+    <title>Secretaria — FindIT School</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
         tailwind.config = {
             theme: {
                 extend: {
-                    colors: { 'navy': '#0b1b3d', 'brand-blue': '#0f3b7a', 'brand-orange': '#e67e22', 'surface': '#f8fafc' },
+                    colors: { navy: '#0b1b3d', 'brand-blue': '#0f3b7a', 'brand-orange': '#e67e22', surface: '#f3f5f8' },
                     fontFamily: { sans: ['Inter', 'sans-serif'] }
                 }
             }
@@ -18,290 +18,221 @@
     </script>
     <link rel="stylesheet" href="style.css">
     <style>
-        /* Layout flex para garantir que nada é cortado */
-        html, body {
-            height: 100%;
-            margin: 0;
-            padding: 0;
-        }
-        body {
-            display: flex;
-            min-height: 100vh;
-            overflow-x: hidden;
-        }
-        .sidebar {
-            width: 260px;
-            flex-shrink: 0;
-        }
-        .main-content {
-            flex: 1;
-            min-width: 0;
-            overflow-y: auto;
-            min-height: 100vh;
-        }
-        /* Mobile: sidebar escondida por defeito */
+        html, body { height: 100%; margin: 0; }
+        body { display: flex; min-height: 100vh; overflow-x: hidden; background: #f3f5f8; }
+        .sidebar { width: 248px; flex-shrink: 0; }
+        .main-content { flex: 1; min-width: 0; overflow-y: auto; min-height: 100vh; }
         @media (max-width: 768px) {
-            .sidebar {
-                position: fixed;
-                left: -260px;
-                top: 0;
-                height: 100vh;
-                z-index: 50;
-                transition: left 0.3s ease;
-            }
-            .sidebar.open {
-                left: 0;
-            }
-            .sidebar-overlay {
-                display: none;
-                position: fixed;
-                inset: 0;
-                background: rgba(0,0,0,0.5);
-                z-index: 40;
-            }
-            .sidebar-overlay.active {
-                display: block;
-            }
+            .sidebar { position: fixed; left: -248px; top: 0; height: 100vh; z-index: 50; transition: left .25s ease; }
+            .sidebar.open { left: 0; }
+            .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(11,27,61,.45); z-index: 40; }
+            .sidebar-overlay.active { display: block; }
         }
+        thead th { letter-spacing: .04em; }
+        tbody tr:hover { background: #f8fafc; }
     </style>
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
-    
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 </head>
-<body class="bg-surface text-gray-800 antialiased">
-
-    <!-- Overlay para mobile -->
+<body class="text-gray-800 antialiased">
     <div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleSidebar()"></div>
-
-    <!-- SIDEBAR -->
-    <aside class="sidebar bg-navy text-white flex flex-col">
-        <div class="p-6 border-b border-white/10">
-        <a href="index.html" class="flex items-center justify-center">
-    <img src="logo.png" alt="FindIT" class="h-12 w-auto">
-</a>
+    <aside class="sidebar bg-[#0b1b3d] text-white flex flex-col">
+        <div class="px-5 py-5 border-b border-white/10">
+            <a href="index.html" class="flex items-center gap-3">
+                <img src="logo.png" alt="FindIT" class="h-10 w-auto brightness-0 invert">
+            </a>
+            <p class="mt-3 text-[11px] font-semibold uppercase tracking-wider text-orange-300">Secretaria</p>
         </div>
-        
-        <nav class="flex-1 p-4 space-y-2">
-            <a href="#" class="flex items-center gap-3 px-4 py-3 bg-white/10 rounded-lg text-white font-semibold">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
-                Registar Objetos
-            </a>
-            <a href="index.html" class="flex items-center gap-3 px-4 py-3 text-gray-300 hover:bg-white/5 hover:text-white rounded-lg transition-colors">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
-                Ver Site Público
-            </a>
+        <nav class="flex-1 p-3 space-y-1">
+            <a href="#registo" class="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-white/10 text-white text-sm font-semibold">Registar</a>
+            <a href="#objetos" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:bg-white/5 hover:text-white text-sm font-medium">Objetos</a>
+            <a href="#contactos" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:bg-white/5 hover:text-white text-sm font-medium">Contactos</a>
+            <a href="index.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:bg-white/5 hover:text-white text-sm font-medium">Site público</a>
         </nav>
-
-        <div class="p-4 border-t border-white/10">
-            <button id="btn-logout" class="w-full flex items-center gap-3 px-4 py-3 text-red-300 hover:bg-red-500/10 hover:text-red-200 rounded-lg transition-colors">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
-                Terminar Sessão
-            </button>
+        <div class="p-3 border-t border-white/10">
+            <button id="btn-logout" class="w-full text-left px-3 py-2.5 rounded-lg text-sm font-semibold text-red-200 hover:bg-red-500/10">Terminar sessão</button>
         </div>
     </aside>
 
-    <!-- CONTEÚDO PRINCIPAL -->
     <div class="main-content">
-        <!-- Header Mobile -->
-        <header class="md:hidden bg-white border-b border-gray-200 p-4 flex items-center justify-between sticky top-0 z-30">
-            <button onclick="toggleSidebar()" class="p-2 text-gray-600 hover:bg-gray-100 rounded-lg">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
-            </button>
-            <span class="font-bold text-navy">FindIT School</span>
-            <div class="w-8 h-8 bg-brand-blue rounded-full flex items-center justify-center text-white text-xs font-bold">AD</div>
-        </header>
-
-        <!-- Header Desktop -->
-        <header class="hidden md:flex bg-white border-b border-gray-200 px-8 py-4 items-center justify-between sticky top-0 z-30">
-            <h1 class="text-xl font-extrabold text-navy flex items-center gap-2">
-                <svg class="w-6 h-6 text-brand-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
-                Gestão de Objetos
-            </h1>
+        <header class="bg-white border-b border-gray-200 px-4 md:px-8 h-16 flex items-center justify-between sticky top-0 z-30">
+            <div class="flex items-center gap-3 min-w-0">
+                <button onclick="toggleSidebar()" class="md:hidden p-2 rounded-lg text-gray-600 hover:bg-gray-100" aria-label="Abrir menu">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                </button>
+                <div class="min-w-0">
+                    <p class="text-[11px] font-semibold uppercase tracking-wider text-gray-400">FindIT School</p>
+                    <h1 class="text-base font-bold text-[#0b1b3d] truncate">Gestão de objetos</h1>
+                </div>
+            </div>
             <div class="flex items-center gap-3">
-                <div class="w-9 h-9 bg-brand-blue rounded-full flex items-center justify-center text-white font-bold text-sm">AD</div>
-                <span id="user-email" class="text-sm font-semibold text-gray-700">carregar...</span>
+                <span id="user-email" class="text-sm text-gray-600 max-w-[10rem] sm:max-w-xs truncate">A carregar...</span>
             </div>
         </header>
 
-        <!-- CONTEÚDO -->
-        <main class="p-4 md:p-8 space-y-8">
-            
-            <!-- FORMULÁRIO DE REGISTO -->
-            <section class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
-                <div class="p-6 border-b border-gray-100">
-                    <h2 class="text-lg font-bold text-navy">Registar Novo Objeto</h2>
-                    <p class="text-sm text-gray-500 mt-1">Preenche os dados do objeto encontrado.</p>
+        <main class="p-4 md:p-8 max-w-6xl space-y-6">
+            <p class="text-sm text-gray-500 -mt-2">Registo de achados e avisos aos alunos.</p>
+
+            <section id="registo" class="bg-white border border-gray-200 rounded-xl">
+                <div class="px-5 py-4 border-b border-gray-100">
+                    <h2 class="text-base font-bold text-[#0b1b3d]">Novo objeto</h2>
+                    <p class="text-sm text-gray-500 mt-0.5">Fotografia, local e categoria. O estado inicial é Achado.</p>
                 </div>
-                
-                <form id="form-objeto" class="p-6 space-y-5">
-                    <div class="grid md:grid-cols-2 gap-5">
+                <form id="form-objeto" class="p-5 space-y-4">
+                    <div class="grid md:grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-sm font-bold text-gray-700 mb-1.5">Título do Objeto</label>
-                            <input type="text" id="titulo" required class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:bg-white focus:ring-2 focus:ring-brand-blue/20 focus:border-brand-blue outline-none" placeholder="Ex: AirPods Brancos">
+                            <label class="block text-sm font-semibold text-gray-700 mb-1.5" for="titulo">Título</label>
+                            <input type="text" id="titulo" required class="w-full px-3.5 py-2.5 bg-white border border-gray-300 rounded-lg text-sm text-gray-900 outline-none focus:border-[#0f3b7a] focus:ring-2 focus:ring-[#0f3b7a]/15" placeholder="Ex: Calculadora Casio">
                         </div>
                         <div>
-                            <label class="block text-sm font-bold text-gray-700 mb-1.5">Categoria</label>
-                            <select id="categoria" required class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:bg-white focus:ring-2 focus:ring-brand-blue/20 focus:border-brand-blue outline-none">
-                                <option>Eletrónica</option>
-                                <option>Roupa</option>
-                                <option>Material Escolar</option>
-                                <option>Chaves</option>
-                                <option>Outros</option>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1.5" for="categoria">Categoria</label>
+                            <select id="categoria" required class="w-full px-3.5 py-2.5 bg-white border border-gray-300 rounded-lg text-sm text-gray-900 outline-none focus:border-[#0f3b7a] focus:ring-2 focus:ring-[#0f3b7a]/15">
+                                <option value="Eletrónica">Eletrónica</option>
+                                <option value="Roupa">Roupa</option>
+                                <option value="Material Escolar">Material Escolar</option>
+                                <option value="Chaves">Chaves</option>
+                                <option value="Outros">Outros</option>
                             </select>
                         </div>
                     </div>
-                    
                     <div>
-                        <label class="block text-sm font-bold text-gray-700 mb-1.5">Sala / Local</label>
-                        <input type="text" id="sala" required class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:bg-white focus:ring-2 focus:ring-brand-blue/20 focus:border-brand-blue outline-none" placeholder="Ex: Sala 1.6, Pavilhão, Refeitório...">
+                        <label class="block text-sm font-semibold text-gray-700 mb-1.5" for="sala">Sala ou local</label>
+                        <input type="text" id="sala" required class="w-full px-3.5 py-2.5 bg-white border border-gray-300 rounded-lg text-sm text-gray-900 outline-none focus:border-[#0f3b7a] focus:ring-2 focus:ring-[#0f3b7a]/15" placeholder="Ex: Sala 1.6, refeitório">
                     </div>
-
                     <div>
-                        <label class="block text-sm font-bold text-gray-700 mb-1.5">Fotografia (Obrigatório)</label>
-                        <label class="flex flex-col items-center justify-center border-2 border-dashed border-gray-300 rounded-lg p-8 hover:border-brand-blue hover:bg-blue-50/30 cursor-pointer transition-all">
-                            <input type="file" id="foto" accept="image/*" required class="hidden">
-                            <svg class="w-10 h-10 text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                            <p class="text-sm font-semibold text-gray-700">Carregar um ficheiro ou arrastar e largar</p>
-                            <p class="text-xs text-gray-500 mt-1">PNG, JPG, GIF até 10MB</p>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1.5">Fotografia</label>
+                        <label id="dropzone" class="flex flex-col items-center justify-center border border-dashed border-gray-300 rounded-lg px-6 py-8 bg-gray-50 hover:bg-white hover:border-[#0f3b7a] cursor-pointer relative">
+                            <input type="file" id="foto" accept="image/*" required class="absolute inset-0 opacity-0 cursor-pointer">
+                            <div id="upload-placeholder" class="text-center pointer-events-none">
+                                <p class="text-sm font-semibold text-gray-800">Escolher fotografia</p>
+                                <p class="text-xs text-gray-500 mt-1">JPG ou PNG</p>
+                            </div>
+                            <div id="image-preview" class="hidden w-full">
+                                <img id="preview-img" alt="" class="max-h-48 mx-auto rounded-md object-contain">
+                            </div>
                         </label>
-                        <div id="image-preview" class="hidden mt-3">
-                            <img id="preview-img" class="max-h-40 rounded-lg border border-gray-200">
-                            <p class="text-xs text-brand-blue font-bold mt-1">Tamanho: <span id="file-size-text">0</span> MB</p>
-                        </div>
+                        <p id="file-size-info" class="hidden text-xs text-gray-500 mt-2 text-right">Tamanho: <span id="file-size-text">0</span> MB</p>
                     </div>
-
-                    <div class="flex justify-end pt-2">
-                        <button type="submit" id="btn-submit" class="bg-brand-blue text-white font-bold px-6 py-2.5 rounded-lg hover:bg-blue-900 transition-all flex items-center gap-2">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-                            Guardar Objeto
-                        </button>
+                    <div class="flex justify-end">
+                        <button type="submit" id="btn-submit" class="bg-[#0f3b7a] text-white text-sm font-semibold px-5 py-2.5 rounded-lg hover:bg-[#0b2f63]">Guardar objeto</button>
                     </div>
                 </form>
             </section>
 
-            <!-- TABELA DE OBJETOS -->
-            <section class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
-                <div class="p-6 border-b border-gray-100">
-                    <h2 class="text-lg font-bold text-navy">Objetos no Sistema</h2>
+            <section id="objetos" class="bg-white border border-gray-200 rounded-xl overflow-hidden">
+                <div class="px-5 py-4 border-b border-gray-100">
+                    <h2 class="text-base font-bold text-[#0b1b3d]">Objetos registados</h2>
                 </div>
                 <div class="overflow-x-auto">
-                    <table class="w-full text-left">
-                        <thead class="bg-gray-50 text-xs font-bold text-gray-500 uppercase">
+                    <table class="w-full text-left text-sm">
+                        <thead class="bg-gray-50 text-xs font-semibold text-gray-500 uppercase">
                             <tr>
-                                <th class="p-4">Fotografia</th>
-                                <th class="p-4">Título / Categoria</th>
-                                <th class="p-4">Localização</th>
-                                <th class="p-4">Estado</th>
-                                <th class="p-4 text-center">Ações</th>
+                                <th class="px-4 py-3 font-semibold">Foto</th>
+                                <th class="px-4 py-3 font-semibold">Objeto</th>
+                                <th class="px-4 py-3 font-semibold">Local</th>
+                                <th class="px-4 py-3 font-semibold">Estado</th>
+                                <th class="px-4 py-3 font-semibold text-right">Ações</th>
                             </tr>
                         </thead>
-                        <tbody id="tabela-corpo" class="divide-y divide-gray-100 text-sm"></tbody>
+                        <tbody id="tabela-corpo" class="divide-y divide-gray-100"></tbody>
                     </table>
                 </div>
             </section>
 
-            <!-- LISTA DE CONTACTOS -->
-            <section class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
-                <div class="p-6 border-b border-gray-100 flex flex-col md:flex-row md:items-center justify-between gap-3">
+            <section id="contactos" class="bg-white border border-gray-200 rounded-xl overflow-hidden">
+                <div class="px-5 py-4 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                     <div>
-                        <h2 class="text-lg font-bold text-navy flex items-center gap-2">
-                            <svg class="w-5 h-5 text-brand-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
-                            Lista de Contactos para Notificação
-                        </h2>
+                        <h2 class="text-base font-bold text-[#0b1b3d]">Contactos</h2>
+                        <p class="text-sm text-gray-500 mt-0.5">Quem recebe o aviso quando um objeto é encontrado.</p>
                     </div>
-                    <button onclick="abrirModal('modal-adicionar-email')" class="bg-brand-orange text-white font-bold px-4 py-2 rounded-lg hover:bg-orange-700 transition-all text-sm flex items-center gap-2">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
-                        Adicionar Email
-                    </button>
+                    <button type="button" onclick="abrirModal('modal-adicionar-email')" class="bg-[#e67e22] text-white text-sm font-semibold px-4 py-2.5 rounded-lg hover:bg-[#d35400]">Adicionar contacto</button>
                 </div>
-                
                 <div class="overflow-x-auto">
-                    <table class="w-full text-left">
-                        <thead class="bg-gray-50 text-xs font-bold text-gray-500 uppercase">
+                    <table class="w-full text-left text-sm">
+                        <thead class="bg-gray-50 text-xs font-semibold text-gray-500 uppercase">
                             <tr>
-                                <th class="p-4">Nome</th>
-                                <th class="p-4">Email</th>
-                                <th class="p-4">Turma</th>
-                                <th class="p-4 text-center">Ações</th>
+                                <th class="px-4 py-3 font-semibold">Nome</th>
+                                <th class="px-4 py-3 font-semibold">Email</th>
+                                <th class="px-4 py-3 font-semibold">Turma</th>
+                                <th class="px-4 py-3 font-semibold text-right">Ações</th>
                             </tr>
                         </thead>
-                        <tbody id="tabela-contactos" class="divide-y divide-gray-100 text-sm"></tbody>
+                        <tbody id="tabela-contactos" class="divide-y divide-gray-100"></tbody>
                     </table>
                 </div>
-
-                <div class="p-4 bg-gray-50 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-3">
-                    <p id="total-contactos" class="text-sm text-gray-600 font-medium">Total: 0 contactos</p>
-                    <button onclick="abrirModalEnvioMassa()" class="bg-brand-blue text-white font-bold px-4 py-2 rounded-lg hover:bg-blue-900 transition-all text-sm flex items-center gap-2">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
-                        Enviar Email a Todos
-                    </button>
+                <div class="px-5 py-3 bg-gray-50 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-3">
+                    <p id="total-contactos" class="text-sm text-gray-600">Total: 0 contactos</p>
+                    <button type="button" onclick="abrirModalEnvioMassa()" class="text-sm font-semibold text-[#0f3b7a] hover:underline">Enviar email a todos</button>
                 </div>
             </section>
-
         </main>
     </div>
 
-    <!-- MODAL: ADICIONAR EMAIL -->
-    <div id="modal-adicionar-email" class="fixed inset-0 bg-navy/80 backdrop-blur-sm hidden items-center justify-center z-[100] p-4">
-        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-8 relative">
-            <button onclick="fecharModal('modal-adicionar-email')" class="absolute top-4 right-4 text-gray-400 hover:text-gray-700 w-8 h-8 rounded-full flex items-center justify-center hover:bg-gray-100">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-            </button>
-            <h2 class="text-xl font-extrabold text-navy mb-2">Adicionar Contacto</h2>
-            <p class="text-sm text-gray-500 mb-6">Este email irá receber notificações da secretaria.</p>
-            <form id="form-adicionar-contacto" class="space-y-4">
+    <div id="modal-adicionar-email" class="fixed inset-0 bg-[#0b1b3d]/70 hidden items-center justify-center z-[100] p-4">
+        <div class="bg-white rounded-xl w-full max-w-md p-6 relative border border-gray-200">
+            <button type="button" onclick="fecharModal('modal-adicionar-email')" class="absolute top-3 right-3 text-gray-400 hover:text-gray-700 w-8 h-8" aria-label="Fechar">×</button>
+            <h2 class="text-lg font-bold text-[#0b1b3d] mb-1">Novo contacto</h2>
+            <p class="text-sm text-gray-500 mb-5">Recebe as notificações da secretaria.</p>
+            <form id="form-adicionar-contacto" class="space-y-3">
                 <div>
-                    <label class="block text-sm font-bold text-gray-700 mb-1.5">Nome Completo</label>
-                    <input type="text" id="contacto-nome" required class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:bg-white focus:ring-2 focus:ring-brand-blue/20 focus:border-brand-blue outline-none" placeholder="Ex: João Silva">
+                    <label class="block text-sm font-semibold text-gray-700 mb-1.5" for="contacto-nome">Nome</label>
+                    <input type="text" id="contacto-nome" required class="w-full px-3.5 py-2.5 bg-white border border-gray-300 rounded-lg text-sm text-gray-900 outline-none focus:border-[#0f3b7a] focus:ring-2 focus:ring-[#0f3b7a]/15" placeholder="Nome do aluno">
                 </div>
                 <div>
-                    <label class="block text-sm font-bold text-gray-700 mb-1.5">Email</label>
-                    <input type="email" id="contacto-email" required class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:bg-white focus:ring-2 focus:ring-brand-blue/20 focus:border-brand-blue outline-none" placeholder="Ex: aluno@etpc.pt">
+                    <label class="block text-sm font-semibold text-gray-700 mb-1.5" for="contacto-email">Email</label>
+                    <input type="email" id="contacto-email" required class="w-full px-3.5 py-2.5 bg-white border border-gray-300 rounded-lg text-sm text-gray-900 outline-none focus:border-[#0f3b7a] focus:ring-2 focus:ring-[#0f3b7a]/15" placeholder="nome@etpc.pt">
                 </div>
                 <div>
-                    <label class="block text-sm font-bold text-gray-700 mb-1.5">Turma (opcional)</label>
-                    <input type="text" id="contacto-turma" class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:bg-white focus:ring-2 focus:ring-brand-blue/20 focus:border-brand-blue outline-none" placeholder="Ex: 12º TGPSI">
+                    <label class="block text-sm font-semibold text-gray-700 mb-1.5" for="contacto-turma">Turma</label>
+                    <input type="text" id="contacto-turma" class="w-full px-3.5 py-2.5 bg-white border border-gray-300 rounded-lg text-sm text-gray-900 outline-none focus:border-[#0f3b7a] focus:ring-2 focus:ring-[#0f3b7a]/15" placeholder="Opcional">
                 </div>
-                <button type="submit" class="w-full bg-brand-blue text-white font-bold py-2.5 rounded-lg hover:bg-blue-900 transition-all">
-                    Guardar Contacto
-                </button>
+                <button type="submit" class="w-full bg-[#0f3b7a] text-white text-sm font-semibold py-2.5 rounded-lg">Guardar contacto</button>
             </form>
         </div>
     </div>
 
-    <!-- MODAL: ENVIAR EMAIL EM MASSA -->
-    <div id="modal-envio-massa" class="fixed inset-0 bg-navy/80 backdrop-blur-sm hidden items-center justify-center z-[100] p-4">
-        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-8 relative">
-            <button onclick="fecharModal('modal-envio-massa')" class="absolute top-4 right-4 text-gray-400 hover:text-gray-700 w-8 h-8 rounded-full flex items-center justify-center hover:bg-gray-100">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-            </button>
-            <div class="flex items-center gap-3 mb-6">
-                <div class="w-12 h-12 bg-brand-orange/10 rounded-xl flex items-center justify-center">
-                    <svg class="w-6 h-6 text-brand-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+    <div id="modal-envio-massa" class="fixed inset-0 bg-[#0b1b3d]/70 hidden items-center justify-center z-[100] p-4">
+        <div class="bg-white rounded-xl w-full max-w-md p-6 relative border border-gray-200">
+            <button type="button" onclick="fecharModal('modal-envio-massa')" class="absolute top-3 right-3 text-gray-400 hover:text-gray-700 w-8 h-8" aria-label="Fechar">×</button>
+            <h2 class="text-lg font-bold text-[#0b1b3d]">Enviar notificação</h2>
+            <p id="contador-destinatarios" class="text-sm text-gray-500 mb-4">0 destinatários</p>
+            <form id="form-envio-massa" class="space-y-3">
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1.5" for="massa-assunto">Assunto</label>
+                    <input type="text" id="massa-assunto" required class="w-full px-3.5 py-2.5 bg-white border border-gray-300 rounded-lg text-sm text-gray-900 outline-none focus:border-[#0f3b7a] focus:ring-2 focus:ring-[#0f3b7a]/15">
                 </div>
                 <div>
-                    <h2 class="text-xl font-extrabold text-navy">Enviar Notificação</h2>
-                    <p id="contador-destinatarios" class="text-sm text-gray-500">0 destinatários</p>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1.5" for="massa-mensagem">Mensagem</label>
+                    <textarea id="massa-mensagem" rows="5" required class="w-full px-3.5 py-2.5 bg-white border border-gray-300 rounded-lg text-sm text-gray-900 outline-none focus:border-[#0f3b7a] focus:ring-2 focus:ring-[#0f3b7a]/15 resize-y"></textarea>
+                </div>
+                <button type="submit" id="btn-enviar-massa" class="w-full bg-[#e67e22] text-white text-sm font-semibold py-2.5 rounded-lg">Enviar agora</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="modal-selecao-emails" class="fixed inset-0 bg-[#0b1b3d]/70 hidden items-center justify-center z-[100] p-4">
+        <div class="bg-white rounded-xl w-full max-w-lg p-6 relative flex flex-col max-h-[90vh] border border-gray-200">
+            <div class="flex items-start justify-between gap-4 mb-4">
+                <div>
+                    <h2 class="text-lg font-bold text-[#0b1b3d]">Destinatários</h2>
+                    <p class="text-sm text-gray-500">Escolhe quem recebe este objeto.</p>
+                </div>
+                <button type="button" onclick="fecharModal('modal-selecao-emails')" class="text-gray-400 hover:text-gray-700" aria-label="Fechar">×</button>
+            </div>
+            <div class="overflow-y-auto flex-grow mb-4 space-y-2" id="lista-checkboxes-container"></div>
+            <div class="border-t border-gray-100 pt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <label class="flex items-center gap-2 text-sm font-semibold text-gray-700">
+                    <input type="checkbox" id="check-todos" class="w-4 h-4" onchange="toggleTodosCheckboxes(this.checked)">
+                    Selecionar todos
+                </label>
+                <div class="flex gap-2">
+                    <button type="button" onclick="fecharModal('modal-selecao-emails')" class="px-4 py-2 text-sm font-semibold text-gray-600">Cancelar</button>
+                    <button type="button" onclick="confirmarEnvioEmails()" class="px-4 py-2 bg-[#e67e22] text-white text-sm font-semibold rounded-lg">Enviar</button>
                 </div>
             </div>
-            <form id="form-envio-massa" class="space-y-4">
-                <div>
-                    <label class="block text-sm font-bold text-gray-700 mb-1.5">Assunto</label>
-                    <input type="text" id="massa-assunto" required class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:bg-white focus:ring-2 focus:ring-brand-blue/20 focus:border-brand-blue outline-none" placeholder="Ex: Novo objeto encontrado">
-                </div>
-                <div>
-                    <label class="block text-sm font-bold text-gray-700 mb-1.5">Mensagem</label>
-                    <textarea id="massa-mensagem" rows="5" required class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:bg-white focus:ring-2 focus:ring-brand-blue/20 focus:border-brand-blue outline-none resize-none" placeholder="Escreve a mensagem..."></textarea>
-                </div>
-                <button type="submit" id="btn-enviar-massa" class="w-full bg-brand-orange text-white font-bold py-2.5 rounded-lg hover:bg-orange-700 transition-all flex items-center justify-center gap-2">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
-                    Enviar Agora
-                </button>
-            </form>
         </div>
     </div>
 
-    <!-- TOAST -->
-    <div id="toast" class="fixed bottom-6 right-6 transform translate-y-20 opacity-0 transition-all duration-300 z-50 bg-white border-l-4 border-brand-blue shadow-2xl rounded-lg p-4 flex items-center gap-3 max-w-sm">
+    <div id="toast" class="fixed bottom-6 right-6 transform translate-y-20 opacity-0 transition-all duration-300 z-50 bg-white border border-gray-200 shadow-lg rounded-lg p-4 flex items-center gap-3 max-w-sm">
         <div id="toast-icon"></div>
         <div>
             <h4 id="toast-title" class="font-bold text-gray-900 text-sm">Sucesso</h4>
@@ -311,61 +242,30 @@
 
     <script src="dashboard.js"></script>
     <script>
-        // Toggle sidebar mobile
         function toggleSidebar() {
             document.getElementById('sidebar-overlay').classList.toggle('active');
             document.querySelector('.sidebar').classList.toggle('open');
         }
-
-        // Modais
+        function toggleAdminSidebar() { toggleSidebar(); }
         function abrirModal(id) {
             const modal = document.getElementById(id);
+            if (!modal) return;
             modal.classList.remove('hidden');
             modal.classList.add('flex');
         }
+        function abrirModalEnvioMassa() {
+            const n = document.getElementById('contador-destinatarios');
+            if (n && typeof listaContactos !== 'undefined') {
+                n.textContent = listaContactos.length + (listaContactos.length === 1 ? ' destinatário' : ' destinatários');
+            }
+            abrirModal('modal-envio-massa');
+        }
         function fecharModal(id) {
             const modal = document.getElementById(id);
+            if (!modal) return;
             modal.classList.add('hidden');
             modal.classList.remove('flex');
         }
     </script>
-    <!-- MODAL DE SELEÇÃO DE DESTINATÁRIOS -->
-<div id="modal-selecao-emails" class="fixed inset-0 bg-navy/80 backdrop-blur-sm hidden items-center justify-center z-[100] p-4">
-    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg p-6 relative flex flex-col max-h-[90vh]">
-        
-        <!-- Cabeçalho -->
-        <div class="flex items-center justify-between mb-4 border-b pb-4">
-            <div>
-                <h2 class="text-xl font-extrabold text-navy">Selecionar Destinatários</h2>
-                <p class="text-sm text-gray-500">Escolhe para quem enviar a notificação.</p>
-            </div>
-            <button onclick="fecharModal('modal-selecao-emails')" class="text-gray-400 hover:text-gray-600">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-            </button>
-        </div>
-
-        <!-- Lista de Checkboxes (Scrollável) -->
-        <div class="overflow-y-auto flex-grow mb-4 pr-2 space-y-2" id="lista-checkboxes-container">
-            <!-- Os checkboxes serão injetados aqui pelo JS -->
-            <p class="text-center text-gray-500 py-4">A carregar contactos...</p>
-        </div>
-
-        <!-- Ações do Rodapé -->
-        <div class="border-t pt-4 flex items-center justify-between bg-gray-50 -mx-6 -mb-6 px-6 py-4 rounded-b-2xl">
-            <label class="flex items-center gap-2 cursor-pointer select-none">
-                <input type="checkbox" id="check-todos" class="w-4 h-4 text-brand-blue rounded focus:ring-brand-blue" onchange="toggleTodosCheckboxes(this.checked)">
-                <span class="text-sm font-bold text-gray-700">Selecionar Todos</span>
-            </label>
-            
-            <div class="flex gap-3">
-                <button onclick="fecharModal('modal-selecao-emails')" class="px-4 py-2 text-sm font-bold text-gray-600 hover:bg-gray-200 rounded-lg transition-colors">Cancelar</button>
-                <button onclick="confirmarEnvioEmails()" class="px-6 py-2 bg-brand-orange text-white font-bold rounded-lg hover:bg-orange-700 transition-colors shadow-md flex items-center gap-2">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
-                    Enviar Selecionados
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
 </body>
 </html>
