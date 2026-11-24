@@ -48,3 +48,17 @@ A branch `feat/dashboard-profissional` reúne a primeira fase da modernização 
 6. Testar envio em modo de teste e confirmar falhas parciais.
 7. Verificar os fluxos em ecrãs móveis e desktop.
 8. Rever políticas RLS e permissões antes de ativar envios reais.
+
+
+## Segunda fase — robustez e gestão de contactos
+
+Na branch `feat/gestao-contactos-seguranca`:
+- Validação de fotografias no cliente (JPG, PNG ou WebP, até 5 MB) antes do upload.
+- Nomes de ficheiro gerados pela aplicação, sem reutilizar o nome original.
+- Limpeza de uploads quando a gravação do registo falha.
+- Mensagens de notificações apresentadas como texto, evitando interpretar mensagens externas como HTML.
+- Melhor tratamento de erros ao alterar estados e remover objetos/contactos.
+- Normalização de emails (espaços removidos e minúsculas) e prevenção de contactos duplicados na interface.
+- Remoção do antigo `dashboard-contactos.js`, que não era carregado pelas páginas atuais e continha uma integração Web3Forms obsoleta.
+
+**Nota de segurança:** a remoção de uma chave de um ficheiro não a invalida nem a apaga do histórico Git. Se a chave Web3Forms antiga ainda estiver ativa, deve ser revogada/rodada no serviço. A proteção real dos dados continua a depender das políticas RLS e das permissões do Storage no Supabase.
