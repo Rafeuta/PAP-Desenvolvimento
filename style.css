@@ -9,7 +9,6 @@ body {
     color: #1e293b;
 }
 
-/* Scrollbar personalizada moderna e discreta */
 ::-webkit-scrollbar {
     width: 8px;
     height: 8px;
@@ -25,7 +24,6 @@ body {
     background: #94a3b8;
 }
 
-/* Estilo dos Botões de Filtro (Design Premium) */
 .filter-btn {
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     border: 1px solid transparent;
@@ -38,13 +36,12 @@ body {
 }
 
 .filter-btn.active {
-    background-color: #eff6ff !important; /* Azul muito claro */
+    background-color: #eff6ff !important;
     color: #0f3b7a !important;
-    border-left: 3px solid #0f3b7a !important; /* Indicador lateral elegante */
+    border-left: 3px solid #0f3b7a !important;
     font-weight: 700 !important;
 }
 
-/* Estilo dos Cartões do Catálogo */
 .card-objeto {
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -55,15 +52,15 @@ body {
     border-color: #bfdbfe;
 }
 
-/* Utilitário para limitar texto a 1 linha com reticências */
-.line-clamp-1 {
+.line-clamp-1,
+.line-clamp-2 {
     display: -webkit-box;
-    -webkit-line-clamp: 1;
     -webkit-box-orient: vertical;
     overflow: hidden;
 }
+.line-clamp-1 { -webkit-line-clamp: 1; }
+.line-clamp-2 { -webkit-line-clamp: 2; }
 
-/* Animação suave para elementos que aparecem */
 @keyframes fadeIn {
     from { opacity: 0; transform: translateY(10px); }
     to { opacity: 1; transform: translateY(0); }
