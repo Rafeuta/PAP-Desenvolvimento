@@ -27,8 +27,10 @@
 </head>
 <body class="bg-gray-50 font-sans flex h-screen overflow-hidden text-gray-800">
 
+    <div id="admin-overlay" onclick="toggleAdminSidebar()"></div>
+
     <!-- Sidebar Admin -->
-    <aside class="w-64 bg-sidebar text-gray-300 flex flex-col shadow-2xl z-30 transition-all duration-300">
+    <aside id="admin-sidebar" class="w-64 bg-sidebar text-gray-300 flex flex-col shadow-2xl z-30 transition-transform duration-300">
         <div class="h-24 flex items-center justify-center border-b border-gray-800 bg-black/40 p-4 relative">
             <img src="logo.png" alt="FindIT" class="h-12 w-auto brightness-0 invert object-contain">
             <span class="absolute bottom-2 right-2 text-[10px] bg-brand-orange text-white px-2 py-0.5 rounded font-bold uppercase tracking-wider">Admin</span>
@@ -56,20 +58,23 @@
     <!-- Main Content (Igual ao dashboard mas com cor diferente no topo) -->
     <main class="flex-grow flex flex-col overflow-y-auto bg-gray-50 relative">
         
-        <header class="bg-white/80 backdrop-blur-md shadow-sm h-20 flex items-center justify-between px-8 sticky top-0 z-20 border-b border-gray-100">
-            <h1 class="text-xl font-extrabold text-gray-800 flex items-center gap-2">
+        <header class="bg-white/80 backdrop-blur-md shadow-sm h-20 flex items-center justify-between px-4 sm:px-8 sticky top-0 z-20 border-b border-gray-100 gap-3">
+            <button id="admin-menu-btn" type="button" onclick="toggleAdminSidebar()" class="md:hidden p-2 rounded-lg text-gray-700 hover:bg-gray-100" aria-label="Abrir menu">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+            </button>
+            <h1 class="text-lg sm:text-xl font-extrabold text-gray-800 flex items-center gap-2 min-w-0">
                 <svg class="w-6 h-6 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
                 Painel de Administração
             </h1>
             
             <div class="flex items-center gap-3 bg-gray-50 border border-gray-200 rounded-full px-2 py-1.5 pr-4">
                 <div class="w-8 h-8 bg-gray-900 rounded-full flex items-center justify-center text-white font-bold text-xs">AD</div>
-                <span id="user-email" class="text-sm font-bold text-gray-700">A carregar...</span>
+                <span id="user-email" class="text-sm font-bold text-gray-700 max-w-[9rem] sm:max-w-xs truncate">A carregar...</span>
             </div>
         </header>
 
         <!-- O resto do conteúdo é exatamente igual ao dashboard -->
-        <div class="p-8 max-w-6xl mx-auto w-full space-y-8">
+        <div class="p-4 sm:p-8 max-w-6xl mx-auto w-full space-y-8">
             <div class="bg-white rounded-3xl shadow-premium border border-gray-100 overflow-hidden">
                 <div class="px-8 py-6 border-b border-gray-100 bg-gray-50/50">
                     <h2 class="text-lg font-extrabold text-gray-800">Registar Novo Objeto</h2>
@@ -241,5 +246,11 @@
         </form>
     </div>
 </div>
+<script>
+function toggleAdminSidebar() {
+    document.getElementById('admin-sidebar')?.classList.toggle('open');
+    document.getElementById('admin-overlay')?.classList.toggle('open');
+}
+</script>
 </body>
 </html>
