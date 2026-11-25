@@ -63,46 +63,75 @@ document.addEventListener('click', function(event) {
 });
 
 async function fazerLogin() {
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
+    const emailInput = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
+    const botao = document.querySelector('#modal-login button[onclick="fazerLogin()"]');
+    const email = emailInput?.value.trim().toLowerCase() || '';
+    const password = passwordInput?.value || '';
     const msgErro = document.getElementById('msg-erro');
     const msgTexto = document.getElementById('msg-erro-texto');
+    const mostrarErro = mensagem => {
+        if (msgTexto) msgTexto.textContent = mensagem;
+        else if (msgErro) msgErro.textContent = mensagem;
+        msgErro?.classList.remove('hidden');
+    };
 
     if (!email || !password) {
-        if (msgTexto) msgTexto.textContent = "Preenche o email e a password.";
-        else if (msgErro) msgErro.textContent = "Preenche o email e a password.";
-        msgErro?.classList.remove('hidden');
+        mostrarErro('Preenche o email institucional e a password.');
         return;
     }
 
-    const { data, error } = await supabaseClient.auth.signInWithPassword({
-        email: email,
-        password: password,
-    });
-
-    if (error) {
-        if (msgTexto) msgTexto.textContent = "Erro: Credenciais inválidas. Tenta novamente.";
-        else if (msgErro) msgErro.textContent = "Erro: Credenciais inválidas. Tenta novamente.";
-        msgErro?.classList.remove('hidden');
-        return;
+    if (botao) {
+        botao.disabled = true;
+        botao.textContent = 'A verificar…';
     }
+    msgErro?.classList.add('hidden');
 
-    const { data: perfil, error: perfilError } = await supabaseClient
-        .from('utilizadores')
-        .select('cargo')
-        .eq('id', data.user.id)
-        .maybeSingle();
+    try {
+        const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
 
-    if (perfilError || !perfil || !['admin', 'funcionario'].includes(perfil.cargo)) {
-        await supabaseClient.auth.signOut();
-        const aviso = 'A conta ainda não tem um perfil de acesso válido. Contacta o responsável pelo FindIT School.';
-        if (msgTexto) msgTexto.textContent = aviso;
-        else if (msgErro) msgErro.textContent = aviso;
-        msgErro?.classList.remove('hidden');
-        return;
+        if (error) {
+            // Mensagens seguras e úteis; nunca mostrar nem registar a password.
+            const code = error.code || '';
+            const message = (error.message || '').toLowerCase();
+            if (code === 'invalid_credentials' || message.includes('invalid login credentials')) {
+                mostrarErro('Email ou password incorretos. Confirma os dados ou repõe a password da conta no Supabase Auth.');
+            } else if (message.includes('email not confirmed')) {
+                mostrarErro('O email desta conta ainda não está confirmado. Verifica o estado da conta no Supabase Auth.');
+            } else if (message.includes('network') || message.includes('fetch')) {
+                mostrarErro('Não foi possível contactar o Supabase. Verifica a ligação à Internet e tenta novamente.');
+            } else {
+                mostrarErro('Não foi possível iniciar sessão. Código: ' + (code || 'AUTH_ERROR') + '. Consulta os registos do Supabase para mais detalhes.');
+            }
+            console.error('[FindIT Auth] Falha de autenticação:', { code, status: error.status });
+            return;
+        }
+
+        const { data: perfil, error: perfilError } = await supabaseClient
+            .from('utilizadores')
+            .select('cargo')
+            .eq('id', data.user.id)
+            .maybeSingle();
+
+        if (perfilError || !perfil || !['admin', 'funcionario'].includes(perfil.cargo)) {
+            await supabaseClient.auth.signOut();
+            mostrarErro(perfilError
+                ? 'A autenticação funcionou, mas não foi possível consultar o perfil. Verifica as permissões RLS da tabela utilizadores.'
+                : 'A autenticação funcionou, mas esta conta não tem cargo admin ou funcionario atribuído.');
+            console.error('[FindIT Auth] Falha ao consultar perfil:', perfilError?.code || 'PROFILE_NOT_FOUND');
+            return;
+        }
+
+        window.location.href = perfil.cargo === 'admin' ? 'admin.html' : 'dashboard.html';
+    } catch (error) {
+        mostrarErro('Ocorreu um erro inesperado ao iniciar sessão. Atualiza a página e tenta novamente.');
+        console.error('[FindIT Auth] Erro inesperado:', error?.message || 'UNKNOWN');
+    } finally {
+        if (botao) {
+            botao.disabled = false;
+            botao.textContent = 'Entrar no Sistema';
+        }
     }
-
-    window.location.href = perfil.cargo === 'admin' ? 'admin.html' : 'dashboard.html';
 }
 
 async function fazerLogout() {
