@@ -581,3 +581,66 @@ window.onclick = function(event) {
 }
 
 window.onload = () => { verificarSessao(); };
+
+
+// ==========================================
+// 11. CONVITES TEMPORÁRIOS PARA FUNCIONÁRIOS (ADMIN)
+// ==========================================
+(() => {
+  const button = document.getElementById('btn-gerar-codigo-funcionario');
+  if (!button) return;
+  const panel = document.getElementById('painel-codigo-funcionario');
+  const codeEl = document.getElementById('codigo-funcionario-gerado');
+  const timerEl = document.getElementById('contador-codigo-funcionario');
+  const statusEl = document.getElementById('estado-codigo-funcionario');
+  const copyButton = document.getElementById('btn-copiar-codigo-funcionario');
+  let interval = null;
+  let currentCode = '';
+
+  button.addEventListener('click', async () => {
+    button.disabled = true;
+    button.textContent = 'A gerar…';
+    statusEl.textContent = '';
+    try {
+      const { data, error } = await supabaseClient.rpc('generate_staff_registration_code');
+      if (error) throw error;
+      if (typeof data !== 'string' || !data) throw new Error('O servidor não devolveu um código válido.');
+      currentCode = data;
+      codeEl.textContent = currentCode;
+      panel.classList.remove('hidden');
+      let remaining = 180;
+      const update = () => {
+        const minutes = String(Math.floor(remaining / 60)).padStart(2, '0');
+        const seconds = String(remaining % 60).padStart(2, '0');
+        timerEl.textContent = remaining > 0 ? 'Expira em ' + minutes + ':' + seconds : 'Código expirado. Gera um novo.';
+        if (remaining <= 0) {
+          clearInterval(interval);
+          currentCode = '';
+          codeEl.textContent = '—— —— ——';
+          copyButton.disabled = true;
+        }
+      };
+      copyButton.disabled = false;
+      if (interval) clearInterval(interval);
+      update();
+      interval = setInterval(() => { remaining--; update(); }, 1000);
+      statusEl.textContent = 'Código criado. Partilha-o apenas com o funcionário autorizado.';
+    } catch (error) {
+      console.error(error);
+      statusEl.textContent = error.message || 'Não foi possível gerar o código.';
+    } finally {
+      button.disabled = false;
+      button.textContent = 'Gerar novo código';
+    }
+  });
+
+  copyButton?.addEventListener('click', async () => {
+    if (!currentCode) return;
+    try {
+      await navigator.clipboard.writeText(currentCode);
+      statusEl.textContent = 'Código copiado.';
+    } catch {
+      statusEl.textContent = 'Não foi possível copiar automaticamente. Seleciona o código.';
+    }
+  });
+})();

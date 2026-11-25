@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registo de funcionário — FindIT School</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="min-h-screen bg-slate-50 flex items-center justify-center p-4">
+  <main class="w-full max-w-md bg-white border border-slate-200 rounded-2xl shadow-xl p-7">
+    <a href="index.html" class="text-sm font-semibold text-blue-800 hover:underline">← Voltar ao FindIT School</a>
+    <div class="mt-6 mb-6">
+      <p class="text-xs uppercase tracking-widest font-bold text-orange-600">Acesso autorizado</p>
+      <h1 class="text-2xl font-extrabold text-slate-900 mt-2">Criar conta de funcionário</h1>
+      <p class="text-sm text-slate-500 mt-2">Introduz o código temporário fornecido pelo administrador. O código só pode ser utilizado uma vez e expira em 3 minutos.</p>
+    </div>
+    <form id="form-registo-funcionario" class="space-y-4">
+      <div><label for="codigo" class="block text-sm font-semibold mb-1">Código de convite</label><input id="codigo" required maxlength="16" autocomplete="one-time-code" class="w-full rounded-lg border border-slate-300 px-3 py-3 font-mono tracking-widest uppercase" placeholder="CÓDIGO"></div>
+      <div><label for="email" class="block text-sm font-semibold mb-1">Email</label><input id="email" type="email" required autocomplete="email" class="w-full rounded-lg border border-slate-300 px-3 py-3" placeholder="nome@escola.pt"></div>
+      <div><label for="password" class="block text-sm font-semibold mb-1">Palavra-passe</label><input id="password" type="password" required minlength="8" autocomplete="new-password" class="w-full rounded-lg border border-slate-300 px-3 py-3" placeholder="Pelo menos 8 caracteres"></div>
+      <div><label for="confirm-password" class="block text-sm font-semibold mb-1">Confirmar palavra-passe</label><input id="confirm-password" type="password" required minlength="8" autocomplete="new-password" class="w-full rounded-lg border border-slate-300 px-3 py-3"></div>
+      <button id="btn-registar-funcionario" type="submit" class="w-full rounded-lg bg-[#0f3b7a] text-white font-bold py-3 hover:bg-blue-900">Criar conta</button>
+      <p id="mensagem-registo-funcionario" class="text-sm" role="status" aria-live="polite"></p>
+    </form>
+  </main>
+  <script src="registar-funcionario.js"></script>
+</body>
+</html>
