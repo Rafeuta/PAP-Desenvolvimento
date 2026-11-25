@@ -115,3 +115,51 @@ O Brevo foi escolhido como servidor SMTP para os emails transacionais do Supabas
 - Rever os avisos de segurança e executar testes de aceitação antes de integrar a branch na produção.
 
 As alterações foram organizadas numa branch de pré-visualização. A existência de commits ou de um deployment de preview não substitui os testes funcionais em browser nem confirma por si só a publicação em produção.
+
+
+## Estado atualizado — 25-11-2026
+
+### Modo de demonstração de autenticação
+
+Para uma demonstração escolar sem serviço SMTP autenticado, o projeto pode funcionar com a confirmação de email desativada no Supabase:
+
+1. Abrir **Authentication → Sign In / Providers → Email** no dashboard do projeto.
+2. Desativar apenas **Confirm email** e guardar.
+3. Manter o fornecedor **Email** ativo.
+
+Esta alteração é uma configuração manual do projeto Supabase e não é aplicada por este repositório. Enquanto estiver desligada, o registo não comprova que a pessoa controla o endereço de email. É uma configuração temporária de demonstração, não adequada para uma implementação real na escola. Antes de produção, voltar a ativar a confirmação e configurar SMTP com um domínio autenticado.
+
+O fluxo de convites de funcionários continua separado: o código é gerado pelo servidor, tem validade de 3 minutos e só pode ser utilizado uma vez. A confirmação de email do Supabase não substitui a validação do convite.
+
+### Estado verificado do Supabase
+
+Em 25-11-2026, o projeto FindIt School encontrava-se ativo. Estavam registadas quatro migrations relacionadas com convites de funcionários:
+
+- `staff_registration_invite_codes`
+- `staff_invite_trigger_and_expiry_cleanup`
+- `increase_staff_invite_entropy`
+- `index_staff_invite_foreign_keys`
+
+A auditoria de segurança mais recente assinalou:
+- Proteção contra palavras-passe comprometidas desativada.
+- A função `public.generate_staff_registration_code()` é `SECURITY DEFINER` e executável por utilizadores autenticados; a função valida internamente se o utilizador tem cargo `admin`, mas o aviso do advisor deve ser revisto.
+- A tabela privada `private.staff_registration_codes` tem RLS ativo e não tem políticas. O acesso direto está revogado; confirmar que esta opção corresponde ao desenho pretendido.
+
+A auditoria de desempenho assinalou quatro índices ainda sem utilização observada. Não os remover sem avaliar primeiro o volume e os padrões reais de consulta.
+
+**Importante:** o script `supabase/security/rls-hardening-review.sql` continua a ser uma proposta de revisão/aplicação manual e não deve ser considerado aplicado. Antes de o aplicar, rever as políticas de leitura do catálogo e testar as permissões com contas de aluno, funcionário e administrador. Não assumir que a auditoria de segurança está concluída.
+
+### Estado de publicação e testes
+
+A branch `feat/auth-demo-sem-confirmacao` tem uma pré-visualização Vercel com estado `READY`. Isto confirma que a compilação/publicação da pré-visualização terminou, mas não substitui testes funcionais no browser. A branch ainda não deve ser tratada como produção nem como integrada na branch principal.
+
+Testes funcionais ainda necessários:
+- Registo e início de sessão com confirmação de email desligada.
+- Recuperação de palavra-passe e entrega real de emails.
+- Geração de convite apenas por administrador.
+- Utilização de convite válido, expirado e já utilizado.
+- Acesso negado ao dashboard para contas sem perfil autorizado.
+- Upload e leitura de fotografias com as permissões previstas.
+- Verificação das políticas RLS e do bucket Storage.
+
+O Brevo não deve ser descrito como SMTP validado: a conta ainda necessita de domínio autenticado e de um teste real de entrega. O EmailJS mantém-se destinado às notificações da aplicação.
