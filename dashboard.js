@@ -20,12 +20,10 @@ if (typeof emailjs !== 'undefined') {
 }
 
 // ==========================================
-// 3. MODO DE TESTE (TEMP MAIL)
+// 3. ENVIO PARA OS DESTINATÁRIOS SELECIONADOS
 // ==========================================
-// true = Envia tudo para o EMAIL_TESTE (seguro para testes)
-// false = Envia para os emails reais da lista de contactos
-const MODO_TESTE = true; 
-const EMAIL_TESTE = 'vigixoh963@dvdee.com'; // O teu Temp Mail atual
+// As notificações são enviadas para o email real de cada contacto selecionado.
+// Não existe encaminhamento para caixas temporárias de teste.
 
 let currentUser = null;
 let listaContactos = [];
@@ -384,16 +382,14 @@ function gerarListaCheckboxes() {
     container.innerHTML = '';
 
     listaContactos.forEach((c, index) => {
-        // Se MODO_TESTE estiver ativo, mostramos um aviso visual mas mantemos o email real na label
-        const isTestMode = MODO_TESTE;
-        const badgeTeste = isTestMode ? '<span class="ml-2 text-xs bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded-full border border-yellow-200">TESTE → Temp Mail</span>' : '';
+        // Mostrar apenas o contacto e o endereço real guardado na lista.
 
         const div = document.createElement('div');
         div.className = "flex items-center p-3 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors";
         div.innerHTML = `
             <input type="checkbox" id="chk-${index}" value="${escapeHTML(c.email)}" class="email-checkbox w-5 h-5 text-brand-blue rounded focus:ring-brand-blue cursor-pointer" checked>
             <label for="chk-${index}" class="ml-3 flex-grow cursor-pointer flex flex-col">
-                <span class="font-bold text-gray-900 text-sm">${escapeHTML(c.nome)} ${badgeTeste}</span>
+                <span class="font-bold text-gray-900 text-sm">${escapeHTML(c.nome)}</span>
                 <span class="text-xs text-gray-500">${escapeHTML(c.email)} • ${escapeHTML(c.turma || 'Sem Turma')}</span>
             </label>
         `;
@@ -434,7 +430,7 @@ async function confirmarEnvioEmails() {
     const textoOriginal = btnEnviar ? btnEnviar.textContent : '';
     const obj = objetoParaEnviar;
 
-    if (!MODO_TESTE && !confirm('Confirmas o envio de ' + emailsSelecionados.length + ' notificações para os endereços selecionados?')) return;
+    if (!confirm('Confirmas o envio de ' + emailsSelecionados.length + ' notificações para os endereços reais selecionados?')) return;
 
     envioEmailsEmCurso = true;
     if (btnEnviar) {
@@ -450,8 +446,8 @@ async function confirmarEnvioEmails() {
         for (const dest of emailsSelecionados) {
             try {
                 const templateParams = {
-                    to_email: MODO_TESTE ? EMAIL_TESTE : dest.email,
-                    name: MODO_TESTE ? '[TESTE] ' + dest.nome : dest.nome,
+                    to_email: dest.email,
+                    name: dest.nome,
                     assunto: 'Objeto Encontrado: ' + obj.titulo,
                     mensagem: 'Informamos que foi encontrado um objeto nas instalações da escola.',
                     titulo_objeto: obj.titulo,
@@ -470,8 +466,7 @@ async function confirmarEnvioEmails() {
         }
 
         if (falhas === 0) {
-            const destino = MODO_TESTE ? 'para o endereço de teste (' + EMAIL_TESTE + ')' : 'para os destinatários selecionados';
-            mostrarNotificacao('Envio concluído', sucessos + ' email(s) enviado(s) ' + destino + '.');
+            mostrarNotificacao('Envio submetido', sucessos + ' email(s) aceites pelo serviço de envio para os endereços selecionados.');
         } else {
             mostrarNotificacao('Envio parcial', sucessos + ' enviado(s); ' + falhas + ' falharam. Consulta a consola para detalhes.', 'erro');
         }
