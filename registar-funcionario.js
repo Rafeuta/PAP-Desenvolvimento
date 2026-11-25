@@ -23,7 +23,7 @@ document.getElementById('form-registo-funcionario').addEventListener('submit', a
   const confirmPassword = document.getElementById('confirm-password').value;
   message.textContent = '';
   if (password !== confirmPassword) { message.textContent = 'As palavras-passe não coincidem.'; return; }
-  if (!/^[A-F0-9]{16}$/.test(code)) { message.textContent = 'Introduz um código válido de 12 caracteres.'; return; }
+  if (!/^[A-F0-9]{16}$/.test(code)) { message.textContent = 'Introduz um código válido de 16 caracteres.'; return; }
 
   button.disabled = true;
   button.textContent = 'A criar conta…';
