@@ -17,6 +17,7 @@
         }
     </script>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="dashboard-enhancements.css">
     <style>
         html, body { height: 100%; margin: 0; }
         body { display: flex; min-height: 100vh; overflow-x: hidden; background: #f3f5f8; }
@@ -69,7 +70,7 @@
             </div>
         </header>
 
-        <main class="p-4 md:p-8 max-w-6xl space-y-6">
+        <main class="p-4 md:p-8 w-full max-w-none space-y-6">
             <p class="text-sm text-gray-500 -mt-2">Registo de achados e avisos aos alunos.</p>
 
             <section id="registo" class="bg-white border border-gray-200 rounded-xl">
@@ -241,6 +242,7 @@
     </div>
 
     <script src="dashboard.js"></script>
+    <script src="dashboard-enhancements.js"></script>
     <script>
         function toggleSidebar() {
             document.getElementById('sidebar-overlay').classList.toggle('active');
