@@ -120,5 +120,12 @@
   search?.addEventListener('input', render);
   filter?.addEventListener('change', render);
   document.getElementById('btn-atualizar-reclamacoes')?.addEventListener('click', carregar);
-  carregar();
+  supabaseClient.auth.getSession().then(({ data, error }) => {
+    if (error || !data?.session) {
+      msg.textContent = 'Inicia sessão com uma conta de funcionário para consultar as reclamações.';
+      table.innerHTML = '<tr><td colspan="6" class="px-4 py-8 text-center text-gray-400">Sessão necessária.</td></tr>';
+      return;
+    }
+    carregar();
+  });
 })();
