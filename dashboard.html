@@ -46,6 +46,7 @@
         <nav class="flex-1 p-3 space-y-1">
             <a href="#registo" class="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-white/10 text-white text-sm font-semibold">Registar</a>
             <a href="#objetos" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:bg-white/5 hover:text-white text-sm font-medium">Objetos</a>
+            <a href="#reclamacoes" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:bg-white/5 hover:text-white text-sm font-medium">Reclamações</a>
             <a href="#contactos" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:bg-white/5 hover:text-white text-sm font-medium">Contactos</a>
             <a href="index.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:bg-white/5 hover:text-white text-sm font-medium">Site público</a>
         </nav>
@@ -135,6 +136,39 @@
                             </tr>
                         </thead>
                         <tbody id="tabela-corpo" class="divide-y divide-gray-100"></tbody>
+                    </table>
+                </div>
+            </section>
+
+
+            <section id="reclamacoes" class="bg-white border border-gray-200 rounded-xl overflow-hidden">
+                <div class="px-5 py-4 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div>
+                        <h2 class="text-base font-bold text-[#0b1b3d]">Reclamações de objetos</h2>
+                        <p class="text-sm text-gray-500 mt-0.5">Analisa os dados apresentados e regista a decisão da escola. A decisão não substitui a confirmação presencial da propriedade.</p>
+                    </div>
+                    <button type="button" id="btn-atualizar-reclamacoes" class="text-sm font-semibold text-[#0f3b7a] border border-gray-200 px-4 py-2 rounded-lg hover:bg-gray-50">Atualizar lista</button>
+                </div>
+                <div class="p-4 flex flex-col sm:flex-row gap-3">
+                    <input id="pesquisa-reclamacoes" type="search" placeholder="Pesquisar aluno, email ou objeto..." class="w-full sm:max-w-md px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm">
+                    <select id="filtro-reclamacoes" class="px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm">
+                        <option value="Todas">Todos os estados</option>
+                        <option value="Pendente">Pendentes</option>
+                        <option value="Aprovado">Aprovados</option>
+                        <option value="Rejeitado">Rejeitados</option>
+                    </select>
+                </div>
+                <div id="reclamacoes-mensagem" class="px-5 pb-3 text-sm text-gray-500" role="status">A carregar reclamações...</div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm">
+                        <thead class="bg-gray-50 text-xs font-semibold text-gray-500 uppercase">
+                            <tr>
+                                <th class="px-4 py-3">Data</th><th class="px-4 py-3">Aluno</th><th class="px-4 py-3">Objeto</th><th class="px-4 py-3">Justificação</th><th class="px-4 py-3">Estado</th><th class="px-4 py-3 text-right">Decisão</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabela-reclamacoes" class="divide-y divide-gray-100">
+                            <tr><td colspan="6" class="px-4 py-8 text-center text-gray-400">A carregar...</td></tr>
+                        </tbody>
                     </table>
                 </div>
             </section>
@@ -242,6 +276,7 @@
     </div>
 
     <script src="dashboard.js"></script>
+    <script src="reclamacoes-dashboard.js"></script>
     <script src="dashboard-enhancements.js"></script>
     <script>
         function toggleSidebar() {
