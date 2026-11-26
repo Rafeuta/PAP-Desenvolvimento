@@ -14,13 +14,13 @@ const EMAILJS_SERVICE_ID='service_vr8m9ms', EMAILJS_PUBLIC_KEY='2DOZgWNakRCfg9ZN
 emailjs.init({publicKey:EMAILJS_PUBLIC_KEY});
 document.getElementById('staff-register').addEventListener('submit',async e=>{
  e.preventDefault();const btn=document.getElementById('submit'),msg=document.getElementById('msg');btn.disabled=true;btn.textContent='A enviar…';
- const nome=document.getElementById('nome').value.trim(),email=document.getElementById('email').value.trim().toLowerCase(),turma='',codigo=document.getElementById('codigo').value.trim().toUpperCase(),password=document.getElementById('password').value;
+ const nome=document.getElementById('nome').value.trim(),email=document.getElementById('email').value.trim().toLowerCase(),codigo=document.getElementById('codigo').value.trim().toUpperCase(),password=document.getElementById('password').value;
  try{
   const hash=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(codigo));
   const hashHex=[...new Uint8Array(hash)].map(b=>b.toString(16).padStart(2,'0')).join('');
-  const {data,error}=await sb.auth.signUp({email,password,options:{data:{nome,turma,staff_invite_hash:hashHex}}});
+  const {data,error}=await sb.auth.signUp({email,password,options:{data:{nome,staff_invite_hash:hashHex}}});
   if(error)throw error;
-  try{await emailjs.send(EMAILJS_SERVICE_ID,TEMPLATE_ID,{nome,email,turma,data_pedido:new Date().toLocaleString('pt-PT'),link_painel:location.origin+'/admin.html'});}catch(mailError){console.error('EmailJS notification error',mailError);}
+  try{await emailjs.send(EMAILJS_SERVICE_ID,TEMPLATE_ID,{nome,email,data_pedido:new Date().toLocaleString('pt-PT'),link_painel:location.origin+'/admin.html'});}catch(mailError){console.error('EmailJS notification error',mailError);}
   msg.textContent=data.session?'Pedido enviado. Aguarda a aprovação do administrador.':'Pedido submetido. Se receberes um email de confirmação, confirma o endereço e aguarda a aprovação.';
   msg.className='text-sm text-green-700';
   e.target.reset();
