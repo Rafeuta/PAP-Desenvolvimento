@@ -93,6 +93,7 @@ async function executarImportacaoExcel(){
  if(mode==='replace'){
   const del=await supabaseClient.from('contactos_email').delete().not('id','is',null);
   if(del.error){adminFeatureToast('Erro',del.error.message,'error');return;}
+  map.clear();
   payload=rows.map(r=>({nome:r.nome,email:r.email,turma:r.turma}));
  }
  let added=0,updated=0,failed=0;
