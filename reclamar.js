@@ -19,7 +19,7 @@ const EMAILJS_SERVICE_ID  = 'service_vr8m9ms';   // ex: service_abc123
 const EMAILJS_TEMPLATE_ID = 'template_sfue4jf';  // ex: template_xyz789
 
 // Email da secretaria (para onde vão todas as reclamações)
-const EMAIL_SECRETARIA = 'rafaelnadal866@gmail.com';
+const EMAIL_SECRETARIA = 'rafaelrodrigues.164049@etpc.pt';
 
 // Inicializar o EmailJS (apenas se o script estiver carregado no HTML)
 if (typeof emailjs !== 'undefined') {
@@ -157,6 +157,10 @@ if (formReclamacao) {
             // -----------------------------------------
             // PASSO 1: Enviar o email para a secretaria (EmailJS)
             // -----------------------------------------
+            if (typeof emailjs === 'undefined') {
+                throw new Error('A biblioteca EmailJS não foi carregada. Verifica a ligação à Internet e tenta novamente.');
+            }
+
             await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
                 to_email: EMAIL_SECRETARIA,
                 nome_destinatario: 'Secretaria ETPC',
