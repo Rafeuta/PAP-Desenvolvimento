@@ -3,7 +3,6 @@
 <body class="min-h-screen bg-slate-100 flex items-center justify-center p-4"><main class="bg-white rounded-2xl shadow p-7 w-full max-w-lg"><a href="index.html" class="text-blue-800 text-sm">← Voltar</a><h1 class="text-2xl font-bold text-slate-900 mt-4">Pedido de acesso</h1><p class="text-sm text-slate-600 mt-2">Preenche os dados e introduz o código fornecido pelo administrador. O pedido fica sujeito a aprovação.</p><form id="staff-register" class="space-y-4 mt-6">
 <label class="block text-sm font-semibold">Nome<input id="nome" required class="w-full border rounded-lg p-3 mt-1"></label>
 <label class="block text-sm font-semibold">Email<input id="email" type="email" required class="w-full border rounded-lg p-3 mt-1"></label>
-<label class="block text-sm font-semibold">Turma<input id="turma" required class="w-full border rounded-lg p-3 mt-1"></label>
 <label class="block text-sm font-semibold">Código de registo<input id="codigo" required autocomplete="off" class="w-full border rounded-lg p-3 mt-1 uppercase"></label>
 <label class="block text-sm font-semibold">Password<input id="password" type="password" minlength="8" required class="w-full border rounded-lg p-3 mt-1"></label>
 <button id="submit" class="w-full bg-blue-800 text-white rounded-lg p-3 font-bold">Enviar pedido</button><p id="msg" class="text-sm" role="status"></p></form></main>
@@ -15,7 +14,7 @@ const EMAILJS_SERVICE_ID='service_vr8m9ms', EMAILJS_PUBLIC_KEY='2DOZgWNakRCfg9ZN
 emailjs.init({publicKey:EMAILJS_PUBLIC_KEY});
 document.getElementById('staff-register').addEventListener('submit',async e=>{
  e.preventDefault();const btn=document.getElementById('submit'),msg=document.getElementById('msg');btn.disabled=true;btn.textContent='A enviar…';
- const nome=document.getElementById('nome').value.trim(),email=document.getElementById('email').value.trim().toLowerCase(),turma=document.getElementById('turma').value.trim(),codigo=document.getElementById('codigo').value.trim().toUpperCase(),password=document.getElementById('password').value;
+ const nome=document.getElementById('nome').value.trim(),email=document.getElementById('email').value.trim().toLowerCase(),turma='',codigo=document.getElementById('codigo').value.trim().toUpperCase(),password=document.getElementById('password').value;
  try{
   const hash=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(codigo));
   const hashHex=[...new Uint8Array(hash)].map(b=>b.toString(16).padStart(2,'0')).join('');
