@@ -91,8 +91,12 @@ async function executarImportacaoExcel(){
   payload=rows.filter(r=>map.has(r.email)).map(r=>{const p={email:r.email};selected.forEach(k=>p[k]=r[k]);return p;});
  } else if(mode==='add'||mode==='update') payload=payload.map(r=>({nome:r.nome,email:r.email,turma:r.turma}));
  if(mode==='replace'){
-  const del=await supabaseClient.from('contactos_email').delete().not('id','is',null);
-  if(del.error){adminFeatureToast('Erro',del.error.message,'error');return;}
+  // Apaga apenas os IDs que foram lidos previamente; o filtro explícito evita DELETE sem WHERE.
+  if(current.length){
+   const ids=current.map(c=>c.id);
+   const del=await supabaseClient.from('contactos_email').delete().in('id',ids);
+   if(del.error){adminFeatureToast('Erro',del.error.message,'error');return;}
+  }
   map.clear();
   payload=rows.map(r=>({nome:r.nome,email:r.email,turma:r.turma}));
  }
