@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="pt-PT"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Pedir acesso — FindIT School</title><script src="https://cdn.tailwindcss.com"></script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script></head>
+<body class="min-h-screen bg-slate-100 flex items-center justify-center p-4"><main class="bg-white rounded-2xl shadow p-7 w-full max-w-lg"><a href="index.html" class="text-blue-800 text-sm">← Voltar</a><h1 class="text-2xl font-bold text-slate-900 mt-4">Pedido de acesso</h1><p class="text-sm text-slate-600 mt-2">Preenche os dados e introduz o código fornecido pelo administrador. O pedido fica sujeito a aprovação.</p><form id="staff-register" class="space-y-4 mt-6">
+<label class="block text-sm font-semibold">Nome<input id="nome" required class="w-full border rounded-lg p-3 mt-1"></label>
+<label class="block text-sm font-semibold">Email<input id="email" type="email" required class="w-full border rounded-lg p-3 mt-1"></label>
+<label class="block text-sm font-semibold">Turma<input id="turma" required class="w-full border rounded-lg p-3 mt-1"></label>
+<label class="block text-sm font-semibold">Código de registo<input id="codigo" required autocomplete="off" class="w-full border rounded-lg p-3 mt-1 uppercase"></label>
+<label class="block text-sm font-semibold">Password<input id="password" type="password" minlength="8" required class="w-full border rounded-lg p-3 mt-1"></label>
+<button id="submit" class="w-full bg-blue-800 text-white rounded-lg p-3 font-bold">Enviar pedido</button><p id="msg" class="text-sm" role="status"></p></form></main>
+<script>
+const SUPABASE_URL='https://kswqakffuudugnfudizg.supabase.co';
+const SUPABASE_ANON_KEY='sb_publishable_XM9rWUkcESRXVrKFFlgNDA_VZ8XgXJl';
+const sb=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+const EMAILJS_SERVICE_ID='service_vr8m9ms', EMAILJS_PUBLIC_KEY='2DOZgWNakRCfg9ZNd', TEMPLATE_ID='template_1v48z3l';
+emailjs.init({publicKey:EMAILJS_PUBLIC_KEY});
+document.getElementById('staff-register').addEventListener('submit',async e=>{
+ e.preventDefault();const btn=document.getElementById('submit'),msg=document.getElementById('msg');btn.disabled=true;btn.textContent='A enviar…';
+ const nome=document.getElementById('nome').value.trim(),email=document.getElementById('email').value.trim().toLowerCase(),turma=document.getElementById('turma').value.trim(),codigo=document.getElementById('codigo').value.trim().toUpperCase(),password=document.getElementById('password').value;
+ try{
+  const hash=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(codigo));
+  const hashHex=[...new Uint8Array(hash)].map(b=>b.toString(16).padStart(2,'0')).join('');
+  const {data,error}=await sb.auth.signUp({email,password,options:{data:{nome,turma,staff_invite_hash:hashHex}}});
+  if(error)throw error;
+  try{await emailjs.send(EMAILJS_SERVICE_ID,TEMPLATE_ID,{nome,email,turma,data_pedido:new Date().toLocaleString('pt-PT'),link_painel:location.origin+'/admin.html'});}catch(mailError){console.error('EmailJS notification error',mailError);}
+  msg.textContent=data.session?'Pedido enviado. Aguarda a aprovação do administrador.':'Pedido submetido. Se receberes um email de confirmação, confirma o endereço e aguarda a aprovação.';
+  msg.className='text-sm text-green-700';
+  e.target.reset();
+ }catch(err){msg.textContent=err.message||'Não foi possível submeter o pedido.';msg.className='text-sm text-red-600';}
+ finally{btn.disabled=false;btn.textContent='Enviar pedido';}
+});
+</script></body></html>
